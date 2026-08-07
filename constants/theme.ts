@@ -5,6 +5,11 @@
 
 import { Platform } from 'react-native';
 
+import { colors } from './colors';
+import { radius } from './radius';
+import { spacing } from './spacing';
+import { typography } from './typography';
+
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
 
@@ -51,3 +56,12 @@ export const Fonts = Platform.select({
     mono: "SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
   },
 });
+
+export const theme = {
+  colors,
+  spacing,
+  radius,
+  typography,
+} as const;
+
+export type AppTheme = typeof theme;
