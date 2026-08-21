@@ -1,4 +1,4 @@
-import { type ReactNode, useState } from 'react';
+import React, { type ReactNode, useState } from 'react';
 import { TextInput, type TextInputProps, View, type ViewStyle } from 'react-native';
 
 import { colors } from '@/constants/colors';
@@ -30,6 +30,14 @@ export function AppInput({
   ...props
 }: AppInputProps) {
   const [isFocused, setIsFocused] = useState(false);
+
+  const iconColor = isFocused ? colors.light.primary : colors.light.outline;
+
+  const renderedLeftIcon = React.isValidElement(leftIcon)
+    ? React.cloneElement(leftIcon as React.ReactElement<{ color?: string }>, {
+        color: (leftIcon.props as { color?: string }).color === colors.light.primary ? colors.light.primary : iconColor,
+      })
+    : leftIcon;
 
   return (
     <View className="w-full" style={[{ gap: spacing[2] }, containerStyle]}>
@@ -64,11 +72,11 @@ export function AppInput({
           borderWidth: 1,
           flexDirection: 'row',
           gap: spacing[3],
-          minHeight: 52,
+          minHeight: 56,
           overflow: 'hidden',
           paddingHorizontal: spacing[3],
         }}>
-        {leftIcon}
+        {renderedLeftIcon}
         <TextInput
           accessibilityLabel={accessibilityLabel ?? label}
           onBlur={(e) => {

@@ -51,6 +51,18 @@ export default function TabLayout() {
           tabBarIcon: ({ color, size }) => <Settings color={color} size={size} />,
         }}
       />
+      <Tabs.Screen
+        name="html-course"
+        options={{
+          href: null,
+        }}
+      />
+      <Tabs.Screen
+        name="css-course"
+        options={{
+          href: null,
+        }}
+      />
     </Tabs>
   );
 }
