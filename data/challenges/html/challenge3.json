@@ -1,0 +1,50 @@
+{
+  "id": "html-003",
+  "title": "Membuat form sederhana",
+  "difficulty": "Hard",
+  "category": "HTML",
+  "xp": 50,
+
+  "description": "Tampilkan teks di HTML",
+
+  "starterCode": {
+    "html": "",
+    "css": "",
+    "js": ""
+  },
+
+  "tests": [
+    {
+      "id": 1,
+      "type": "selector",
+      "selector": "form",
+      "message": "Harus terdapat elemen <form>"
+    },
+    {
+      "id": 2,
+      "type": "selector",
+      "selector": "",
+      "expected": "",
+      "message": ""
+    },
+    {
+      "id": 3,
+      "type": "",
+      "selector": "",
+      "property": "",
+      "expected": "",
+      "message": ""
+    }
+  ],
+
+  "solution": {
+    "html": "<h1>Hello World</h1>",
+    "css": "",
+    "js": ""
+  },
+
+  "hint": [
+    "Gunakan elemen h1",
+    ""
+  ]
+}

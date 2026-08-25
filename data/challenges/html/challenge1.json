@@ -1,0 +1,50 @@
+{
+  "id": "html-001",
+  "title": "Menampilkan teks di HTML",
+  "difficulty": "Easy",
+  "category": "HTML",
+  "xp": 20,
+
+  "description": "Tampilkan teks di HTML",
+
+  "starterCode": {
+    "html": "",
+    "css": "",
+    "js": ""
+  },
+
+  "tests": [
+    {
+      "id": 1,
+      "type": "selector",
+      "selector": "H1",
+      "message": "Harus terdapat elemen <h1>"
+    },
+    {
+      "id": 2,
+      "type": "",
+      "selector": "",
+      "expected": "",
+      "message": ""
+    },
+    {
+      "id": 3,
+      "type": "",
+      "selector": "",
+      "property": "",
+      "expected": "",
+      "message": ""
+    }
+  ],
+
+  "solution": {
+    "html": "<h1>Hello World</h1>",
+    "css": "",
+    "js": ""
+  },
+
+  "hint": [
+    "Gunakan elemen h1",
+    ""
+  ]
+}

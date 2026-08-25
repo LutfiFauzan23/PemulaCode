@@ -1,0 +1,50 @@
+{
+  "id": "html-002",
+  "title": "Membuat tabel di HMTL",
+  "difficulty": "Medium",
+  "category": "HTML",
+  "xp": 25,
+
+  "description": "Tampilkan sebuah tabel di HTML",
+
+  "starterCode": {
+    "html": "",
+    "css": "",
+    "js": ""
+  },
+
+  "tests": [
+    {
+      "id": 1,
+      "type": "selector",
+      "selector": "table",
+      "message": "Harus terdapat elemen <table>"
+    },
+    {
+      "id": 2,
+      "type": "selector",
+      "selector": "tr",
+      "expected": "",
+      "message": "Harus terdapat elemen <tr>"
+    },
+    {
+      "id": 3,
+      "type": "selector",
+      "selector": "td",
+      "property": "",
+      "expected": "",
+      "message": "Harus terdapat elemen <td>"
+    }
+  ],
+
+  "solution": {
+    "html": "<table><tr>Nama</tr><tr>Nama</tr></table>",
+    "css": "",
+    "js": ""
+  },
+
+  "hint": [
+    "Gunakan elemen <h1>",
+    ""
+  ]
+}
