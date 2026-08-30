@@ -15,6 +15,7 @@ import {
   ThumbsUp,
   X,
 } from 'lucide-react-native';
+
 import React, { useState } from 'react';
 import {
   Image,
@@ -33,6 +34,8 @@ import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface PostData {
   accentColor: string;

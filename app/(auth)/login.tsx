@@ -1,22 +1,16 @@
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Mail } from 'lucide-react-native';
-import { useState, useEffect } from 'react'; // Tambahkan useEffect
+import { useState } from 'react';
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
   useWindowDimensions,
   View,
-  Alert, // Tambahkan Alert untuk notifikasi error
 } from 'react-native';
-
-// --- IMPORTS FIREBASE & GOOGLE SIGN IN ---
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import { auth } from '@/config/firebase'; // Sesuaikan path dengan lokasi config firebase kamu
-import { syncUserData } from '@/services/userService'; // Sesuaikan path dengan lokasi file syncUserData
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { AppInput } from '@/components/ui/AppInput';
@@ -41,15 +35,7 @@ export default function LoginScreen() {
   // State untuk indikator loading
   const [isLoading, setIsLoading] = useState(false);
 
-  // Konfigurasi Google Sign-In saat komponen pertama kali dimuat
-  useEffect(() => {
-    GoogleSignin.configure({
-      // Ganti dengan Web Client ID dari Firebase Console kamu (bukan Android/iOS Client ID)
-      webClientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com', 
-    });
-  }, []);
-
-  // --- HANDLER LOGIN MANUAL ---
+  // --- HANDLER DUMMY LOGIN MANUAL ---
   const handleLogin = async () => {
     if (!email || !password) {
       Alert.alert('Perhatian', 'Email dan password tidak boleh kosong.');
@@ -57,66 +43,32 @@ export default function LoginScreen() {
     }
 
     setIsLoading(true);
-    try {
-      // 1. Autentikasi dengan Firebase
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      
-      // 2. Sinkronisasi data ke Firestore
-      await syncUserData(userCredential.user);
-      
-      // 3. Navigasi ke halaman utama
-      router.replace('/(tabs)');
-    } catch (error: any) {
-      // Tangani pesan error Firebase agar lebih ramah dibaca
-      let errorMessage = 'Terjadi kesalahan saat login.';
-      if (error.code === 'auth/invalid-credential') {
-        errorMessage = 'Email atau password salah.';
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'Format email tidak valid.';
-      }
-      Alert.alert('Login Gagal', errorMessage);
-    } finally {
+    
+    // Simulasi waktu proses loading (1.5 detik)
+    setTimeout(() => {
       setIsLoading(false);
-    }
+      
+      // Pengecekan dummy akun
+      if (email === 'test@example.com' && password === '123456') {
+        router.replace('/(tabs)');
+      } else {
+        Alert.alert(
+          'Login Gagal', 
+          'Gunakan akun dummy berikut untuk masuk:\n\nEmail: test@example.com\nPassword: 123456'
+        );
+      }
+    }, 1500);
   };
 
-// --- HANDLER LOGIN GOOGLE ---
-  const handleGoogleLogin = async () => {
+  // --- HANDLER DUMMY LOGIN GOOGLE ---
+  const handleGoogleLogin = () => {
     setIsLoading(true);
-    try {
-      // 1. Cek play services
-      await GoogleSignin.hasPlayServices();
-      
-      // 2. Dapatkan response dari Google
-      const response = await GoogleSignin.signIn();
-
-      // 3. Ambil idToken menyesuaikan versi library (v11+ menggunakan response.data)
-      // @ts-ignore (Abaikan sementara jika TypeScript masih error di response.idToken)
-      const idToken = response.data?.idToken || response.idToken;
-
-      if (!idToken) {
-        throw new Error('Gagal mendapatkan token dari Google.');
-      }
-
-      // 4. Buat kredensial Firebase menggunakan token Google
-      const googleCredential = GoogleAuthProvider.credential(idToken);
-
-      // 5. Autentikasi dengan Firebase menggunakan kredensial Google
-      const userCredential = await signInWithCredential(auth, googleCredential);
-
-      // 6. Sinkronisasi data user Google ke Firestore
-      await syncUserData(userCredential.user);
-
-      // 7. Navigasi ke halaman utama
-      router.replace('/(tabs)');
-    } catch (error: any) {
-      if (error.code !== 'SIGN_IN_CANCELLED') {
-        Alert.alert('Google Login Gagal', error.message || 'Terjadi kesalahan');
-        console.error(error);
-      }
-    } finally {
+    
+    // Simulasi loading 1.5 detik lalu langsung masuk
+    setTimeout(() => {
       setIsLoading(false);
-    }
+      router.replace('/(tabs)');
+    }, 1500);
   };
 
   const handleForgotPassword = () => {
@@ -220,9 +172,9 @@ export default function LoginScreen() {
                   label="Email Address"
                   leftIcon={<Mail color={colors.light.outline} size={20} />}
                   onChangeText={setEmail}
-                  placeholder="name@example.com"
+                  placeholder="test@example.com"
                   value={email}
-                  editable={!isLoading} // Disable saat loading
+                  editable={!isLoading}
                 />
 
                 {/* Password Input & Forgot Password Link */}
@@ -234,7 +186,7 @@ export default function LoginScreen() {
                     onChangeText={setPassword}
                     placeholder="••••••••"
                     value={password}
-                    editable={!isLoading} // Disable saat loading
+                    editable={!isLoading}
                   />
                   <View style={{ alignItems: 'flex-end', marginTop: spacing[2] }}>
                     <Pressable
@@ -294,7 +246,7 @@ export default function LoginScreen() {
                   accessibilityLabel="Login"
                   accessibilityRole="button"
                   onPress={handleLogin}
-                  disabled={isLoading} // Disable saat loading
+                  disabled={isLoading}
                   style={({ pressed }) => ({
                     backgroundColor: isLoading 
                       ? colors.light.outline 
@@ -319,7 +271,7 @@ export default function LoginScreen() {
                   accessibilityRole="button"
                   icon={<GoogleIcon size={20} />}
                   onPress={handleGoogleLogin}
-                  disabled={isLoading} // Disable saat loading
+                  disabled={isLoading}
                   title="Continue with Google"
                 />
 

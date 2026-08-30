@@ -491,7 +491,7 @@ function ProgressDots() {
 export default function Onboarding2Screen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-
+ 
   const handleNext = () => {
     // Navigate to Onboarding 3 (the final onboarding screen)
     router.push('/onboarding3');
