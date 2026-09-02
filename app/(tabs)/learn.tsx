@@ -26,6 +26,7 @@ import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { TAB_BAR_CLEARANCE } from './_layout';
 
 export default function LearnScreen() {
   const router = useRouter();
@@ -44,7 +45,7 @@ export default function LearnScreen() {
       <ScrollView
         bounces={false}
         contentContainerStyle={{
-          paddingBottom: spacing[8],
+          paddingBottom: TAB_BAR_CLEARANCE,
         }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}>

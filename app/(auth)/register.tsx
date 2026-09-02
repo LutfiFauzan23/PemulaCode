@@ -1,47 +1,166 @@
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import {
-  ArrowLeft,
-  ArrowRight,
-  Code2,
-  Contact,
-  Lock,
-  Mail,
-  RotateCcw,
-  ShieldCheck,
-  Smile,
-  UserPlus,
-  Users,
-} from 'lucide-react-native';
-import { useState } from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  useWindowDimensions,
-  View,
-} from 'react-native';
+import { Contact, Lock, Mail, RotateCcw, Smile } from 'lucide-react-native';
+import { useRef, useState } from 'react';
+import { Animated, KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native';
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { AppInput } from '@/components/ui/AppInput';
 import { AppText } from '@/components/ui/AppText';
 import { PasswordInput } from '@/components/ui/PasswordInput';
-import { PrimaryButton } from '@/components/ui/PrimaryButton';
 import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
 
+// ======================================================
+// DUO-STYLE 3D PRESS BUTTON
+// ======================================================
+
+function DuoButton({
+  title,
+  onPress,
+  backgroundColor,
+  shadowColor,
+  textColor = '#ffffff',
+  disabled,
+}: {
+  backgroundColor: string;
+  disabled?: boolean;
+  onPress: () => void;
+  shadowColor: string;
+  textColor?: string;
+  title: string;
+}) {
+  const translateY = useRef(new Animated.Value(0)).current;
+
+  const pressIn = () => {
+    Animated.timing(translateY, { duration: 80, toValue: 4, useNativeDriver: true }).start();
+  };
+  const pressOut = () => {
+    Animated.timing(translateY, { duration: 80, toValue: 0, useNativeDriver: true }).start();
+  };
+
+  return (
+    <View style={{ backgroundColor: shadowColor, borderRadius: radius.lg }}>
+      <Pressable
+        accessibilityLabel={title}
+        accessibilityRole="button"
+        disabled={disabled}
+        onPress={onPress}
+        onPressIn={pressIn}
+        onPressOut={pressOut}>
+        <Animated.View
+          style={{
+            alignItems: 'center',
+            backgroundColor: disabled ? colors.light.outline : backgroundColor,
+            borderRadius: radius.lg,
+            justifyContent: 'center',
+            marginBottom: 4,
+            paddingVertical: spacing[4],
+            transform: [{ translateY }],
+          }}>
+          <AppText
+            color={textColor}
+            style={{
+              fontFamily: typography.family.sansBold,
+              fontSize: 15,
+              letterSpacing: 0.6,
+            }}>
+            {title.toUpperCase()}
+          </AppText>
+        </Animated.View>
+      </Pressable>
+    </View>
+  );
+}
+
+// ======================================================
+// SIMPLE BOT MASCOT (with graduation touch for sign-up)
+// ======================================================
+
+function BotMascot() {
+  return (
+    <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: spacing[2] }}>
+      <View
+        style={{
+          alignItems: 'center',
+          backgroundColor: '#ffffff',
+          borderRadius: 5,
+          height: 10,
+          marginBottom: -2,
+          width: 4,
+        }}
+      />
+      <View
+        style={{
+          backgroundColor: '#FFD166',
+          borderRadius: 6,
+          height: 12,
+          marginBottom: 4,
+          width: 12,
+        }}
+      />
+      <View
+        style={{
+          alignItems: 'center',
+          backgroundColor: '#ffffff',
+          borderRadius: radius.xl,
+          height: 88,
+          justifyContent: 'center',
+          width: 96,
+        }}>
+        <View style={{ flexDirection: 'row', gap: 16 }}>
+          <View
+            style={{
+              alignItems: 'center',
+              backgroundColor: colors.light.text,
+              borderRadius: 11,
+              height: 22,
+              justifyContent: 'center',
+              width: 18,
+            }}>
+            <View style={{ backgroundColor: '#ffffff', borderRadius: 3, height: 6, width: 6 }} />
+          </View>
+          <View
+            style={{
+              alignItems: 'center',
+              backgroundColor: colors.light.text,
+              borderRadius: 11,
+              height: 22,
+              justifyContent: 'center',
+              width: 18,
+            }}>
+            <View style={{ backgroundColor: '#ffffff', borderRadius: 3, height: 6, width: 6 }} />
+          </View>
+        </View>
+        <View
+          style={{
+            backgroundColor: colors.light.secondary,
+            borderRadius: 4,
+            height: 6,
+            marginTop: spacing[2],
+            width: 24,
+          }}
+        />
+      </View>
+    </View>
+  );
+}
+
+// ======================================================
+// REGISTER SCREEN
+// ======================================================
+
 export default function RegisterScreen() {
   const router = useRouter();
-  const { height } = useWindowDimensions();
 
   const [fullName, setFullName] = useState('');
   const [nickname, setNickname] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [agreeTerms, setAgreeTerms] = useState(false);
 
   const handleCreateAccount = () => {
     // UI only - no backend registration per requirement
@@ -49,266 +168,175 @@ export default function RegisterScreen() {
 
   return (
     <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" backgroundColor={colors.light.background} />
+      <StatusBar style="light" backgroundColor={colors.light.primary} />
 
-      {/* Decorative Background Shapes */}
-      <View
-        aria-hidden
-        className="absolute -left-20 -top-20 h-[380px] w-[380px] rounded-full"
-        pointerEvents="none"
-        style={{ backgroundColor: colors.light.primaryFixed, opacity: 0.45 }}
-      />
-      <View
-        aria-hidden
-        className="absolute -bottom-24 -right-24 h-[340px] w-[340px] rounded-full"
-        pointerEvents="none"
-        style={{ backgroundColor: colors.light.secondaryFixed, opacity: 0.4 }}
-      />
-
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1">
-        <ScrollView
-          bounces={false}
-          contentContainerStyle={{
-            flexGrow: 1,
-            justifyContent: 'center',
-            minHeight: height,
-            paddingHorizontal: spacing[5],
-            paddingVertical: spacing[6],
-          }}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}>
-          
-          {/* Top Bar Header */}
-          <View className="mb-4 flex-row items-center">
-            <Pressable
-              accessibilityLabel="Back"
-              accessibilityRole="button"
-              hitSlop={8}
-              onPress={() => router.back()}
-              style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[2] }}>
-              <ArrowLeft color={colors.light.primary} size={20} />
-              <AppText
-                color={colors.light.primary}
-                style={{
-                  fontFamily: typography.family.sansBold,
-                  fontSize: 18,
-                  lineHeight: 26,
-                }}>
-                Pemula Code
-              </AppText>
-            </Pressable>
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+        <ScrollView bounces={false} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          {/* Header banner */}
+          <View
+            style={{
+              alignItems: 'center',
+              backgroundColor: colors.light.primary,
+              borderBottomLeftRadius: radius['2xl'],
+              borderBottomRightRadius: radius['2xl'],
+              paddingBottom: spacing[6],
+              paddingTop: spacing[8],
+            }}>
+            <BotMascot />
+            <AppText
+              color="#ffffff"
+              style={{
+                fontFamily: typography.family.sansExtraBold,
+                fontSize: 22,
+                marginTop: spacing[3],
+              }}>
+              Pemula Code
+            </AppText>
           </View>
 
-          {/* Main Card Container */}
-          <View className="mx-auto w-full max-w-[430px]">
-            {/* Header section with Icon */}
-            <View className="items-center" style={{ marginBottom: spacing[5] }}>
-              <View
-                style={{
-                  alignItems: 'center',
-                  backgroundColor: colors.light.primary,
-                  borderRadius: radius.xl,
-                  height: 64,
-                  justifyContent: 'center',
-                  marginBottom: spacing[3],
-                  width: 64,
-                }}>
-                <UserPlus color={colors.light.primaryForeground} size={32} />
-              </View>
+          {/* Content */}
+          <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[6] }}>
+            <View style={{ alignSelf: 'center', maxWidth: 430, width: '100%' }}>
               <AppText
                 color={colors.light.text}
                 style={{
-                  fontFamily: typography.family.sansBold,
-                  fontSize: 28,
-                  lineHeight: 36,
+                  fontFamily: typography.family.sansExtraBold,
+                  fontSize: 24,
+                  lineHeight: 32,
                   textAlign: 'center',
                 }}>
-                Join the Journey
+                Buat Akun Baru
               </AppText>
               <AppText
                 color={colors.light.onSurfaceVariant}
-                numberOfLines={2}
                 style={{
-                  fontSize: 15,
-                  lineHeight: 22,
+                  fontSize: 14,
+                  lineHeight: 20,
                   marginTop: spacing[1],
                   textAlign: 'center',
                 }}>
-                Master programming with the encouraging mentor.
+                Gratis, dan cuma butuh 1 menit.
               </AppText>
-            </View>
 
-            {/* Registration Form Card */}
-            <View
-              className="w-full"
-              style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                borderColor: colors.light.outlineVariant,
-                borderRadius: radius['2xl'],
-                borderWidth: 1,
-                elevation: 10,
-                paddingHorizontal: spacing[6],
-                paddingVertical: spacing[6],
-                shadowColor: colors.light.primary,
-                shadowOffset: { width: 0, height: 10 },
-                shadowOpacity: 0.1,
-                shadowRadius: 24,
-              }}>
-              <View className="w-full" style={{ gap: spacing[4] }}>
-                {/* 1. Full Name */}
+              <View style={{ gap: spacing[4], marginTop: spacing[6] }}>
                 <AppInput
                   accessibilityLabel="Full Name"
                   autoCapitalize="words"
                   autoComplete="name"
-                  label="Full Name"
+                  label="Nama Lengkap"
                   leftIcon={<Contact color={colors.light.outline} size={20} />}
                   onChangeText={setFullName}
-                  placeholder="Enter your legal name"
+                  placeholder="Nama lengkap"
                   value={fullName}
                 />
 
-                {/* 2. Nickname */}
                 <AppInput
                   accessibilityLabel="Nickname"
                   autoCapitalize="words"
                   autoComplete="nickname"
-                  label="Nickname"
+                  label="Nama Panggilan"
                   leftIcon={<Smile color={colors.light.outline} size={20} />}
                   onChangeText={setNickname}
-                  placeholder="How should we call you?"
+                  placeholder="Mau dipanggil apa?"
                   value={nickname}
                 />
 
-                {/* 3. Email Address */}
                 <AppInput
                   accessibilityLabel="Email Address"
                   autoCapitalize="none"
                   autoComplete="email"
                   keyboardType="email-address"
-                  label="Email Address"
+                  label="Email"
                   leftIcon={<Mail color={colors.light.outline} size={20} />}
                   onChangeText={setEmail}
-                  placeholder="name@example.com"
+                  placeholder="nama@email.com"
                   value={email}
                 />
 
-                {/* 4. Password */}
                 <PasswordInput
                   accessibilityLabel="Password"
                   autoComplete="new-password"
                   label="Password"
                   leftIcon={<Lock color={colors.light.outline} size={20} />}
                   onChangeText={setPassword}
-                  placeholder="Min. 8 characters"
+                  placeholder="Minimal 8 karakter"
                   value={password}
                 />
 
-                {/* 5. Confirm Password */}
                 <PasswordInput
                   accessibilityLabel="Confirm Password"
                   autoComplete="new-password"
-                  label="Confirm Password"
+                  label="Konfirmasi Password"
                   leftIcon={<RotateCcw color={colors.light.outline} size={20} />}
                   onChangeText={setConfirmPassword}
-                  placeholder="Repeat your password"
+                  placeholder="Ulangi password"
                   value={confirmPassword}
                 />
 
-                {/* Create Account Button */}
-                <PrimaryButton
-                  accessibilityLabel="Create Account"
-                  accessibilityRole="button"
-                  onPress={handleCreateAccount}
-                  rightIcon={<ArrowRight color={colors.light.primaryForeground} size={20} />}
-                  style={({ pressed }) => ({
-                    backgroundColor: pressed
-                      ? colors.light.primaryPressed
-                      : colors.light.primary,
-                    borderRadius: radius.full,
-                    elevation: 6,
-                    minHeight: 52,
-                    marginTop: spacing[2],
-                    shadowColor: colors.light.primary,
-                    shadowOffset: { width: 0, height: 6 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 12,
-                  })}
-                  title="Create Account"
-                />
-
-                {/* Bottom Action */}
-                <View
-                  style={{
-                    alignItems: 'center',
-                    flexDirection: 'row',
-                    gap: spacing[1],
-                    justifyContent: 'center',
-                    marginTop: spacing[2],
-                  }}>
-                  <AppText color={colors.light.onSurfaceVariant} style={{ fontSize: 15 }}>
-                    Already have an account?
+                <Pressable
+                  accessibilityLabel="Agree to Terms"
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked: agreeTerms }}
+                  onPress={() => setAgreeTerms((prev) => !prev)}
+                  style={{ alignItems: 'flex-start', flexDirection: 'row', gap: spacing[2] }}>
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      backgroundColor: agreeTerms
+                        ? colors.light.primary
+                        : colors.light.surfaceContainerLow,
+                      borderColor: agreeTerms ? colors.light.primary : colors.light.outlineVariant,
+                      borderRadius: radius.sm,
+                      borderWidth: 1,
+                      height: 20,
+                      justifyContent: 'center',
+                      marginTop: 1,
+                      width: 20,
+                    }}>
+                    {agreeTerms ? (
+                      <AppText color={colors.light.onPrimary} style={{ fontSize: 12, fontWeight: 'bold' }}>
+                        ✓
+                      </AppText>
+                    ) : null}
+                  </View>
+                  <AppText
+                    color={colors.light.onSurfaceVariant}
+                    style={{ flexShrink: 1, fontSize: 13, lineHeight: 19 }}>
+                    Saya menyetujui Syarat & Ketentuan serta Kebijakan Privasi.
                   </AppText>
-                  <Pressable
-                    accessibilityLabel="Log In"
-                    accessibilityRole="button"
-                    hitSlop={8}
-                    onPress={() => router.push('/(auth)/login')}>
-                    <AppText
-                      color={colors.light.primary}
-                      style={{ fontFamily: typography.family.sansBold, fontSize: 15 }}>
-                      Log In
-                    </AppText>
-                  </Pressable>
-                </View>
-              </View>
-            </View>
+                </Pressable>
 
-            {/* Decorative Social Proof */}
-            <View
-              style={{
-                alignItems: 'center',
-                flexDirection: 'row',
-                gap: spacing[4],
-                justifyContent: 'center',
-                marginTop: spacing[6],
-              }}>
-              <View style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[1] }}>
-                <ShieldCheck color={colors.light.outline} size={14} />
-                <AppText
-                  color={colors.light.outline}
-                  style={{
-                    fontFamily: typography.family.mono,
-                    fontSize: 11,
-                    letterSpacing: 0.5,
-                  }}>
-                  SECURE DATA
-                </AppText>
+                <DuoButton
+                  backgroundColor={colors.light.primary}
+                  onPress={handleCreateAccount}
+                  shadowColor={colors.light.primaryPressed}
+                  title="Buat Akun"
+                />
               </View>
-              <View style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[1] }}>
-                <Code2 color={colors.light.outline} size={14} />
-                <AppText
-                  color={colors.light.outline}
-                  style={{
-                    fontFamily: typography.family.mono,
-                    fontSize: 11,
-                    letterSpacing: 0.5,
-                  }}>
-                  CLEAN CODE
+
+              <View
+                style={{
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  gap: spacing[1],
+                  justifyContent: 'center',
+                  marginTop: spacing[6],
+                  paddingBottom: spacing[8],
+                }}>
+                <AppText color={colors.light.onSurfaceVariant} style={{ fontSize: 14 }}>
+                  Sudah punya akun?
                 </AppText>
-              </View>
-              <View style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[1] }}>
-                <Users color={colors.light.outline} size={14} />
-                <AppText
-                  color={colors.light.outline}
-                  style={{
-                    fontFamily: typography.family.mono,
-                    fontSize: 11,
-                    letterSpacing: 0.5,
-                  }}>
-                  10K+ PEERS
-                </AppText>
+                <Pressable
+                  accessibilityLabel="Log In"
+                  accessibilityRole="button"
+                  hitSlop={8}
+                  onPress={() => router.push('/(auth)/login')}>
+                  <AppText
+                    color={colors.light.primary}
+                    style={{ fontFamily: typography.family.sansBold, fontSize: 14 }}>
+                    Masuk
+                  </AppText>
+                </Pressable>
               </View>
             </View>
           </View>

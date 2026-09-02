@@ -5,6 +5,7 @@ import {
   MessageCircleMore,
   BookOpenCheck,
   User,
+  Trophy,
   Settings,
 } from 'lucide-react-native';
 
@@ -21,6 +22,8 @@ import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+export const TAB_BAR_CLEARANCE = 100;
 
 // ======================================================
 // TAB YANG BOLEH MUNCUL DI BOTTOM NAVBAR
@@ -47,10 +50,15 @@ const TAB_CONFIG: Record<string, any> = {
     label: 'Profile',
   },
 
+  leaderboard: {
+    icon: Trophy,
+    label: 'Leaderboard',
+  },
+
   settings: {
     icon: Settings,
     label: 'Setting',
-  },
+  }
 };
 
 
@@ -65,6 +73,7 @@ function CustomTabBar({
 }: any) {
 
   // HANYA 5 ROUTE INI YANG BOLEH MUNCUL
+  const TAB_ORDER = ['index', 'community', 'learn', 'profile', 'leaderboard', 'settings'];
   const visibleRoutes = state.routes.filter(
     (route: any) =>
       Object.prototype.hasOwnProperty.call(
@@ -72,7 +81,9 @@ function CustomTabBar({
         route.name
       )
   );
-
+  visibleRoutes.sort(
+  (a: any, b: any) => TAB_ORDER.indexOf(a.name) - TAB_ORDER.indexOf(b.name)
+);
   return (
     <View style={styles.bottomContainer}>
       <View style={styles.navbar}>
@@ -292,7 +303,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="settings"
           options={{
-            title: 'Setting',
+            title: 'Settings',
           }}
         />
       </Tabs>

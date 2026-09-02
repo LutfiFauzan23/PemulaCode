@@ -1,305 +1,347 @@
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Mail } from 'lucide-react-native';
-import { useState } from 'react';
+import { Lock, Mail } from 'lucide-react-native';
+import { useRef, useState } from 'react';
 import {
   Alert,
+  Animated,
   KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
-  useWindowDimensions,
   View,
 } from 'react-native';
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { AppInput } from '@/components/ui/AppInput';
 import { AppText } from '@/components/ui/AppText';
-import { Divider } from '@/components/ui/Divider';
 import { GoogleIcon } from '@/components/ui/GoogleIcon';
 import { PasswordInput } from '@/components/ui/PasswordInput';
-import { PrimaryButton } from '@/components/ui/PrimaryButton';
-import { SocialButton } from '@/components/ui/SocialButton';
 import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
 
+// ======================================================
+// DUO-STYLE 3D PRESS BUTTON
+// ======================================================
+
+function DuoButton({
+  title,
+  onPress,
+  backgroundColor,
+  shadowColor,
+  textColor = '#ffffff',
+  disabled,
+  icon,
+}: {
+  backgroundColor: string;
+  disabled?: boolean;
+  icon?: React.ReactNode;
+  onPress: () => void;
+  shadowColor: string;
+  textColor?: string;
+  title: string;
+}) {
+  const translateY = useRef(new Animated.Value(0)).current;
+
+  const pressIn = () => {
+    Animated.timing(translateY, { duration: 80, toValue: 4, useNativeDriver: true }).start();
+  };
+  const pressOut = () => {
+    Animated.timing(translateY, { duration: 80, toValue: 0, useNativeDriver: true }).start();
+  };
+
+  return (
+    <View style={{ backgroundColor: shadowColor, borderRadius: radius.lg }}>
+      <Pressable
+        accessibilityLabel={title}
+        accessibilityRole="button"
+        disabled={disabled}
+        onPress={onPress}
+        onPressIn={pressIn}
+        onPressOut={pressOut}>
+        <Animated.View
+          style={{
+            alignItems: 'center',
+            backgroundColor: disabled ? colors.light.outline : backgroundColor,
+            borderRadius: radius.lg,
+            flexDirection: 'row',
+            gap: spacing[2],
+            justifyContent: 'center',
+            marginBottom: 4,
+            paddingVertical: spacing[4],
+            transform: [{ translateY }],
+          }}>
+          {icon}
+          <AppText
+            color={textColor}
+            style={{
+              fontFamily: typography.family.sansBold,
+              fontSize: 15,
+              letterSpacing: 0.6,
+            }}>
+            {title.toUpperCase()}
+          </AppText>
+        </Animated.View>
+      </Pressable>
+    </View>
+  );
+}
+
+// ======================================================
+// SIMPLE BOT MASCOT
+// ======================================================
+
+function BotMascot() {
+  return (
+    <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: spacing[2] }}>
+      <View
+        style={{
+          alignItems: 'center',
+          backgroundColor: '#ffffff',
+          borderRadius: 5,
+          height: 10,
+          marginBottom: -2,
+          width: 4,
+        }}
+      />
+      <View
+        style={{
+          backgroundColor: '#FFD166',
+          borderRadius: 6,
+          height: 12,
+          marginBottom: 4,
+          width: 12,
+        }}
+      />
+      <View
+        style={{
+          alignItems: 'center',
+          backgroundColor: '#ffffff',
+          borderRadius: radius.xl,
+          height: 88,
+          justifyContent: 'center',
+          width: 96,
+        }}>
+        <View style={{ flexDirection: 'row', gap: 16 }}>
+          <View
+            style={{
+              alignItems: 'center',
+              backgroundColor: colors.light.text,
+              borderRadius: 11,
+              height: 22,
+              justifyContent: 'center',
+              width: 18,
+            }}>
+            <View style={{ backgroundColor: '#ffffff', borderRadius: 3, height: 6, width: 6 }} />
+          </View>
+          <View
+            style={{
+              alignItems: 'center',
+              backgroundColor: colors.light.text,
+              borderRadius: 11,
+              height: 22,
+              justifyContent: 'center',
+              width: 18,
+            }}>
+            <View style={{ backgroundColor: '#ffffff', borderRadius: 3, height: 6, width: 6 }} />
+          </View>
+        </View>
+        <View
+          style={{
+            backgroundColor: colors.light.secondary,
+            borderRadius: 4,
+            height: 6,
+            marginTop: spacing[2],
+            width: 24,
+          }}
+        />
+      </View>
+    </View>
+  );
+}
+
+// ======================================================
+// LOGIN SCREEN
+// ======================================================
+
 export default function LoginScreen() {
   const router = useRouter();
-  const { height } = useWindowDimensions();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
-  
-  // State untuk indikator loading
   const [isLoading, setIsLoading] = useState(false);
 
-  // --- HANDLER DUMMY LOGIN MANUAL ---
-  const handleLogin = async () => {
+  const handleLogin = () => {
     if (!email || !password) {
       Alert.alert('Perhatian', 'Email dan password tidak boleh kosong.');
       return;
     }
 
     setIsLoading(true);
-    
-    // Simulasi waktu proses loading (1.5 detik)
     setTimeout(() => {
       setIsLoading(false);
-      
-      // Pengecekan dummy akun
       if (email === 'test@example.com' && password === '123456') {
         router.replace('/(tabs)');
       } else {
         Alert.alert(
-          'Login Gagal', 
+          'Login Gagal',
           'Gunakan akun dummy berikut untuk masuk:\n\nEmail: test@example.com\nPassword: 123456'
         );
       }
-    }, 1500);
+    }, 1200);
   };
 
-  // --- HANDLER DUMMY LOGIN GOOGLE ---
   const handleGoogleLogin = () => {
     setIsLoading(true);
-    
-    // Simulasi loading 1.5 detik lalu langsung masuk
     setTimeout(() => {
       setIsLoading(false);
       router.replace('/(tabs)');
-    }, 1500);
-  };
-
-  const handleForgotPassword = () => {
-    // TODO: Forgot Password navigation
-  };
-
-  const handleRegister = () => {
-    router.push('/(auth)/register');
+    }, 1200);
   };
 
   return (
     <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" backgroundColor={colors.light.background} />
+      <StatusBar style="light" backgroundColor={colors.light.primary} />
 
-      {/* Background Decorative Circles */}
-      <View
-        className="absolute -left-20 -top-20 h-[380px] w-[380px] rounded-full"
-        style={{ backgroundColor: colors.light.primaryFixed, opacity: 0.45 }}
-      />
-      <View
-        className="absolute -bottom-24 -right-24 h-[340px] w-[340px] rounded-full"
-        style={{ backgroundColor: colors.light.secondaryFixed, opacity: 0.4 }}
-      />
-
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        className="flex-1">
-        <ScrollView
-          bounces={false}
-          contentContainerStyle={{
-            flexGrow: 1,
-            justifyContent: 'center',
-            minHeight: height,
-            paddingHorizontal: spacing[5],
-            paddingVertical: spacing[6],
-          }}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}>
-
-          {/* Top Brand Header */}
-          <View className="absolute left-6 top-6">
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
+        <ScrollView bounces={false} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          {/* Header banner */}
+          <View
+            style={{
+              alignItems: 'center',
+              backgroundColor: colors.light.primary,
+              borderBottomLeftRadius: radius['2xl'],
+              borderBottomRightRadius: radius['2xl'],
+              paddingBottom: spacing[6],
+              paddingTop: spacing[8],
+            }}>
+            <BotMascot />
             <AppText
-              color={colors.light.primary}
+              color="#ffffff"
               style={{
-                fontFamily: typography.family.sansBold,
-                fontSize: 20,
-                lineHeight: 28,
+                fontFamily: typography.family.sansExtraBold,
+                fontSize: 22,
+                marginTop: spacing[3],
               }}>
               Pemula Code
             </AppText>
           </View>
 
-          {/* Main Card Container */}
-          <View className="mx-auto w-full max-w-[430px]">
-            <View
-              className="w-full"
-              style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                borderColor: colors.light.outlineVariant,
-                borderRadius: radius['2xl'],
-                borderWidth: 1,
-                elevation: 10,
-                paddingHorizontal: spacing[6],
-                paddingVertical: spacing[8],
-                shadowColor: colors.light.primary,
-                shadowOffset: { width: 0, height: 10 },
-                shadowOpacity: 0.1,
-                shadowRadius: 24,
-              }}>
-              {/* Title & Subtitle */}
-              <View className="items-center text-center" style={{ marginBottom: spacing[8] }}>
-                <AppText
-                  color={colors.light.text}
-                  style={{
-                    fontFamily: typography.family.sansBold,
-                    fontSize: 28,
-                    lineHeight: 36,
-                  }}>
-                  Welcome Back
-                </AppText>
-                <AppText
-                  className="mt-2 text-center"
-                  color={colors.light.onSurfaceVariant}
-                  numberOfLines={2}
-                  style={{
-                    fontSize: 16,
-                    lineHeight: 24,
-                  }}>
-                  Log in to continue your coding journey
-                </AppText>
-              </View>
+          {/* Content */}
+          <View style={{ paddingHorizontal: spacing[5], paddingTop: spacing[6] }}>
+            <View style={{ alignSelf: 'center', maxWidth: 430, width: '100%' }}>
+              <AppText
+                color={colors.light.text}
+                style={{
+                  fontFamily: typography.family.sansExtraBold,
+                  fontSize: 24,
+                  lineHeight: 32,
+                  textAlign: 'center',
+                }}>
+                Selamat Datang Kembali!
+              </AppText>
+              <AppText
+                color={colors.light.onSurfaceVariant}
+                style={{
+                  fontSize: 14,
+                  lineHeight: 20,
+                  marginTop: spacing[1],
+                  textAlign: 'center',
+                }}>
+                Lanjutkan progress belajarmu hari ini.
+              </AppText>
 
-              {/* Form Inputs Container */}
-              <View className="w-full" style={{ gap: spacing[5] }}>
-                {/* Email Input */}
+              <View style={{ gap: spacing[4], marginTop: spacing[6] }}>
                 <AppInput
                   accessibilityLabel="Email Address"
                   autoCapitalize="none"
                   autoComplete="email"
+                  editable={!isLoading}
                   keyboardType="email-address"
-                  label="Email Address"
+                  label="Email"
                   leftIcon={<Mail color={colors.light.outline} size={20} />}
                   onChangeText={setEmail}
                   placeholder="test@example.com"
                   value={email}
+                />
+
+                <PasswordInput
+                  accessibilityLabel="Password"
+                  autoComplete="password"
                   editable={!isLoading}
+                  label="Password"
+                  leftIcon={<Lock color={colors.light.outline} size={20} />}
+                  onChangeText={setPassword}
+                  placeholder="••••••••"
+                  value={password}
                 />
 
-                {/* Password Input & Forgot Password Link */}
-                <View className="w-full">
-                  <PasswordInput
-                    accessibilityLabel="Password"
-                    autoComplete="password"
-                    label="Password"
-                    onChangeText={setPassword}
-                    placeholder="••••••••"
-                    value={password}
-                    editable={!isLoading}
-                  />
-                  <View style={{ alignItems: 'flex-end', marginTop: spacing[2] }}>
-                    <Pressable
-                      accessibilityLabel="Forgot Password"
-                      accessibilityRole="button"
-                      hitSlop={8}
-                      onPress={handleForgotPassword}
-                      disabled={isLoading}>
-                      <AppText
-                        color={colors.light.primary}
-                        style={{
-                          fontFamily: typography.family.mono,
-                          fontSize: 13,
-                          lineHeight: 18,
-                        }}>
-                        Forgot Password?
-                      </AppText>
-                    </Pressable>
-                  </View>
-                </View>
-
-                {/* Remember Me Checkbox Row */}
-                <View style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[2] }}>
-                  <Pressable
-                    accessibilityLabel="Remember Me"
-                    accessibilityRole="checkbox"
-                    accessibilityState={{ checked: rememberMe }}
-                    className="h-5 w-5 items-center justify-center rounded"
-                    onPress={() => setRememberMe((prev) => !prev)}
-                    disabled={isLoading}
-                    style={{
-                      backgroundColor: rememberMe
-                        ? colors.light.primary
-                        : colors.light.surfaceContainerLow,
-                      borderColor: rememberMe
-                        ? colors.light.primary
-                        : colors.light.outlineVariant,
-                      borderWidth: 1,
-                    }}>
-                    {rememberMe ? (
-                      <AppText
-                        color={colors.light.onPrimary}
-                        style={{ fontSize: 12, fontWeight: 'bold' }}>
-                        ✓
-                      </AppText>
-                    ) : null}
-                  </Pressable>
+                <Pressable accessibilityLabel="Forgot Password" accessibilityRole="button" hitSlop={8}>
                   <AppText
-                    color={colors.light.text}
-                    style={{ fontSize: 14, lineHeight: 20 }}>
-                    Remember Me
+                    color={colors.light.primary}
+                    style={{
+                      fontFamily: typography.family.sansBold,
+                      fontSize: 13,
+                      textAlign: 'right',
+                    }}>
+                    Lupa Password?
                   </AppText>
-                </View>
+                </Pressable>
 
-                {/* Login Button */}
-                <PrimaryButton
-                  accessibilityLabel="Login"
-                  accessibilityRole="button"
-                  onPress={handleLogin}
+                <DuoButton
+                  backgroundColor={colors.light.primary}
                   disabled={isLoading}
-                  style={({ pressed }) => ({
-                    backgroundColor: isLoading 
-                      ? colors.light.outline 
-                      : (pressed ? colors.light.primaryPressed : colors.light.primary),
-                    borderRadius: radius.lg,
-                    elevation: 6,
-                    minHeight: 52,
-                    shadowColor: colors.light.primary,
-                    shadowOffset: { width: 0, height: 6 },
-                    shadowOpacity: 0.2,
-                    shadowRadius: 12,
-                  })}
-                  title={isLoading ? "Memproses..." : "Login"}
+                  onPress={handleLogin}
+                  shadowColor={colors.light.primaryPressed}
+                  title={isLoading ? 'Memproses...' : 'Masuk'}
                 />
 
-                {/* Divider */}
-                <Divider text="OR" />
+                <View style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[3] }}>
+                  <View style={{ backgroundColor: colors.light.outlineVariant, flex: 1, height: 1 }} />
+                  <AppText
+                    color={colors.light.onSurfaceVariant}
+                    style={{ fontFamily: typography.family.sansBold, fontSize: 12 }}>
+                    ATAU
+                  </AppText>
+                  <View style={{ backgroundColor: colors.light.outlineVariant, flex: 1, height: 1 }} />
+                </View>
 
-                {/* Google Login Button */}
-                <SocialButton
-                  accessibilityLabel="Continue with Google"
-                  accessibilityRole="button"
+                <DuoButton
+                  backgroundColor="#ffffff"
+                  disabled={isLoading}
                   icon={<GoogleIcon size={20} />}
                   onPress={handleGoogleLogin}
-                  disabled={isLoading}
-                  title="Continue with Google"
+                  shadowColor={colors.light.outlineVariant}
+                  textColor={colors.light.text}
+                  title="Lanjutkan dengan Google"
                 />
+              </View>
 
-                {/* Register Link */}
-                <View
-                  style={{
-                    alignItems: 'center',
-                    flexDirection: 'row',
-                    gap: spacing[1],
-                    justifyContent: 'center',
-                    marginTop: spacing[2],
-                  }}>
-                  <AppText color={colors.light.onSurfaceVariant} style={{ fontSize: 15 }}>
-                    Don't have an account?
+              <View
+                style={{
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  gap: spacing[1],
+                  justifyContent: 'center',
+                  marginTop: spacing[6],
+                  paddingBottom: spacing[8],
+                }}>
+                <AppText color={colors.light.onSurfaceVariant} style={{ fontSize: 14 }}>
+                  Belum punya akun?
+                </AppText>
+                <Pressable
+                  accessibilityLabel="Register"
+                  accessibilityRole="button"
+                  disabled={isLoading}
+                  hitSlop={8}
+                  onPress={() => router.push('/(auth)/register')}>
+                  <AppText
+                    color={colors.light.primary}
+                    style={{ fontFamily: typography.family.sansBold, fontSize: 14 }}>
+                    Daftar
                   </AppText>
-                  <Pressable
-                    accessibilityLabel="Register"
-                    accessibilityRole="button"
-                    hitSlop={8}
-                    onPress={handleRegister}
-                    disabled={isLoading}>
-                    <AppText
-                      color={colors.light.primary}
-                      style={{ fontFamily: typography.family.sansBold, fontSize: 15 }}>
-                      Register
-                    </AppText>
-                  </Pressable>
-                </View>
+                </Pressable>
               </View>
             </View>
           </View>

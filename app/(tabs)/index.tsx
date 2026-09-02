@@ -27,6 +27,7 @@ import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { TAB_BAR_CLEARANCE } from './_layout';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -40,7 +41,7 @@ export default function HomeScreen() {
       <ScrollView
         bounces={false}
         contentContainerStyle={{
-          paddingBottom: spacing[8],
+          paddingBottom: TAB_BAR_CLEARANCE,
         }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}>
@@ -611,7 +612,7 @@ export default function HomeScreen() {
             <Pressable
               accessibilityLabel="Rankings Shortcut"
               accessibilityRole="button"
-              onPress={() => {}}
+              onPress={() => router.push('/(tabs)/leaderboard')}
               style={({ pressed }) => ({
                 backgroundColor: pressed
                   ? colors.light.surfaceContainer
@@ -641,7 +642,7 @@ export default function HomeScreen() {
                   fontSize: 16,
                   lineHeight: 22,
                 }}>
-                Rankings
+                Leaderboard
               </AppText>
               <AppText
                 color={colors.light.onSurfaceVariant}
