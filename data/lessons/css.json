@@ -1,0 +1,135 @@
+{
+  "courseId": "css",
+  "lessons": [
+    {
+      "id": "css-01",
+      "moduleNumber": 1,
+      "title": "Selectors & Specificity",
+      "category": "Styling",
+      "readTime": "15 min",
+      "sections": [
+        {
+          "type": "heading",
+          "content": "Targeting Elements with CSS Selectors"
+        },
+        {
+          "type": "paragraph",
+          "content": "CSS selectors define which HTML elements on a page receive specific styles. Mastering selectors is fundamental — they give you granular control to style elements individually, in groups, or based on element relationships."
+        },
+        {
+          "type": "tip",
+          "title": "Did you know?",
+          "content": "Specificity determines which CSS rule wins when multiple rules target the same element. An ID selector (#id) is more specific than a class selector (.class), which is more specific than an element selector (p)."
+        },
+        {
+          "type": "subheading",
+          "content": "Element, Class, and ID Selectors"
+        },
+        {
+          "type": "paragraph",
+          "content": "Element selectors target all tags of a type. Class selectors (.) target elements sharing a class name. ID selectors (#) target a single unique element."
+        },
+        {
+          "type": "code",
+          "language": "css",
+          "filename": "selectors.css",
+          "code": "/* Universal selector: targets every element */\n* {\n  box-sizing: border-box;\n}\n\n/* Element selector: all paragraphs */\np {\n  font-size: 16px;\n  color: #464554;\n}\n\n/* Class selector: elements with class=\"btn\" */\n.btn {\n  background-color: #00629d;\n  color: #ffffff;\n  border-radius: 8px;\n}\n\n/* ID selector: element with id=\"main-header\" */\n#main-header {\n  font-size: 28px;\n  font-weight: bold;\n}"
+        },
+        {
+          "type": "subheading",
+          "content": "Combinators & Specificity Calculation"
+        },
+        {
+          "type": "paragraph",
+          "content": "You can combine selectors to target nested elements. Descendant selectors (space), child selectors (>), and grouped selectors (comma) allow precise matching. Specificity is calculated based on weights: Inline (1000) > ID (100) > Class (10) > Element (1)."
+        },
+        {
+          "type": "code",
+          "language": "css",
+          "filename": "combinations.css",
+          "code": "/* Descendant combinator: p inside article */\narticle p {\n  line-height: 1.6;\n}\n\n/* Child combinator: direct li children of ul */\nul > li {\n  list-style-type: square;\n}\n\n/* Grouping selectors */\nh1, h2, h3 {\n  font-family: 'Inter', sans-serif;\n}"
+        }
+      ],
+      "objectives": [
+        "Understand element, class, ID, and universal selectors",
+        "Use selector combinators to target nested HTML elements",
+        "Calculate CSS specificity weights to resolve styling conflicts",
+        "Write clean, maintainable stylesheets"
+      ],
+      "mentorTip": "Favor class selectors for reusable styling. Relying heavily on ID selectors can lead to specificity battles that make CSS difficult to debug.",
+      "relatedResource": {
+        "title": "MDN CSS Selectors & Specificity",
+        "description": "In-depth guide to selector types and specificity rules in modern CSS."
+      }
+    },
+    {
+      "id": "css-02",
+      "moduleNumber": 2,
+      "title": "The Box Model",
+      "category": "Layout",
+      "readTime": "16 min",
+      "sections": [
+        {
+          "type": "heading",
+          "content": "Understanding the CSS Box Model"
+        },
+        {
+          "type": "paragraph",
+          "content": "Every element in CSS is a rectangular box. The CSS Box Model governs how the dimensions of these boxes are computed — comprising Content, Padding, Border, and Margin layers."
+        },
+        {
+          "type": "tip",
+          "title": "Essential Tip",
+          "content": "Setting 'box-sizing: border-box' forces padding and border to be included within the element's total width and height, preventing unexpected overflow layout bugs!"
+        },
+        {
+          "type": "subheading",
+          "content": "The Four Layers of the Box Model"
+        },
+        {
+          "type": "paragraph",
+          "content": "1. Content: The area where text and images appear.\n2. Padding: Transparent space surrounding content inside the border.\n3. Border: The line surrounding the padding and content.\n4. Margin: Transparent space outside the border separating elements."
+        },
+        {
+          "type": "code",
+          "language": "css",
+          "filename": "box-model.css",
+          "code": ".box {\n  /* Set box-sizing so width includes padding & border */\n  box-sizing: border-box;\n  width: 300px;\n  height: 200px;\n  \n  /* Inner spacing */\n  padding: 20px;\n  \n  /* Border */\n  border: 2px solid #00629d;\n  \n  /* Outer spacing */\n  margin: 16px;\n}"
+        }
+      ],
+      "objectives": [
+        "Identify content, padding, border, and margin components of the Box Model",
+        "Understand default content-box vs border-box sizing behaviors",
+        "Control element spacing, width, height, and alignment effectively"
+      ],
+      "mentorTip": "Use dev tools (Inspect Element) to view the visual Box Model breakdown diagram for any element on a webpage.",
+      "relatedResource": {
+        "title": "MDN CSS Box Model Guide",
+        "description": "Complete breakdown of box dimensions, margins, padding, and box-sizing."
+      }
+    },
+    {
+      "id": "css-03",
+      "moduleNumber": 3,
+      "title": "Flexbox Layouts",
+      "category": "Layout",
+      "readTime": "15 min",
+      "sections": [
+        {
+          "type": "heading",
+          "content": "Coming Soon"
+        },
+        {
+          "type": "paragraph",
+          "content": "This module will cover Flexbox container properties, main axis, cross axis, and flex item alignment."
+        }
+      ],
+      "objectives": ["Learn Flexbox layout concepts"],
+      "mentorTip": "Coming Soon module.",
+      "relatedResource": {
+        "title": "Flexbox",
+        "description": "Coming soon lesson."
+      }
+    }
+  ]
+}

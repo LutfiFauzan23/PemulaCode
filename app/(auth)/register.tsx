@@ -168,7 +168,7 @@ export default function RegisterScreen() {
 
   return (
     <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="light" backgroundColor={colors.light.primary} />
+      <StatusBar style="light" />
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
         <ScrollView bounces={false} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>

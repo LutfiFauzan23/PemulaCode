@@ -45,11 +45,6 @@ const TAB_CONFIG: Record<string, any> = {
     label: 'Learn',
   },
 
-  profile: {
-    icon: User,
-    label: 'Profile',
-  },
-
   leaderboard: {
     icon: Trophy,
     label: 'Leaderboard',
@@ -71,9 +66,16 @@ function CustomTabBar({
   descriptors,
   navigation,
 }: any) {
+  const currentRoute = state.routes[state.index];
+  const { options } = descriptors[currentRoute.key];
+
+  // Sembunyikan navbar bawah jika di luar 5 main tab (seperti materi/lesson detail)
+  if (options?.tabBarStyle?.display === 'none' || !TAB_CONFIG[currentRoute.name]) {
+    return null;
+  }
 
   // HANYA 5 ROUTE INI YANG BOLEH MUNCUL
-  const TAB_ORDER = ['index', 'community', 'learn', 'profile', 'leaderboard', 'settings'];
+  const TAB_ORDER = ['index', 'community', 'learn', 'leaderboard', 'settings'];
   const visibleRoutes = state.routes.filter(
     (route: any) =>
       Object.prototype.hasOwnProperty.call(
@@ -265,6 +267,7 @@ export default function TabsLayout() {
       }}
     >
       <Tabs
+        backBehavior="history"
         tabBar={(props) => (
           <CustomTabBar {...props} />
         )}
@@ -294,9 +297,9 @@ export default function TabsLayout() {
         />
 
         <Tabs.Screen
-          name="profile"
+          name="leaderboard"
           options={{
-            title: 'Profile',
+            title: 'Leaderboard',
           }}
         />
 
@@ -304,6 +307,46 @@ export default function TabsLayout() {
           name="settings"
           options={{
             title: 'Settings',
+          }}
+        />
+
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: 'Profile',
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
+          name="course-detail"
+          options={{
+            title: 'Course Detail',
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
+          name="lesson-detail"
+          options={{
+            title: 'Lesson Detail',
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
+          name="quiz-placeholder"
+          options={{
+            title: 'Quiz',
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
+          name="quiz-screen"
+          options={{
+            title: 'Quiz',
+            href: null,
           }}
         />
       </Tabs>
@@ -395,7 +438,7 @@ const styles = StyleSheet.create({
 
   activeTab: {
     backgroundColor:
-      colors.light.primaryContainer,
+      colors.light.primaryFixed,
 
     paddingHorizontal: 11,
 

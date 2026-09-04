@@ -156,7 +156,7 @@ export default function CommunityScreen() {
 
   return (
     <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" backgroundColor={colors.light.background} />
+      <StatusBar style="dark" />
 
       <View style={{ flex: 1, position: 'relative' }}>
         <ScrollView

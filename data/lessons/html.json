@@ -1,0 +1,158 @@
+{
+  "courseId": "html",
+  "lessons": [
+    {
+      "id": "html-01",
+      "moduleNumber": 1,
+      "title": "Introduction to Tags",
+      "category": "Basics",
+      "readTime": "12 min",
+      "sections": [
+        {
+          "type": "heading",
+          "content": "The Backbone of the Web"
+        },
+        {
+          "type": "paragraph",
+          "content": "HTML, or HyperText Markup Language, is the standard language used to create and structure content on the web. Every webpage you visit — from a simple blog to a complex web application — is built on a foundation of HTML. Without HTML, browsers would have no idea how to display text, images, or links."
+        },
+        {
+          "type": "tip",
+          "title": "Did you know?",
+          "content": "HTML is NOT a programming language — it's a markup language. It tells the browser how to display content, but it doesn't perform calculations or logic. That's what JavaScript is for!"
+        },
+        {
+          "type": "subheading",
+          "content": "Basic HTML Document Structure"
+        },
+        {
+          "type": "paragraph",
+          "content": "Every HTML document follows a standard structure. The DOCTYPE declaration tells the browser which version of HTML you're using, and the rest organizes your content into head (metadata) and body (visible content)."
+        },
+        {
+          "type": "code",
+          "language": "html",
+          "filename": "index.html",
+          "code": "<!DOCTYPE html>\n<html lang=\"en\">\n  <head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width\">\n    <title>My First Page</title>\n  </head>\n  <body>\n    <h1>Hello, World!</h1>\n    <p>This is my first webpage.</p>\n  </body>\n</html>"
+        },
+        {
+          "type": "subheading",
+          "content": "HTML Tags & Elements"
+        },
+        {
+          "type": "paragraph",
+          "content": "HTML is made up of elements. An element usually has an opening tag, some content, and a closing tag. Tags are keywords surrounded by angle brackets. Most tags come in pairs — the closing tag has a forward slash before the keyword."
+        },
+        {
+          "type": "code",
+          "language": "html",
+          "filename": "tags.html",
+          "code": "<!-- Headings: h1 is largest, h6 is smallest -->\n<h1>Main Title</h1>\n<h2>Section Title</h2>\n<h3>Subsection</h3>\n\n<!-- Paragraph of text -->\n<p>This is a paragraph.</p>\n\n<!-- Bold and italic -->\n<strong>Bold text</strong>\n<em>Italic text</em>"
+        },
+        {
+          "type": "subheading",
+          "content": "Why HTML Matters"
+        },
+        {
+          "type": "paragraph",
+          "content": "HTML is the entry point into web development. Before you can style a page with CSS or add interactivity with JavaScript, you need a solid HTML structure. Think of HTML as the skeleton — it gives everything else something to attach to."
+        }
+      ],
+      "objectives": [
+        "Understand what HTML is and its role in web development",
+        "Learn the basic structure of an HTML document",
+        "Identify and use common HTML tags like headings and paragraphs",
+        "Write a simple working webpage from scratch"
+      ],
+      "mentorTip": "Don't worry about memorizing every HTML tag. Start with the basics — headings, paragraphs, and links — and build from there. You will naturally learn more tags as you build real projects.",
+      "relatedResource": {
+        "title": "MDN HTML Basics",
+        "description": "The official Mozilla guide to getting started with HTML and web structure."
+      }
+    },
+    {
+      "id": "html-02",
+      "moduleNumber": 2,
+      "title": "Data & Validation",
+      "category": "Forms",
+      "readTime": "15 min",
+      "sections": [
+        {
+          "type": "heading",
+          "content": "HTML Forms & User Inputs"
+        },
+        {
+          "type": "paragraph",
+          "content": "Forms are how websites collect input from users — whether logging in, submitting feedback, or filling out a contact form. In HTML, the <form> element wraps all form controls, and attributes like action and method define where and how data is sent."
+        },
+        {
+          "type": "tip",
+          "title": "Pro Tip",
+          "content": "Always connect every <input> with a corresponding <label> using the 'for' attribute matching the input's 'id'. This improves user accessibility and touch targets!"
+        },
+        {
+          "type": "subheading",
+          "content": "Essential Input Types"
+        },
+        {
+          "type": "paragraph",
+          "content": "The <input> element is versatile. By changing its type attribute, you can accept text, passwords, emails, numbers, checkboxes, and radio buttons."
+        },
+        {
+          "type": "code",
+          "language": "html",
+          "filename": "form-inputs.html",
+          "code": "<form action=\"/submit\" method=\"POST\">\n  <!-- Text Input -->\n  <label for=\"username\">Username:</label>\n  <input type=\"text\" id=\"username\" name=\"username\" required>\n\n  <!-- Email Input -->\n  <label for=\"email\">Email:</label>\n  <input type=\"email\" id=\"email\" name=\"email\" required>\n\n  <!-- Password Input -->\n  <label for=\"pwd\">Password:</label>\n  <input type=\"password\" id=\"pwd\" name=\"password\" minlength=\"6\" required>\n\n  <!-- Submit Button -->\n  <button type=\"submit\">Register</button>\n</form>"
+        },
+        {
+          "type": "subheading",
+          "content": "Built-in HTML Form Validation"
+        },
+        {
+          "type": "paragraph",
+          "content": "HTML provides native client-side validation attributes like required, minlength, maxlength, min, max, and pattern. The browser checks these before the form is submitted, showing warning messages automatically."
+        },
+        {
+          "type": "code",
+          "language": "html",
+          "filename": "validation.html",
+          "code": "<!-- Required number input between 18 and 99 -->\n<label for=\"age\">Age:</label>\n<input type=\"number\" id=\"age\" name=\"age\" min=\"18\" max=\"99\" required>\n\n<!-- Custom pattern validation for phone numbers -->\n<label for=\"phone\">Phone (digits only):</label>\n<input type=\"tel\" id=\"phone\" name=\"phone\" pattern=\"[0-9]{10}\">"
+        }
+      ],
+      "objectives": [
+        "Build functional forms using <form>, <input>, and <label>",
+        "Understand common input types: text, email, password, number, and tel",
+        "Implement HTML native validation with required, min, max, and pattern attributes",
+        "Learn best practices for accessible form design"
+      ],
+      "mentorTip": "HTML native validation is fast and works without any JavaScript. Use built-in input types like email and number to get mobile browser keyboard optimizations automatically!",
+      "relatedResource": {
+        "title": "MDN Form Validation Guide",
+        "description": "Comprehensive guide to client-side form validation using native HTML attributes."
+      }
+    },
+    {
+      "id": "html-03",
+      "moduleNumber": 3,
+      "title": "The DOM Tree & Hierarchy",
+      "category": "Structure",
+      "readTime": "15 min",
+      "sections": [
+        {
+          "type": "heading",
+          "content": "Coming Soon"
+        },
+        {
+          "type": "paragraph",
+          "content": "This module will cover parent-child DOM element relationships and document tree structure."
+        }
+      ],
+      "objectives": ["Understand parent-child DOM hierarchy"],
+      "mentorTip": "Coming Soon module.",
+      "relatedResource": {
+        "title": "DOM Tree",
+        "description": "Coming soon lesson."
+      }
+    }
+  ]
+}

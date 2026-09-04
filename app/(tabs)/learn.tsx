@@ -26,21 +26,29 @@ import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useProgressStore } from '@/stores/progress-store';
 import { TAB_BAR_CLEARANCE } from './_layout';
 
 export default function LearnScreen() {
   const router = useRouter();
+  const getCourseProgress = useProgressStore((state) => state.getCourseProgress);
+  const getOverallProgress = useProgressStore((state) => state.getOverallProgress);
+
+  const htmlProgress = getCourseProgress('html');
+  const cssProgress = getCourseProgress('css');
+  const jsProgress = getCourseProgress('javascript');
+  const overallProgress = getOverallProgress();
 
   // SVG Circular progress ring calculations (Radius: 36, Stroke: 8)
   const circleRadius = 36;
   const strokeWidth = 8;
   const circumference = 2 * Math.PI * circleRadius;
-  const progressPercent = 0.75;
+  const progressPercent = overallProgress / 100;
   const strokeDashoffset = circumference * (1 - progressPercent);
 
   return (
     <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" backgroundColor={colors.light.background} />
+      <StatusBar style="dark" />
 
       <ScrollView
         bounces={false}
@@ -240,7 +248,7 @@ export default function LearnScreen() {
                   fontSize: 13,
                   fontWeight: 'bold',
                 }}>
-                65% Complete
+                {htmlProgress}% Complete
               </AppText>
               <AppText
                 color={colors.light.onSurfaceVariant}
@@ -248,7 +256,7 @@ export default function LearnScreen() {
                   fontFamily: typography.family.mono,
                   fontSize: 13,
                 }}>
-                12/18 Lessons
+                0/2 Modules
               </AppText>
             </View>
 
@@ -267,14 +275,14 @@ export default function LearnScreen() {
                   backgroundColor: colors.light.secondary,
                   borderRadius: radius.full,
                   height: '100%',
-                  width: '65%',
+                  width: `${htmlProgress}%`,
                 }}
               />
             </View>
 
-            {/* Continue Button */}
+            {/* Continue / Start Button */}
             <Pressable
-              accessibilityLabel="Continue HTML Foundation"
+              accessibilityLabel="Start Learning HTML Foundation"
               accessibilityRole="button"
               onPress={() => router.push('/(tabs)/html-course')}
               style={({ pressed }) => ({
@@ -298,7 +306,7 @@ export default function LearnScreen() {
                   fontFamily: typography.family.sansBold,
                   fontSize: 15,
                 }}>
-                Continue
+                {htmlProgress > 0 ? 'Continue' : 'Start Learning'}
               </AppText>
               <Play color="#ffffff" size={16} fill="#ffffff" />
             </Pressable>
@@ -404,7 +412,7 @@ export default function LearnScreen() {
                   fontSize: 13,
                   fontWeight: 'bold',
                 }}>
-                40% Complete
+                {cssProgress}% Complete
               </AppText>
               <AppText
                 color={colors.light.onSurfaceVariant}
@@ -412,7 +420,7 @@ export default function LearnScreen() {
                   fontFamily: typography.family.mono,
                   fontSize: 13,
                 }}>
-                8/20 Lessons
+                0/2 Modules
               </AppText>
             </View>
 
@@ -431,14 +439,14 @@ export default function LearnScreen() {
                   backgroundColor: '#00629d',
                   borderRadius: radius.full,
                   height: '100%',
-                  width: '40%',
+                  width: `${cssProgress}%`,
                 }}
               />
             </View>
 
-            {/* Continue Button */}
+            {/* Continue / Start Button */}
             <Pressable
-              accessibilityLabel="Continue Advanced CSS"
+              accessibilityLabel="Start Learning Advanced CSS"
               accessibilityRole="button"
               onPress={() => router.push('/(tabs)/css-course')}
               style={({ pressed }) => ({
@@ -460,7 +468,7 @@ export default function LearnScreen() {
                   fontFamily: typography.family.sansBold,
                   fontSize: 15,
                 }}>
-                Continue
+                {cssProgress > 0 ? 'Continue' : 'Start Learning'}
               </AppText>
               <Play color="#ffffff" size={16} fill="#ffffff" />
             </Pressable>
@@ -566,7 +574,7 @@ export default function LearnScreen() {
                   fontSize: 13,
                   fontWeight: 'bold',
                 }}>
-                15% Complete
+                {jsProgress}% Complete
               </AppText>
               <AppText
                 color={colors.light.onSurfaceVariant}
@@ -574,7 +582,7 @@ export default function LearnScreen() {
                   fontFamily: typography.family.mono,
                   fontSize: 13,
                 }}>
-                3/22 Lessons
+                0/2 Modules
               </AppText>
             </View>
 
@@ -593,16 +601,16 @@ export default function LearnScreen() {
                   backgroundColor: colors.light.primary,
                   borderRadius: radius.full,
                   height: '100%',
-                  width: '15%',
+                  width: `${jsProgress}%`,
                 }}
               />
             </View>
 
-            {/* Continue Button */}
+            {/* Continue / Start Button */}
             <Pressable
-              accessibilityLabel="Continue JS Logic & APIs"
+              accessibilityLabel="Start Learning JS Logic & APIs"
               accessibilityRole="button"
-              onPress={() => {}}
+              onPress={() => router.push('/(tabs)/course-detail?courseId=javascript')}
               style={({ pressed }) => ({
                 alignItems: 'center',
                 backgroundColor: pressed
@@ -624,7 +632,7 @@ export default function LearnScreen() {
                   fontFamily: typography.family.sansBold,
                   fontSize: 15,
                 }}>
-                Continue
+                {jsProgress > 0 ? 'Continue' : 'Start Learning'}
               </AppText>
               <Play color="#ffffff" size={16} fill="#ffffff" />
             </Pressable>
@@ -652,7 +660,7 @@ export default function LearnScreen() {
             {/* SVG Circular Progress Ring */}
             <View style={{ alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
               <Svg height={90} width={90} viewBox="0 0 90 90">
-                <G rotation="-90" origin="45, 45">
+                <G transform="rotate(-90 45 45)">
                   {/* Background Track Circle */}
                   <Circle
                     cx="45"

@@ -1,0 +1,151 @@
+{
+  "courseId": "css",
+  "quizzes": {
+    "css-01": {
+      "courseId": "css",
+      "moduleId": "css-01",
+      "title": "CSS Module 1 Quiz",
+      "description": "Test your understanding of CSS selectors and specificity.",
+      "questions": [
+        {
+          "id": "css-m1-q1",
+          "question": "What is the main purpose of a CSS selector?",
+          "options": [
+            "To create an HTML document",
+            "To select HTML elements that will be styled",
+            "To store CSS variables",
+            "To execute JavaScript",
+            "To create a database"
+          ],
+          "correctAnswer": 1,
+          "explanation": "A CSS selector identifies the HTML elements to which CSS rules should be applied."
+        },
+        {
+          "id": "css-m1-q2",
+          "question": "Which selector targets all elements with the class name card?",
+          "options": [
+            "#card",
+            ".card",
+            "card",
+            "*card",
+            "@card"
+          ],
+          "correctAnswer": 1,
+          "explanation": "A period . is used before a class name in a CSS selector."
+        },
+        {
+          "id": "css-m1-q3",
+          "question": "Which selector targets an element with the ID header?",
+          "options": [
+            ".header",
+            "header",
+            "#header",
+            "*header",
+            "@header"
+          ],
+          "correctAnswer": 2,
+          "explanation": "A hash # is used to select an element by its ID."
+        },
+        {
+          "id": "css-m1-q4",
+          "question": "Which CSS selector has the highest specificity among these options?",
+          "options": [
+            "p",
+            ".text",
+            "#title",
+            "*",
+            "body"
+          ],
+          "correctAnswer": 2,
+          "explanation": "An ID selector generally has higher specificity than a class selector, element selector, or universal selector."
+        },
+        {
+          "id": "css-m1-q5",
+          "question": "What does CSS specificity help determine?",
+          "options": [
+            "How fast a webpage loads",
+            "Which CSS rule takes priority when multiple rules target the same element",
+            "How HTML tags are created",
+            "How JavaScript functions execute",
+            "How images are compressed"
+          ],
+          "correctAnswer": 1,
+          "explanation": "Specificity is part of the process browsers use to determine which CSS declarations take precedence when rules conflict."
+        }
+      ]
+    },
+    "css-02": {
+      "courseId": "css",
+      "moduleId": "css-02",
+      "title": "CSS Module 2 Quiz",
+      "description": "Test your understanding of the CSS Box Model.",
+      "questions": [
+        {
+          "id": "css-m2-q1",
+          "question": "Which four parts make up the CSS Box Model?",
+          "options": [
+            "Header, body, footer, navigation",
+            "Content, padding, border, margin",
+            "Width, height, color, font",
+            "HTML, CSS, JavaScript, DOM",
+            "Row, column, grid, flex"
+          ],
+          "correctAnswer": 1,
+          "explanation": "The CSS Box Model consists of content, padding, border, and margin."
+        },
+        {
+          "id": "css-m2-q2",
+          "question": "What is the purpose of padding?",
+          "options": [
+            "Space outside the border",
+            "Space between the content and the border",
+            "The thickness of the border",
+            "The width of the webpage",
+            "Space between two HTML documents"
+          ],
+          "correctAnswer": 1,
+          "explanation": "Padding creates space inside an element, between its content and its border."
+        },
+        {
+          "id": "css-m2-q3",
+          "question": "What is the purpose of margin?",
+          "options": [
+            "Space inside the content",
+            "Space between text and an image",
+            "Space outside an element's border",
+            "The thickness of an element's border",
+            "The background of an element"
+          ],
+          "correctAnswer": 2,
+          "explanation": "Margin creates space outside the element's border."
+        },
+        {
+          "id": "css-m2-q4",
+          "question": "Which property controls the border around an element?",
+          "options": [
+            "outline-box",
+            "border",
+            "edge",
+            "frame",
+            "box-border-style"
+          ],
+          "correctAnswer": 1,
+          "explanation": "The border property controls an element's border."
+        },
+        {
+          "id": "css-m2-q5",
+          "question": "What does box-sizing: border-box generally do?",
+          "options": [
+            "Removes the border",
+            "Makes the element invisible",
+            "Includes padding and border in the declared width and height",
+            "Removes padding",
+            "Changes the element into a flex container"
+          ],
+          "correctAnswer": 2,
+          "explanation": "With border-box, the declared width and height include the element's content, padding, and border."
+        }
+      ]
+    }
+  }
+}

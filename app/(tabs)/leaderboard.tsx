@@ -82,7 +82,7 @@ export default function LeaderboardScreen() {
 
   return (
     <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" backgroundColor={colors.light.background} />
+      <StatusBar style="dark" />
 
       <ScrollView
         bounces={false}

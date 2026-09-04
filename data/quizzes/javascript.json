@@ -1,0 +1,151 @@
+{
+  "courseId": "javascript",
+  "quizzes": {
+    "js-01": {
+      "courseId": "javascript",
+      "moduleId": "js-01",
+      "title": "JavaScript Module 1 Quiz",
+      "description": "Test your understanding of JavaScript variables and data types.",
+      "questions": [
+        {
+          "id": "js-m1-q1",
+          "question": "Which keyword is commonly used to declare a variable whose value should not be reassigned?",
+          "options": [
+            "var",
+            "let",
+            "const",
+            "fixed",
+            "static"
+          ],
+          "correctAnswer": 2,
+          "explanation": "const declares a variable binding that cannot be reassigned after initialization."
+        },
+        {
+          "id": "js-m1-q2",
+          "question": "Which JavaScript data type represents text?",
+          "options": [
+            "Number",
+            "Boolean",
+            "String",
+            "Object",
+            "Undefined"
+          ],
+          "correctAnswer": 2,
+          "explanation": "A String represents text in JavaScript."
+        },
+        {
+          "id": "js-m1-q3",
+          "question": "What is the value of the following code?\n\nlet age = 17;",
+          "options": [
+            "String",
+            "Boolean",
+            "Number",
+            "Object",
+            "Array"
+          ],
+          "correctAnswer": 2,
+          "explanation": "The value 17 is a number, so the variable age contains a Number value."
+        },
+        {
+          "id": "js-m1-q4",
+          "question": "Which value represents a Boolean?",
+          "options": [
+            "\"true\"",
+            "1",
+            "true",
+            "\"yes\"",
+            "Boolean"
+          ],
+          "correctAnswer": 2,
+          "explanation": "true and false are the two Boolean values in JavaScript. \"true\" is a String, not a Boolean."
+        },
+        {
+          "id": "js-m1-q5",
+          "question": "Which operator can be used to determine the data type of a value?",
+          "options": [
+            "datatype",
+            "typeof",
+            "type",
+            "checktype",
+            "instance"
+          ],
+          "correctAnswer": 1,
+          "explanation": "The typeof operator returns a String indicating the type of a value."
+        }
+      ]
+    },
+    "js-02": {
+      "courseId": "javascript",
+      "moduleId": "js-02",
+      "title": "JavaScript Module 2 Quiz",
+      "description": "Test your understanding of JavaScript functions and scope.",
+      "questions": [
+        {
+          "id": "js-m2-q1",
+          "question": "What is the main purpose of a function?",
+          "options": [
+            "To permanently store data",
+            "To group reusable instructions",
+            "To create an HTML document",
+            "To style a webpage",
+            "To connect to Wi-Fi"
+          ],
+          "correctAnswer": 1,
+          "explanation": "A function groups instructions that can be executed when the function is called."
+        },
+        {
+          "id": "js-m2-q2",
+          "question": "Which syntax correctly declares a JavaScript function?",
+          "options": [
+            "function greet() {}",
+            "create greet() {}",
+            "def greet() {}",
+            "func greet() {}",
+            "new function greet()"
+          ],
+          "correctAnswer": 0,
+          "explanation": "A standard JavaScript function declaration uses the function keyword followed by the function name and parentheses."
+        },
+        {
+          "id": "js-m2-q3",
+          "question": "What is a parameter?",
+          "options": [
+            "A value returned by a function",
+            "A variable defined in a function's parameter list",
+            "The name of a JavaScript file",
+            "A CSS selector",
+            "An HTML attribute"
+          ],
+          "correctAnswer": 1,
+          "explanation": "A parameter is a variable defined in a function declaration that receives a value when the function is called."
+        },
+        {
+          "id": "js-m2-q4",
+          "question": "What does return do inside a function?",
+          "options": [
+            "It creates a new function",
+            "It stops JavaScript completely",
+            "It sends a value back from the function",
+            "It creates a variable",
+            "It changes the HTML document"
+          ],
+          "correctAnswer": 2,
+          "explanation": "The return statement ends the function's execution and can provide a value back to the code that called the function."
+        },
+        {
+          "id": "js-m2-q5",
+          "question": "What does scope determine in JavaScript?",
+          "options": [
+            "The color of a variable",
+            "Where a variable can be accessed",
+            "How quickly a function runs",
+            "The size of an HTML element",
+            "The font used on a webpage"
+          ],
+          "correctAnswer": 1,
+          "explanation": "Scope determines where variables and other identifiers can be accessed in a program."
+        }
+      ]
+    }
+  }
+}

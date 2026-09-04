@@ -109,7 +109,7 @@ export default function PlaygroundScreen() {
 
   return (
     <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" backgroundColor={colors.light.background} />
+      <StatusBar style="dark" />
 
       <ScrollView
         style={{ flex: 1 }}

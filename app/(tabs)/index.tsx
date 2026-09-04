@@ -28,15 +28,18 @@ import { typography } from '@/constants/typography';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { TAB_BAR_CLEARANCE } from './_layout';
+import { useProgressStore } from '@/stores/progress-store';
 
 export default function HomeScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
+  const overallProgress = useProgressStore((state) => state.getOverallProgress());
+  const htmlProgress = useProgressStore((state) => state.getCourseProgress('html'));
 
   return (
     <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" backgroundColor={colors.light.background} />
+      <StatusBar style="dark" />
 
       <ScrollView
         bounces={false}
@@ -244,7 +247,7 @@ export default function HomeScreen() {
                   fontSize: 18,
                   lineHeight: 26,
                 }}>
-                68%
+                {overallProgress}%
               </AppText>
             </View>
 
@@ -263,7 +266,7 @@ export default function HomeScreen() {
                   backgroundColor: colors.light.primary,
                   borderRadius: radius.full,
                   height: '100%',
-                  width: '68%',
+                  width: `${overallProgress}%`,
                 }}
               />
             </View>
@@ -450,7 +453,7 @@ export default function HomeScreen() {
                           fontSize: 11,
                           letterSpacing: 0.5,
                         }}>
-                        JAVASCRIPT
+                        HTML
                       </AppText>
                     </View>
                   </View>
@@ -461,7 +464,7 @@ export default function HomeScreen() {
                       fontSize: 13,
                       marginTop: spacing[2],
                     }}>
-                    Module 4: Async/Await
+                    Module 1: Introduction to Tags
                   </AppText>
                   <AppText
                     color="#ffffff"
@@ -471,7 +474,7 @@ export default function HomeScreen() {
                       lineHeight: 28,
                       marginTop: spacing[1],
                     }}>
-                    Mastering the Event Loop
+                    HTML Essentials
                   </AppText>
                 </View>
 
@@ -490,7 +493,7 @@ export default function HomeScreen() {
                         backgroundColor: colors.light.secondary,
                         borderRadius: radius.full,
                         height: '100%',
-                        width: '45%',
+                        width: `${htmlProgress}%`,
                       }}
                     />
                   </View>
@@ -500,7 +503,7 @@ export default function HomeScreen() {
                       fontFamily: typography.family.sansBold,
                       fontSize: 14,
                     }}>
-                    45%
+                    {htmlProgress}%
                   </AppText>
                 </View>
               </View>

@@ -1,0 +1,121 @@
+{
+  "courseId": "javascript",
+  "lessons": [
+    {
+      "id": "js-01",
+      "moduleNumber": 1,
+      "title": "Variables & Data Types",
+      "category": "Programming",
+      "readTime": "15 min",
+      "sections": [
+        {
+          "type": "heading",
+          "content": "Variables in JavaScript"
+        },
+        {
+          "type": "paragraph",
+          "content": "Variables are named containers used to store data values. In modern JavaScript, we declare variables using 'const' for constant values that won't be reassigned, and 'let' for variables whose values may change over time."
+        },
+        {
+          "type": "tip",
+          "title": "Best Practice",
+          "content": "Always default to using 'const'. Only use 'let' when you know the variable's value needs to change later in execution. Avoid using 'var' in modern code!"
+        },
+        {
+          "type": "subheading",
+          "content": "Primitive & Complex Data Types"
+        },
+        {
+          "type": "paragraph",
+          "content": "JavaScript supports several core data types:\n• Strings: Text enclosed in quotes or backticks\n• Numbers: Integers and decimals\n• Booleans: true or false\n• Arrays: Ordered lists of items\n• Objects: Key-value data collections\n• typeof: Operator to check a variable's data type"
+        },
+        {
+          "type": "code",
+          "language": "javascript",
+          "filename": "variables.js",
+          "code": "// 1. Variables\nconst appName = 'Pemula Code';\nlet score = 0;\nscore = 10; // OK\n\n// 2. Data Types\nconst studentName = 'Sari';         // String\nconst age = 20;                     // Number\nconst isActive = true;              // Boolean\nconst skills = ['HTML', 'CSS'];     // Array\nconst user = { name: 'Sari', age }; // Object\n\n// 3. Checking types\nconsole.log(typeof studentName); // 'string'\nconsole.log(typeof age);         // 'number'\nconsole.log(typeof isActive);    // 'boolean'"
+        }
+      ],
+      "objectives": [
+        "Declare variables using const and let keywords correctly",
+        "Work with primitive data types: strings, numbers, and booleans",
+        "Store multi-value collections using arrays and objects",
+        "Inspect data types using the typeof operator"
+      ],
+      "mentorTip": "Use template literals (`Hello ${name}`) when building strings with variables — it's cleaner than string concatenation with +.",
+      "relatedResource": {
+        "title": "MDN JavaScript Data Types",
+        "description": "Comprehensive reference to primitive and object data types in JavaScript."
+      }
+    },
+    {
+      "id": "js-02",
+      "moduleNumber": 2,
+      "title": "Functions & Scope",
+      "category": "Programming",
+      "readTime": "16 min",
+      "sections": [
+        {
+          "type": "heading",
+          "content": "Reusability with Functions"
+        },
+        {
+          "type": "paragraph",
+          "content": "Functions are reusable blocks of code designed to perform specific tasks. They take inputs (parameters), execute logic, and can return an output value using the 'return' statement."
+        },
+        {
+          "type": "tip",
+          "title": "Pro Tip",
+          "content": "Keep functions small and focused on a single task. This makes your code easier to test, read, and maintain."
+        },
+        {
+          "type": "subheading",
+          "content": "Function Declarations, Parameters & Scope"
+        },
+        {
+          "type": "paragraph",
+          "content": "Scope defines where variables are accessible in your code:\n• Global Scope: Declared outside any function, accessible everywhere.\n• Local/Function Scope: Declared inside a function, accessible only within that function.\n• Block Scope: Declared with let/const inside { }, accessible only inside that block."
+        },
+        {
+          "type": "code",
+          "language": "javascript",
+          "filename": "functions.js",
+          "code": "// Function declaration with parameters\nfunction calculateTotal(price, taxRate = 0.1) {\n  const tax = price * taxRate; // local scope\n  return price + tax;\n}\n\n// Invoking function with arguments\nconst total = calculateTotal(100); // 110\nconsole.log(total);\n\n// Block scope example\nif (total > 100) {\n  const discount = 10; // block scope\n  console.log('Discount applied:', discount);\n}"
+        }
+      ],
+      "objectives": [
+        "Write reusable functions with parameters and return values",
+        "Distinguish between function parameters and arguments",
+        "Understand global, function/local, and block variable scopes"
+      ],
+      "mentorTip": "Always specify return values when a function needs to compute and pass data back to the caller.",
+      "relatedResource": {
+        "title": "MDN Functions & Scope Guide",
+        "description": "Detailed guide on function declarations, expressions, arrow functions, and closure scope."
+      }
+    },
+    {
+      "id": "js-03",
+      "moduleNumber": 3,
+      "title": "DOM Manipulation",
+      "category": "Programming",
+      "readTime": "15 min",
+      "sections": [
+        {
+          "type": "heading",
+          "content": "Coming Soon"
+        },
+        {
+          "type": "paragraph",
+          "content": "This module will cover selecting DOM elements, modifying text/styles, and handling click/keyboard events."
+        }
+      ],
+      "objectives": ["Understand DOM manipulation"],
+      "mentorTip": "Coming Soon module.",
+      "relatedResource": {
+        "title": "DOM Manipulation",
+        "description": "Coming soon lesson."
+      }
+    }
+  ]
+}

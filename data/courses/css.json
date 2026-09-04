@@ -1,0 +1,41 @@
+{
+  "id": "css",
+  "title": "CSS Essentials",
+  "category": "CERTIFICATION TRACK",
+  "description": "Style the web with confidence. From selectors to responsive layouts and animations.",
+  "accentColor": "#00629d",
+  "accentFixed": "#cfe5ff",
+  "progress": 0,
+  "modules": [
+    {
+      "id": "css-01",
+      "title": "Selectors & Specificity",
+      "description": "Master element, class, ID, universal, and combined selectors, plus CSS specificity rules.",
+      "difficulty": "Easy",
+      "duration": "20 mins",
+      "status": "available",
+      "moduleProgress": 0,
+      "unlockRequirement": null
+    },
+    {
+      "id": "css-02",
+      "title": "The Box Model",
+      "description": "Understand content, padding, border, margin, width, height, and how box-sizing affects layout calculations.",
+      "difficulty": "Easy",
+      "duration": "25 mins",
+      "status": "locked",
+      "moduleProgress": 0,
+      "unlockRequirement": "Complete Module 1 quiz to unlock"
+    },
+    {
+      "id": "css-03",
+      "title": "Flexbox Layouts",
+      "description": "Build powerful one-dimensional layouts using flex containers, alignment, and wrapping properties.",
+      "difficulty": "Medium",
+      "duration": "40 mins",
+      "status": "coming_soon",
+      "moduleProgress": 0,
+      "unlockRequirement": "Coming Soon"
+    }
+  ]
+}

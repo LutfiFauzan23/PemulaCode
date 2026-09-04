@@ -1,0 +1,41 @@
+{
+  "id": "javascript",
+  "title": "JavaScript Essentials",
+  "category": "CERTIFICATION TRACK",
+  "description": "The brain of the web. Master variables, data types, functions, and modern ES6+ concepts.",
+  "accentColor": "#4648d4",
+  "accentFixed": "#e1e0ff",
+  "progress": 0,
+  "modules": [
+    {
+      "id": "js-01",
+      "title": "Variables & Data Types",
+      "description": "Learn let, const, strings, numbers, booleans, arrays, objects, and typeof in modern JavaScript.",
+      "difficulty": "Easy",
+      "duration": "20 mins",
+      "status": "available",
+      "moduleProgress": 0,
+      "unlockRequirement": null
+    },
+    {
+      "id": "js-02",
+      "title": "Functions & Scope",
+      "description": "Understand function declarations, parameters, return values, local, global, and block scope.",
+      "difficulty": "Medium",
+      "duration": "35 mins",
+      "status": "locked",
+      "moduleProgress": 0,
+      "unlockRequirement": "Complete Module 1 quiz to unlock"
+    },
+    {
+      "id": "js-03",
+      "title": "DOM Manipulation",
+      "description": "Query and modify HTML elements dynamically. Handle events and update the UI without reloads.",
+      "difficulty": "Medium",
+      "duration": "45 mins",
+      "status": "coming_soon",
+      "moduleProgress": 0,
+      "unlockRequirement": "Coming Soon"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "id": "html",
+  "title": "HTML Essentials",
+  "category": "CERTIFICATION TRACK",
+  "description": "Master the skeletal structure of the web with our industry-aligned curriculum.",
+  "accentColor": "#9b4500",
+  "accentFixed": "#ffdbc9",
+  "progress": 0,
+  "modules": [
+    {
+      "id": "html-01",
+      "title": "Introduction to Tags",
+      "description": "Learn the fundamental syntax of HTML and how to structure your first webpage using basic elements.",
+      "difficulty": "Easy",
+      "duration": "15 mins",
+      "status": "available",
+      "moduleProgress": 0,
+      "unlockRequirement": null
+    },
+    {
+      "id": "html-02",
+      "title": "Data & Validation",
+      "description": "Master HTML forms, form controls, input elements, required fields, and browser validation techniques.",
+      "difficulty": "Medium",
+      "duration": "30 mins",
+      "status": "locked",
+      "moduleProgress": 0,
+      "unlockRequirement": "Complete Module 1 quiz to unlock"
+    },
+    {
+      "id": "html-03",
+      "title": "The DOM Tree & Hierarchy",
+      "description": "Understand parent-child relationships and nested document structure.",
+      "difficulty": "Medium",
+      "duration": "45 mins",
+      "status": "coming_soon",
+      "moduleProgress": 0,
+      "unlockRequirement": "Coming Soon"
+    }
+  ]
+}

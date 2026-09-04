@@ -9,7 +9,9 @@ import {
   LogOut,
   Moon,
   ShieldCheck,
+  User,
 } from 'lucide-react-native';
+
 import React, { useState } from 'react';
 import {
   Alert,
@@ -49,7 +51,7 @@ export default function SettingsScreen() {
 
   return (
     <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" backgroundColor={colors.light.background} />
+      <StatusBar style="dark" />
 
       <ScrollView
         style={{ flex: 1 }}
@@ -107,21 +109,25 @@ export default function SettingsScreen() {
           </AppText>
 
           {/* Right: Profile Avatar */}
-          <View
-            style={{
+          <Pressable
+            accessibilityLabel="View Profile"
+            accessibilityRole="button"
+            onPress={() => router.push('/(tabs)/profile')}
+            style={({ pressed }) => ({
               borderColor: colors.light.primary,
               borderRadius: radius.full,
               borderWidth: 2,
               height: 40,
+              opacity: pressed ? 0.8 : 1,
               overflow: 'hidden',
               width: 40,
-            }}>
+            })}>
             <Image
               source={require('@/assets/images/welcome-hero.png')}
               style={{ height: '100%', width: '100%' }}
               resizeMode="cover"
             />
-          </View>
+          </Pressable>
         </View>
 
         {/* 2. SECTION 1 — GENERAL PREFERENCES */}
@@ -349,7 +355,61 @@ export default function SettingsScreen() {
               shadowRadius: 12,
             }}>
             
-            {/* Item 1: Privacy */}
+            {/* Item 1: Profile */}
+            <Pressable
+              accessibilityLabel="My Profile"
+              accessibilityRole="button"
+              onPress={() => router.push('/(tabs)/profile')}
+              style={({ pressed }) => ({
+                alignItems: 'center',
+                backgroundColor: pressed
+                  ? colors.light.surfaceContainerLow
+                  : 'transparent',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                padding: spacing[4],
+              })}>
+              <View style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[3], flex: 1 }}>
+                <View
+                  style={{
+                    alignItems: 'center',
+                    backgroundColor: colors.light.primaryFixed,
+                    borderRadius: radius.xl,
+                    height: 40,
+                    justifyContent: 'center',
+                    width: 40,
+                  }}>
+                  <User color={colors.light.primary} size={20} />
+                </View>
+                <View style={{ flex: 1 }}>
+                  <AppText
+                    color={colors.light.text}
+                    style={{
+                      fontFamily: typography.family.sansBold,
+                      fontSize: 16,
+                      lineHeight: 22,
+                    }}>
+                    My Profile
+                  </AppText>
+                  <AppText
+                    color={colors.light.onSurfaceVariant}
+                    style={{
+                      fontSize: 13,
+                      lineHeight: 18,
+                      marginTop: spacing[1],
+                    }}>
+                    View stats, badges, and account details
+                  </AppText>
+                </View>
+              </View>
+
+              <ChevronRight color={colors.light.outline} size={20} />
+            </Pressable>
+
+            {/* Divider */}
+            <View style={{ backgroundColor: colors.light.outlineVariant, height: 1, marginHorizontal: spacing[4] }} />
+
+            {/* Item 2: Privacy */}
             <Pressable
               accessibilityLabel="Privacy Settings"
               accessibilityRole="button"

@@ -46,7 +46,7 @@ export default function SplashScreen() {
     <SafeAreaView
       className="flex-1 items-center justify-center"
       style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" backgroundColor={colors.light.background} />
+      <StatusBar style="dark" />
 
       <View className="items-center justify-center px-6">
         {/* App Logo */}

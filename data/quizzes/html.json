@@ -1,0 +1,151 @@
+{
+  "courseId": "html",
+  "quizzes": {
+    "html-01": {
+      "courseId": "html",
+      "moduleId": "html-01",
+      "title": "HTML Module 1 Quiz",
+      "description": "Test your understanding of basic HTML tags and structure.",
+      "questions": [
+        {
+          "id": "html-m1-q1",
+          "question": "What is the main purpose of HTML?",
+          "options": [
+            "To style the appearance of a webpage",
+            "To structure the content of a webpage",
+            "To store data in a database",
+            "To create network connections",
+            "To control computer hardware"
+          ],
+          "correctAnswer": 1,
+          "explanation": "HTML is used to structure webpage content such as headings, paragraphs, links, images, and other elements."
+        },
+        {
+          "id": "html-m1-q2",
+          "question": "Which HTML tag is used for the main heading of a webpage?",
+          "options": [
+            "<p>",
+            "<head>",
+            "<h1>",
+            "<title>",
+            "<heading>"
+          ],
+          "correctAnswer": 2,
+          "explanation": "The <h1> element represents the highest-level heading in the HTML document."
+        },
+        {
+          "id": "html-m1-q3",
+          "question": "Which tag is used to create a paragraph in HTML?",
+          "options": [
+            "<paragraph>",
+            "<text>",
+            "<p>",
+            "<para>",
+            "<content>"
+          ],
+          "correctAnswer": 2,
+          "explanation": "The <p> element is used to define a paragraph."
+        },
+        {
+          "id": "html-m1-q4",
+          "question": "Which HTML element is used to create a hyperlink?",
+          "options": [
+            "<link>",
+            "<a>",
+            "<href>",
+            "<url>",
+            "<hyperlink>"
+          ],
+          "correctAnswer": 1,
+          "explanation": "The <a> element creates a hyperlink. Its href attribute specifies the destination URL."
+        },
+        {
+          "id": "html-m1-q5",
+          "question": "Which HTML element is commonly used to display an image?",
+          "options": [
+            "<picture>",
+            "<src>",
+            "<image>",
+            "<img>",
+            "<photo>"
+          ],
+          "correctAnswer": 3,
+          "explanation": "The <img> element is used to embed an image in an HTML document."
+        }
+      ]
+    },
+    "html-02": {
+      "courseId": "html",
+      "moduleId": "html-02",
+      "title": "HTML Module 2 Quiz",
+      "description": "Test your understanding of HTML forms and data validation.",
+      "questions": [
+        {
+          "id": "html-m2-q1",
+          "question": "Which HTML element is used to create a form?",
+          "options": [
+            "<input>",
+            "<form>",
+            "<data>",
+            "<fieldset>",
+            "<submit>"
+          ],
+          "correctAnswer": 1,
+          "explanation": "The <form> element defines a section used to collect and submit user input."
+        },
+        {
+          "id": "html-m2-q2",
+          "question": "Which attribute makes an input field required before a form can be submitted?",
+          "options": [
+            "validate",
+            "mandatory",
+            "required",
+            "needed",
+            "mustfill"
+          ],
+          "correctAnswer": 2,
+          "explanation": "The required attribute tells the browser that the user must provide a value before submitting the form."
+        },
+        {
+          "id": "html-m2-q3",
+          "question": "Which input type is most appropriate for collecting an email address?",
+          "options": [
+            "type=\"text\"",
+            "type=\"mail\"",
+            "type=\"email\"",
+            "type=\"address\"",
+            "type=\"contact\""
+          ],
+          "correctAnswer": 2,
+          "explanation": "type=\"email\" is designed for email addresses and allows the browser to perform basic email-format validation."
+        },
+        {
+          "id": "html-m2-q4",
+          "question": "What is the main purpose of the <label> element?",
+          "options": [
+            "To submit a form",
+            "To display an image",
+            "To describe or identify a form control",
+            "To validate a password",
+            "To store user data"
+          ],
+          "correctAnswer": 2,
+          "explanation": "The <label> element provides a text label for a form control and improves usability and accessibility."
+        },
+        {
+          "id": "html-m2-q5",
+          "question": "Which attribute can be used to limit the number of characters entered into a text input?",
+          "options": [
+            "maxlength",
+            "limit",
+            "characters",
+            "maxtext",
+            "length"
+          ],
+          "correctAnswer": 0,
+          "explanation": "The maxlength attribute specifies the maximum number of characters that the user can enter."
+        }
+      ]
+    }
+  }
+}
