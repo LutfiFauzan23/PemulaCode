@@ -3,8 +3,6 @@ import { StatusBar } from 'expo-status-bar';
 import {
   Bell,
   Check,
-  Code,
-  Code2,
   Copy,
   Eye,
   Globe,
@@ -15,8 +13,6 @@ import {
 import React, { useState } from 'react';
 import {
   Image,
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
   ScrollView,
   TextInput,
@@ -25,10 +21,11 @@ import {
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useTheme } from '@/context/ThemeContext';
+import { useTranslation } from '@/translations';
 
 type LanguageKey = 'html' | 'css' | 'js';
 
@@ -41,8 +38,8 @@ const INITIAL_CODE: Record<LanguageKey, CodeSnippet> = {
   html: {
     filename: 'index.html',
     code: `<div class="hero">
-  <h1>Hello, Coder!</h1>
-  <p>Welcome to the playground.</p>
+  <h1>Halo, Coder!</h1>
+  <p>Selamat datang di playground.</p>
 </div>`,
   },
   css: {
@@ -59,13 +56,15 @@ const INITIAL_CODE: Record<LanguageKey, CodeSnippet> = {
     code: `console.log("Hello, World!");
 
 function greet() {
-  alert("Welcome to Pemula!");
+  alert("Selamat datang di Pemula!");
 }`,
   },
 };
 
 export default function PlaygroundScreen() {
   const router = useRouter();
+  const { colors: c, mode } = useTheme();
+  const { t } = useTranslation();
   const [activeLang, setActiveLang] = useState<LanguageKey>('html');
   const [codeMap, setCodeMap] = useState<Record<LanguageKey, string>>({
     html: INITIAL_CODE.html.code,
@@ -100,16 +99,16 @@ export default function PlaygroundScreen() {
     const h1Match = html.match(/<h1>(.*?)<\/h1>/i);
     const pMatch = html.match(/<p>(.*?)<\/p>/i);
     return {
-      h1: h1Match ? h1Match[1] : 'Hello, Coder!',
-      p: pMatch ? pMatch[1] : 'Welcome to the playground.',
+      h1: h1Match ? h1Match[1] : 'Halo, Coder!',
+      p: pMatch ? pMatch[1] : 'Selamat datang di playground.',
     };
   };
 
   const parsedPreview = getParsedHtml();
 
   return (
-    <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" />
+    <ScreenContainer padded={false} style={{ backgroundColor: c.background }}>
+      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
 
       <ScrollView
         style={{ flex: 1 }}
@@ -123,7 +122,7 @@ export default function PlaygroundScreen() {
           <View
             style={{
               alignItems: 'center',
-              backgroundColor: colors.light.background,
+              backgroundColor: c.background,
               flexDirection: 'row',
               height: 60,
               justifyContent: 'space-between',
@@ -137,7 +136,7 @@ export default function PlaygroundScreen() {
               style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[3] }}>
               <View
                 style={{
-                  borderColor: colors.light.primary,
+                  borderColor: c.primary,
                   borderRadius: radius.full,
                   borderWidth: 2,
                   height: 40,
@@ -151,7 +150,7 @@ export default function PlaygroundScreen() {
                 />
               </View>
               <AppText
-                color={colors.light.primary}
+                color={c.primary}
                 style={{
                   fontFamily: typography.family.sansBold,
                   fontSize: 20,
@@ -170,14 +169,14 @@ export default function PlaygroundScreen() {
               style={({ pressed }) => ({
                 alignItems: 'center',
                 backgroundColor: pressed
-                  ? colors.light.surfaceContainerHigh
-                  : colors.light.surfaceContainerLow,
+                  ? c.surfaceContainerHigh
+                  : c.surfaceContainerLow,
                 borderRadius: radius.full,
                 height: 40,
                 justifyContent: 'center',
                 width: 40,
               })}>
-              <Bell color={colors.light.primary} size={20} />
+              <Bell color={c.primary} size={20} />
             </Pressable>
           </View>
 
@@ -197,12 +196,12 @@ export default function PlaygroundScreen() {
                   alignItems: 'center',
                   backgroundColor:
                     activeLang === 'html'
-                      ? colors.light.secondaryFixed
-                      : colors.light.surfaceContainerLow,
+                      ? c.secondaryFixed
+                      : c.surfaceContainerLow,
                   borderColor:
                     activeLang === 'html'
-                      ? colors.light.secondary
-                      : colors.light.outlineVariant,
+                      ? c.secondary
+                      : c.outlineVariant,
                   borderRadius: radius.xl,
                   borderWidth: 1,
                   flexDirection: 'row',
@@ -214,16 +213,16 @@ export default function PlaygroundScreen() {
                 <Globe
                   color={
                     activeLang === 'html'
-                      ? colors.light.secondary
-                      : colors.light.onSurfaceVariant
+                      ? c.secondary
+                      : c.onSurfaceVariant
                   }
                   size={18}
                 />
                 <AppText
                   color={
                     activeLang === 'html'
-                      ? colors.light.secondary
-                      : colors.light.onSurfaceVariant
+                      ? c.secondary
+                      : c.onSurfaceVariant
                   }
                   style={{
                     fontFamily: typography.family.mono,
@@ -243,12 +242,12 @@ export default function PlaygroundScreen() {
                   alignItems: 'center',
                   backgroundColor:
                     activeLang === 'css'
-                      ? colors.light.secondaryFixed
-                      : colors.light.surfaceContainerLow,
+                      ? c.secondaryFixed
+                      : c.surfaceContainerLow,
                   borderColor:
                     activeLang === 'css'
-                      ? colors.light.secondary
-                      : colors.light.outlineVariant,
+                      ? c.secondary
+                      : c.outlineVariant,
                   borderRadius: radius.xl,
                   borderWidth: 1,
                   flexDirection: 'row',
@@ -260,16 +259,16 @@ export default function PlaygroundScreen() {
                 <Palette
                   color={
                     activeLang === 'css'
-                      ? colors.light.secondary
-                      : colors.light.onSurfaceVariant
+                      ? c.secondary
+                      : c.onSurfaceVariant
                   }
                   size={18}
                 />
                 <AppText
                   color={
                     activeLang === 'css'
-                      ? colors.light.secondary
-                      : colors.light.onSurfaceVariant
+                      ? c.secondary
+                      : c.onSurfaceVariant
                   }
                   style={{
                     fontFamily: typography.family.mono,
@@ -289,12 +288,12 @@ export default function PlaygroundScreen() {
                   alignItems: 'center',
                   backgroundColor:
                     activeLang === 'js'
-                      ? colors.light.secondaryFixed
-                      : colors.light.surfaceContainerLow,
+                      ? c.secondaryFixed
+                      : c.surfaceContainerLow,
                   borderColor:
                     activeLang === 'js'
-                      ? colors.light.secondary
-                      : colors.light.outlineVariant,
+                      ? c.secondary
+                      : c.outlineVariant,
                   borderRadius: radius.xl,
                   borderWidth: 1,
                   flexDirection: 'row',
@@ -306,16 +305,16 @@ export default function PlaygroundScreen() {
                 <Terminal
                   color={
                     activeLang === 'js'
-                      ? colors.light.secondary
-                      : colors.light.onSurfaceVariant
+                      ? c.secondary
+                      : c.onSurfaceVariant
                   }
                   size={18}
                 />
                 <AppText
                   color={
                     activeLang === 'js'
-                      ? colors.light.secondary
-                      : colors.light.onSurfaceVariant
+                      ? c.secondary
+                      : c.onSurfaceVariant
                   }
                   style={{
                     fontFamily: typography.family.mono,
@@ -336,7 +335,7 @@ export default function PlaygroundScreen() {
                 borderRadius: radius['2xl'],
                 elevation: 8,
                 overflow: 'hidden',
-                shadowColor: colors.light.primary,
+                shadowColor: c.primary,
                 shadowOffset: { width: 0, height: 8 },
                 shadowOpacity: 0.15,
                 shadowRadius: 20,
@@ -381,7 +380,7 @@ export default function PlaygroundScreen() {
                       <AppText
                         color="#22c55e"
                         style={{ fontFamily: typography.family.mono, fontSize: 11 }}>
-                        Copied
+                        {t('copied')}
                       </AppText>
                     </>
                   ) : (
@@ -419,8 +418,8 @@ export default function PlaygroundScreen() {
                   style={({ pressed }) => ({
                     alignItems: 'center',
                     backgroundColor: pressed
-                      ? colors.light.primaryPressed
-                      : colors.light.primary,
+                      ? c.primaryPressed
+                      : c.primary,
                     borderRadius: radius.xl,
                     flexDirection: 'row',
                     gap: spacing[2],
@@ -435,7 +434,7 @@ export default function PlaygroundScreen() {
                       fontFamily: typography.family.sansBold,
                       fontSize: 16,
                     }}>
-                    Run Code
+                    {t('runCode')}
                   </AppText>
                 </Pressable>
               </View>
@@ -446,13 +445,13 @@ export default function PlaygroundScreen() {
           <View style={{ marginTop: spacing[6], paddingHorizontal: spacing[5] }}>
             <View
               style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                borderColor: colors.light.outlineVariant,
+                backgroundColor: c.surfaceContainerLowest,
+                borderColor: c.outlineVariant,
                 borderRadius: radius['2xl'],
                 borderWidth: 1,
                 elevation: 4,
                 overflow: 'hidden',
-                shadowColor: colors.light.primary,
+                shadowColor: c.primary,
                 shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.08,
                 shadowRadius: 12,
@@ -461,8 +460,8 @@ export default function PlaygroundScreen() {
               <View
                 style={{
                   alignItems: 'center',
-                  backgroundColor: colors.light.surfaceContainerLow,
-                  borderColor: colors.light.outlineVariant,
+                  backgroundColor: c.surfaceContainerLow,
+                  borderColor: c.outlineVariant,
                   borderBottomWidth: 1,
                   flexDirection: 'row',
                   height: 44,
@@ -470,16 +469,16 @@ export default function PlaygroundScreen() {
                   paddingHorizontal: spacing[4],
                 }}>
                 <View style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[2] }}>
-                  <Eye color={colors.light.onSurfaceVariant} size={18} />
+                  <Eye color={c.onSurfaceVariant} size={18} />
                   <AppText
-                    color={colors.light.onSurfaceVariant}
+                    color={c.onSurfaceVariant}
                     style={{
                       fontFamily: typography.family.mono,
                       fontSize: 12,
                       fontWeight: 'bold',
                       letterSpacing: 0.5,
                     }}>
-                    LIVE PREVIEW
+                    {t('livePreview')}
                   </AppText>
                 </View>
 
@@ -500,7 +499,7 @@ export default function PlaygroundScreen() {
                       fontSize: 12,
                       fontWeight: '600',
                     }}>
-                    Live
+                    {t('active')}
                   </AppText>
                 </View>
               </View>
@@ -509,7 +508,7 @@ export default function PlaygroundScreen() {
               <View
                 style={{
                   alignItems: 'center',
-                  backgroundColor: '#ffffff',
+                  backgroundColor: c.surfaceContainerLowest,
                   justifyContent: 'center',
                   minHeight: 140,
                   padding: spacing[6],
@@ -517,7 +516,7 @@ export default function PlaygroundScreen() {
                 {activeLang === 'html' ? (
                   <View style={{ alignItems: 'center' }}>
                     <AppText
-                      color={colors.light.text}
+                      color={c.text}
                       style={{
                         fontFamily: typography.family.sansBold,
                         fontSize: 22,
@@ -527,7 +526,7 @@ export default function PlaygroundScreen() {
                       {parsedPreview.h1}
                     </AppText>
                     <AppText
-                      color={colors.light.onSurfaceVariant}
+                      color={c.onSurfaceVariant}
                       style={{
                         fontSize: 15,
                         lineHeight: 22,
@@ -542,22 +541,22 @@ export default function PlaygroundScreen() {
                     <View
                       style={{
                         alignItems: 'center',
-                        backgroundColor: colors.light.primaryFixed,
-                        borderColor: colors.light.primary,
+                        backgroundColor: c.primaryFixed,
+                        borderColor: c.primary,
                         borderRadius: radius.xl,
                         borderWidth: 1,
                         padding: spacing[5],
                       }}>
                       <AppText
-                        color={colors.light.primary}
+                        color={c.primary}
                         style={{
                           fontFamily: typography.family.sansBold,
                           fontSize: 18,
                         }}>
-                        Styled Hero Element
+                        {t('styledHeroElement')}
                       </AppText>
                       <AppText
-                        color={colors.light.onSurfaceVariant}
+                        color={c.onSurfaceVariant}
                         style={{
                           fontFamily: typography.family.mono,
                           fontSize: 13,
@@ -582,7 +581,7 @@ export default function PlaygroundScreen() {
                           fontSize: 13,
                           lineHeight: 20,
                         }}>
-                        Console Output:
+                        {t('consoleOutput')}
                       </AppText>
                       <AppText
                         color="#f8fafc"

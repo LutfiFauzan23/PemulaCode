@@ -4,7 +4,6 @@ import {
   Home,
   MessageCircleMore,
   BookOpenCheck,
-  User,
   Trophy,
   Settings,
 } from 'lucide-react-native';
@@ -20,6 +19,8 @@ import {
 import { AppText } from '@/components/ui/AppText';
 import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
+import { useTheme } from '@/context/ThemeContext';
+import { useTranslation } from '@/translations';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -32,27 +33,27 @@ export const TAB_BAR_CLEARANCE = 100;
 const TAB_CONFIG: Record<string, any> = {
   index: {
     icon: Home,
-    label: 'Home',
+    labelKey: 'home',
   },
 
   community: {
     icon: MessageCircleMore,
-    label: 'Community',
+    labelKey: 'community',
   },
 
   learn: {
     icon: BookOpenCheck,
-    label: 'Learn',
+    labelKey: 'learn',
   },
 
   leaderboard: {
     icon: Trophy,
-    label: 'Leaderboard',
+    labelKey: 'leaderboard',
   },
 
   settings: {
     icon: Settings,
-    label: 'Setting',
+    labelKey: 'setting',
   }
 };
 
@@ -66,6 +67,8 @@ function CustomTabBar({
   descriptors,
   navigation,
 }: any) {
+  const { colors: themeColors } = useTheme();
+  const { t } = useTranslation();
   const currentRoute = state.routes[state.index];
   const { options } = descriptors[currentRoute.key];
 
@@ -88,7 +91,13 @@ function CustomTabBar({
 );
   return (
     <View style={styles.bottomContainer}>
-      <View style={styles.navbar}>
+      <View style={[
+        styles.navbar,
+        {
+          backgroundColor: themeColors.surfaceContainerLowest,
+          borderColor: themeColors.outlineVariant,
+        }
+      ]}>
 
         {visibleRoutes.map((route: any) => {
           const originalIndex = state.routes.findIndex(
@@ -103,7 +112,7 @@ function CustomTabBar({
           const config = TAB_CONFIG[route.name];
 
           const Icon = config.icon;
-          const label = config.label;
+          const label = t(config.labelKey);
 
 
           // ============================================
@@ -134,6 +143,7 @@ function CustomTabBar({
               isFocused={isFocused}
               options={options}
               onPress={onPress}
+              themeColors={themeColors}
             />
           );
         })}
@@ -154,6 +164,7 @@ function TabButton({
   isFocused,
   options,
   onPress,
+  themeColors,
 }: any) {
 
   const scale = new Animated.Value(1);
@@ -205,7 +216,10 @@ function TabButton({
           style={[
             styles.tab,
 
-            isFocused && styles.activeTab,
+            isFocused && [
+              styles.activeTab,
+              { backgroundColor: themeColors?.primaryFixed ?? colors.light.primaryFixed },
+            ],
 
             {
               transform: [
@@ -222,8 +236,8 @@ function TabButton({
 
             color={
               isFocused
-                ? colors.light.primary
-                : colors.light.onSurfaceVariant
+                ? (themeColors?.primary ?? colors.light.primary)
+                : (themeColors?.onSurfaceVariant ?? colors.light.onSurfaceVariant)
             }
 
             strokeWidth={
@@ -234,7 +248,7 @@ function TabButton({
 
           {isFocused && (
             <AppText
-              color={colors.light.primary}
+              color={themeColors?.primary ?? colors.light.primary}
 
               style={styles.activeLabel}
 
@@ -258,12 +272,13 @@ function TabButton({
 // ======================================================
 
 export default function TabsLayout() {
+  const { colors: themeColors, mode } = useTheme();
   return (
     <SafeAreaView
       edges={['top']}
       style={{
         flex: 1,
-        backgroundColor: colors.light.background,
+        backgroundColor: themeColors.background,
       }}
     >
       <Tabs

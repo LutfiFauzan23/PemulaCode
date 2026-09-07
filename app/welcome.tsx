@@ -10,10 +10,10 @@ import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
 import { PrimaryButton } from '@/components/ui/PrimaryButton';
 import { SecondaryButton } from '@/components/ui/SecondaryButton';
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useTheme } from '@/context/ThemeContext';
 
 const CHIPS = [
   { icon: Code2, label: 'Playground' },
@@ -21,18 +21,20 @@ const CHIPS = [
   { icon: Trophy, label: 'Ranking' },
 ];
 
-const CODE_LINES: { color: string; width: `${number}%`; indent?: number }[] = [
-  { color: colors.light.primary, width: '38%' },
-  { color: colors.light.secondary, width: '62%', indent: 1 },
-  { color: colors.light.outlineVariant, width: '48%', indent: 1 },
-  { color: colors.light.outlineVariant, width: '55%', indent: 2 },
-  { color: colors.light.primary, width: '30%' },
-];
+import { useTranslation } from '@/translations';
 
 export default function WelcomeScreen() {
   const router = useRouter();
+  const { colors, mode } = useTheme();
+  const { t } = useTranslation();
   const { height } = useWindowDimensions();
   const compact = height < 760;
+
+  const CHIPS = [
+    { icon: Code2, label: t('playground') },
+    { icon: BookOpenCheck, label: t('curriculum') },
+    { icon: Trophy, label: t('leaderboard') },
+  ];
 
   const fade = useRef(new Animated.Value(0)).current;
 
@@ -47,9 +49,17 @@ export default function WelcomeScreen() {
     return () => animation.stop();
   }, [fade]);
 
+  const CODE_LINES: { color: string; width: `${number}%`; indent?: number }[] = [
+    { color: colors.primary, width: '38%' },
+    { color: colors.secondary, width: '62%', indent: 1 },
+    { color: colors.outlineVariant, width: '48%', indent: 1 },
+    { color: colors.outlineVariant, width: '55%', indent: 2 },
+    { color: colors.primary, width: '30%' },
+  ];
+
   return (
-    <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" />
+    <ScreenContainer padded={false} style={{ backgroundColor: colors.background }}>
+      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
 
       <ScrollView
         bounces={false}
@@ -73,7 +83,7 @@ export default function WelcomeScreen() {
             }}>
             <AppLogo shadow size={40} />
             <AppText
-              color={colors.light.text}
+              color={colors.text}
               style={{
                 fontFamily: typography.family.sansBold,
                 fontSize: 20,
@@ -83,16 +93,16 @@ export default function WelcomeScreen() {
             </AppText>
           </View>
 
-          {/* Code-window illustration (self-contained, no external component) */}
+          {/* Code-window illustration */}
           <View
             style={{
-              backgroundColor: colors.light.surfaceContainerLowest,
-              borderColor: colors.light.outlineVariant,
+              backgroundColor: colors.surfaceContainerLowest,
+              borderColor: colors.outlineVariant,
               borderRadius: radius['2xl'],
               borderWidth: 1,
               elevation: 6,
               overflow: 'hidden',
-              shadowColor: colors.light.primary,
+              shadowColor: colors.primary,
               shadowOffset: { width: 0, height: 8 },
               shadowOpacity: 0.1,
               shadowRadius: 18,
@@ -102,8 +112,8 @@ export default function WelcomeScreen() {
             <View
               style={{
                 alignItems: 'center',
-                backgroundColor: colors.light.surfaceContainerLow,
-                borderBottomColor: colors.light.outlineVariant,
+                backgroundColor: colors.surfaceContainerLow,
+                borderBottomColor: colors.outlineVariant,
                 borderBottomWidth: 1,
                 flexDirection: 'row',
                 gap: spacing[2],
@@ -114,7 +124,7 @@ export default function WelcomeScreen() {
               <View style={{ backgroundColor: '#F59E0B', borderRadius: radius.full, height: 10, width: 10 }} />
               <View style={{ backgroundColor: '#22C55E', borderRadius: radius.full, height: 10, width: 10 }} />
               <AppText
-                color={colors.light.onSurfaceVariant}
+                color={colors.onSurfaceVariant}
                 style={{ fontFamily: typography.family.mono, fontSize: 11, marginLeft: spacing[2] }}>
                 app.js
               </AppText>
@@ -130,7 +140,7 @@ export default function WelcomeScreen() {
                     borderRadius: radius.sm,
                     height: 10,
                     marginLeft: (line.indent ?? 0) * spacing[4],
-                    opacity: line.color === colors.light.outlineVariant ? 1 : 0.85,
+                    opacity: line.color === colors.outlineVariant ? 1 : 0.85,
                     width: line.width,
                   }}
                 />
@@ -141,26 +151,26 @@ export default function WelcomeScreen() {
             <View
               style={{
                 alignItems: 'center',
-                backgroundColor: colors.light.primaryFixed,
-                borderTopColor: colors.light.outlineVariant,
+                backgroundColor: colors.primaryFixed,
+                borderTopColor: colors.outlineVariant,
                 borderTopWidth: 1,
                 flexDirection: 'row',
                 gap: spacing[2],
                 paddingHorizontal: spacing[4],
                 paddingVertical: spacing[3],
               }}>
-              <Trophy color={colors.light.primary} size={16} />
+              <Trophy color={colors.primary} size={16} />
               <AppText
-                color={colors.light.primary}
+                color={colors.primary}
                 style={{ fontFamily: typography.family.sansBold, fontSize: 13 }}>
-                +50 XP setiap pelajaran selesai
+                +50 XP
               </AppText>
             </View>
           </View>
 
           {/* Headline */}
           <AppText
-            color={colors.light.text}
+            color={colors.text}
             style={{
               fontFamily: typography.family.sansExtraBold,
               fontSize: 26,
@@ -168,10 +178,10 @@ export default function WelcomeScreen() {
               marginTop: spacing[6],
               textAlign: 'center',
             }}>
-            Mulai Perjalanan{'\n'}Codingmu
+            {t('welcomeTitle')}
           </AppText>
           <AppText
-            color={colors.light.onSurfaceVariant}
+            color={colors.onSurfaceVariant}
             style={{
               fontSize: 15,
               lineHeight: 22,
@@ -180,7 +190,7 @@ export default function WelcomeScreen() {
               opacity: 0.85,
               textAlign: 'center',
             }}>
-            Satu langkah kecil setiap hari, jadi programmer bukan lagi mimpi.
+            {t('welcomeSubtitle')}
           </AppText>
 
           {/* Feature chips */}
@@ -197,8 +207,8 @@ export default function WelcomeScreen() {
                 key={label}
                 style={{
                   alignItems: 'center',
-                  backgroundColor: colors.light.surfaceContainerLow,
-                  borderColor: colors.light.outlineVariant,
+                  backgroundColor: colors.surfaceContainerLow,
+                  borderColor: colors.outlineVariant,
                   borderRadius: radius.full,
                   borderWidth: 1,
                   flexDirection: 'row',
@@ -206,9 +216,9 @@ export default function WelcomeScreen() {
                   paddingHorizontal: spacing[3],
                   paddingVertical: spacing[2],
                 }}>
-                <Icon color={colors.light.primary} size={15} />
+                <Icon color={colors.primary} size={15} />
                 <AppText
-                  color={colors.light.onSurfaceVariant}
+                  color={colors.onSurfaceVariant}
                   style={{
                     fontFamily: typography.family.mono,
                     fontSize: 12,
@@ -222,36 +232,36 @@ export default function WelcomeScreen() {
           {/* Actions */}
           <View style={{ gap: spacing[3], marginTop: spacing[4], width: '100%' }}>
             <PrimaryButton
-              accessibilityLabel="Get Started"
+              accessibilityLabel={t('getStarted')}
               accessibilityRole="button"
               onPress={() => router.push('/onboarding')}
               style={({ pressed }) => ({
-                backgroundColor: pressed ? colors.light.primaryPressed : colors.light.primary,
+                backgroundColor: pressed ? colors.primaryPressed : colors.primary,
                 borderRadius: radius.full,
                 elevation: 8,
                 minHeight: 56,
-                shadowColor: colors.light.primary,
+                shadowColor: colors.primary,
                 shadowOffset: { width: 0, height: 8 },
                 shadowOpacity: 0.22,
                 shadowRadius: 18,
               })}
-              title="Get Started"
+              title={t('getStarted')}
             />
 
             <SecondaryButton
-              accessibilityLabel="Sign In"
+              accessibilityLabel={t('login')}
               accessibilityRole="button"
               onPress={() => router.push('/(auth)/login')}
               style={({ pressed }) => ({
                 backgroundColor: pressed
-                  ? colors.light.surfaceContainer
-                  : colors.light.surfaceContainerLow,
-                borderColor: colors.light.outlineVariant,
+                  ? colors.surfaceContainer
+                  : colors.surfaceContainerLow,
+                borderColor: colors.outlineVariant,
                 borderRadius: radius.full,
                 borderWidth: 1,
                 minHeight: 56,
               })}
-              title="Sign In"
+              title={t('login')}
             />
           </View>
 

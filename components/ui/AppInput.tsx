@@ -1,10 +1,10 @@
 import React, { type ReactNode, useState } from 'react';
 import { TextInput, type TextInputProps, View, type ViewStyle } from 'react-native';
 
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useTheme } from '@/context/ThemeContext';
 import { AppText } from './AppText';
 
 export type AppInputProps = TextInputProps & {
@@ -29,13 +29,14 @@ export function AppInput({
   style,
   ...props
 }: AppInputProps) {
+  const { colors } = useTheme();
   const [isFocused, setIsFocused] = useState(false);
 
-  const iconColor = isFocused ? colors.light.primary : colors.light.outline;
+  const iconColor = isFocused ? colors.primary : colors.outline;
 
   const renderedLeftIcon = React.isValidElement(leftIcon)
     ? React.cloneElement(leftIcon as React.ReactElement<{ color?: string }>, {
-        color: (leftIcon.props as { color?: string }).color === colors.light.primary ? colors.light.primary : iconColor,
+        color: (leftIcon.props as { color?: string }).color === colors.primary ? colors.primary : iconColor,
       })
     : leftIcon;
 
@@ -50,7 +51,7 @@ export function AppInput({
           }}>
           {label ? (
             <AppText
-              color={colors.light.text}
+              color={colors.text}
               style={{ fontFamily: typography.family.mono, fontSize: 14, lineHeight: 20 }}>
               {label}
             </AppText>
@@ -62,12 +63,12 @@ export function AppInput({
       <View
         style={{
           alignItems: 'center',
-          backgroundColor: colors.light.surfaceContainerLow,
+          backgroundColor: colors.surfaceContainerLow,
           borderColor: error
-            ? colors.light.danger
+            ? colors.danger
             : isFocused
-              ? colors.light.primary
-              : colors.light.outlineVariant,
+              ? colors.primary
+              : colors.outlineVariant,
           borderRadius: radius.lg,
           borderWidth: 1,
           flexDirection: 'row',
@@ -87,10 +88,10 @@ export function AppInput({
             setIsFocused(true);
             onFocus?.(e);
           }}
-          placeholderTextColor={colors.light.outline}
+          placeholderTextColor={colors.outline}
           style={[
             {
-              color: colors.light.text,
+              color: colors.text,
               flex: 1,
               fontFamily: typography.family.sans,
               fontSize: 16,
@@ -105,7 +106,7 @@ export function AppInput({
       </View>
 
       {error ? (
-        <AppText color={colors.light.danger} variant="caption">
+        <AppText color={colors.danger} variant="caption">
           {error}
         </AppText>
       ) : null}

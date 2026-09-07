@@ -3,10 +3,10 @@ import React from 'react';
 import { ScrollView, View } from 'react-native';
 
 import { AppText } from '@/components/ui/AppText';
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useTheme } from '@/context/ThemeContext';
 
 export type SectionData = {
   type: 'heading' | 'paragraph' | 'tip' | 'code' | 'subheading';
@@ -23,12 +23,15 @@ type Props = {
   accentFixed?: string;
 };
 
-export function LessonSection({ section, accentColor = colors.light.primary, accentFixed = colors.light.primaryFixed }: Props) {
+export function LessonSection({ section, accentColor, accentFixed }: Props) {
+  const { colors: c, mode } = useTheme();
+  const effectiveAccent = accentColor ?? c.primary;
+
   switch (section.type) {
     case 'heading':
       return (
         <AppText
-          color={accentColor}
+          color={effectiveAccent}
           style={{
             fontFamily: typography.family.sansBold,
             fontSize: 22,
@@ -43,7 +46,7 @@ export function LessonSection({ section, accentColor = colors.light.primary, acc
     case 'subheading':
       return (
         <AppText
-          color={colors.light.text}
+          color={c.text}
           style={{
             fontFamily: typography.family.sansBold,
             fontSize: 18,
@@ -58,7 +61,7 @@ export function LessonSection({ section, accentColor = colors.light.primary, acc
     case 'paragraph':
       return (
         <AppText
-          color={colors.light.text}
+          color={c.text}
           style={{
             fontSize: 15,
             lineHeight: 24,
@@ -72,8 +75,8 @@ export function LessonSection({ section, accentColor = colors.light.primary, acc
       return (
         <View
           style={{
-            backgroundColor: '#FFFBEB',
-            borderColor: '#FCD34D',
+            backgroundColor: mode === 'dark' ? '#2d2305' : '#FFFBEB',
+            borderColor: mode === 'dark' ? '#5c480a' : '#FCD34D',
             borderLeftColor: '#F59E0B',
             borderLeftWidth: 4,
             borderRadius: radius.xl,
@@ -84,16 +87,16 @@ export function LessonSection({ section, accentColor = colors.light.primary, acc
           <View style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[2], marginBottom: spacing[1] }}>
             <Lightbulb color="#D97706" size={18} />
             <AppText
-              color="#B45309"
+              color={mode === 'dark' ? '#fbbf24' : '#B45309'}
               style={{
                 fontFamily: typography.family.sansBold,
                 fontSize: 15,
               }}>
-              {section.title || 'Did you know?'}
+              {section.title || 'Tahukah Kamu?'}
             </AppText>
           </View>
           <AppText
-            color="#92400E"
+            color={mode === 'dark' ? '#fef3c7' : '#92400E'}
             style={{
               fontSize: 14,
               lineHeight: 21,

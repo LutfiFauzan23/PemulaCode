@@ -1,12 +1,5 @@
-/**
- * Onboarding Screen 1 — "Practice with Interactive Coding"
- *
- * NEW FILE: does not modify any existing screen, component, or constant.
- * Routing: already declared in app/_layout.tsx (<Stack.Screen name="onboarding" />)
- *          and already triggered by welcome.tsx (router.push('/onboarding')).
- */
-
 import { useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef } from 'react';
 import {
   Animated,
@@ -18,34 +11,26 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useTheme } from '@/context/ThemeContext';
 
-// ─── Colour aliases (onboarding-specific, not modifying constants/colors.ts) ───
-const C = {
-  bg: colors.light.background,          // #F7F9FB
-  primary: colors.light.primary,        // #4648D4
-  primaryFg: colors.light.onPrimary,    // #FFFFFF
-  primaryPressed: colors.light.primaryPressed,
-  text: colors.light.onSurface,
-  textMuted: colors.light.onSurfaceVariant,
-  orange: '#FF914E',
-  editorBg: '#1A1F2E',
-  editorPane: '#141824',
-  dotRed: '#FF5F57',
-  dotYellow: '#FEBC2E',
-  dotGreen: '#28C840',
-  codeKeyword: '#C792EA',
-  codeConst: '#82AAFF',
-  codeString: '#C3E88D',
-  codeFn: '#82AAFF',
-  codeParam: '#FFCB6B',
-  codePunct: '#89DDFF',
-  codeComment: '#546E7A',
-  codeDefault: '#EEFFFF',
-} as const;
+// ─── Syntax-highlighted code line helper ────────────────────────────────────
+type CodeSpan = { text: string; color: string };
+
+function CodeLine({ spans, indent = 0 }: { spans: CodeSpan[]; indent?: number }) {
+  return (
+    <Text style={{ fontFamily: typography.family.mono, fontSize: 12, lineHeight: 20 }}>
+      {'  '.repeat(indent)}
+      {spans.map((s, i) => (
+        <Text key={i} style={{ color: s.color }}>
+          {s.text}
+        </Text>
+      ))}
+    </Text>
+  );
+}
 
 // ─── Blinking cursor hook ────────────────────────────────────────────────────
 function useBlinkingCursor() {
@@ -75,7 +60,7 @@ function useBlinkingCursor() {
   return opacity;
 }
 
-// ─── Floating (bob) animation hook ──────────────────────────────────────────
+// ─── Floating animation hook ──────────────────────────────────────────
 function useFloatAnimation() {
   const translateY = useRef(new Animated.Value(0)).current;
 
@@ -103,36 +88,33 @@ function useFloatAnimation() {
   return translateY;
 }
 
-// ─── Syntax-highlighted code line helper ────────────────────────────────────
-type CodeSpan = { text: string; color: string };
-
-function CodeLine({ spans, indent = 0 }: { spans: CodeSpan[]; indent?: number }) {
-  return (
-    <Text style={{ fontFamily: typography.family.mono, fontSize: 12, lineHeight: 20 }}>
-      {'  '.repeat(indent)}
-      {spans.map((s, i) => (
-        <Text key={i} style={{ color: s.color }}>
-          {s.text}
-        </Text>
-      ))}
-    </Text>
-  );
-}
-
 // ─── Code Editor Illustration ────────────────────────────────────────────────
 function CodeEditorCard() {
+  const { colors } = useTheme();
   const cursorOpacity = useBlinkingCursor();
   const floatY = useFloatAnimation();
+
+  const C = {
+    editorBg: '#1A1F2E',
+    editorPane: '#141824',
+    dotRed: '#FF5F57',
+    dotYellow: '#FEBC2E',
+    dotGreen: '#28C840',
+    codeKeyword: '#C792EA',
+    codeConst: '#82AAFF',
+    codeString: '#C3E88D',
+    codeFn: '#82AAFF',
+    codePunct: '#89DDFF',
+    codeDefault: '#EEFFFF',
+  };
 
   return (
     <Animated.View
       style={{
         transform: [{ translateY: floatY }],
-        // Lay out relative so the console badge can overlap
         position: 'relative',
-        marginBottom: 24,  // extra space so the floating badge isn't clipped
+        marginBottom: 24,
       }}>
-      {/* ── Main editor card ── */}
       <View
         style={{
           backgroundColor: C.editorBg,
@@ -145,7 +127,6 @@ function CodeEditorCard() {
           shadowRadius: 24,
           paddingBottom: 16,
         }}>
-
         {/* Title bar */}
         <View
           style={{
@@ -158,14 +139,12 @@ function CodeEditorCard() {
             paddingVertical: 12,
             gap: 8,
           }}>
-          {/* Window controls */}
           <View style={{ flexDirection: 'row', gap: 6, marginRight: 4 }}>
             <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: C.dotRed }} />
             <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: C.dotYellow }} />
             <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: C.dotGreen }} />
           </View>
 
-          {/* Filename tab */}
           <View
             style={{
               backgroundColor: C.editorBg,
@@ -176,7 +155,6 @@ function CodeEditorCard() {
               alignItems: 'center',
               gap: 6,
             }}>
-            {/* JS icon */}
             <View
               style={{
                 width: 14,
@@ -203,7 +181,6 @@ function CodeEditorCard() {
 
         {/* Code area */}
         <View style={{ paddingHorizontal: 16, paddingTop: 14, paddingBottom: 8, gap: 0 }}>
-          {/* function welcomeLearner() { */}
           <CodeLine
             spans={[
               { text: 'function ', color: C.codeKeyword },
@@ -211,8 +188,6 @@ function CodeEditorCard() {
               { text: '() {', color: C.codePunct },
             ]}
           />
-
-          {/* const status = "Coding..."; */}
           <CodeLine
             indent={1}
             spans={[
@@ -223,8 +198,6 @@ function CodeEditorCard() {
               { text: ';', color: C.codePunct },
             ]}
           />
-
-          {/* console.log(`Ready to play?`); */}
           <CodeLine
             indent={1}
             spans={[
@@ -236,8 +209,6 @@ function CodeEditorCard() {
               { text: ');', color: C.codePunct },
             ]}
           />
-
-          {/* return true; */}
           <CodeLine
             indent={1}
             spans={[
@@ -246,21 +217,16 @@ function CodeEditorCard() {
               { text: ';', color: C.codePunct },
             ]}
           />
-
-          {/* } */}
           <CodeLine spans={[{ text: '}', color: C.codePunct }]} />
-
-          {/* blank line */}
           <CodeLine spans={[{ text: ' ', color: C.codeDefault }]} />
 
-          {/* welcomeLearner(); + blinking cursor */}
           <Text style={{ fontFamily: typography.family.mono, fontSize: 12, lineHeight: 20 }}>
             <Text style={{ color: C.codeFn }}>welcomeLearner</Text>
             <Text style={{ color: C.codePunct }}>{'();'}</Text>
             <Animated.Text
               style={{
                 opacity: cursorOpacity,
-                color: C.primary,
+                color: colors.primary,
                 fontFamily: typography.family.mono,
                 fontSize: 14,
               }}>
@@ -270,13 +236,13 @@ function CodeEditorCard() {
         </View>
       </View>
 
-      {/* ── Console Output floating badge ── */}
+      {/* Console Output floating badge */}
       <View
         style={{
           position: 'absolute',
           bottom: -20,
           right: 12,
-          backgroundColor: '#FFFFFF',
+          backgroundColor: colors.surfaceContainerLowest,
           borderRadius: radius.lg,
           paddingHorizontal: 14,
           paddingVertical: 10,
@@ -290,17 +256,15 @@ function CodeEditorCard() {
           shadowRadius: 12,
           minWidth: 160,
         }}>
-        {/* Orange play icon */}
         <View
           style={{
             width: 30,
             height: 30,
             borderRadius: 15,
-            backgroundColor: C.orange,
+            backgroundColor: '#FF914E',
             alignItems: 'center',
             justifyContent: 'center',
           }}>
-          {/* Triangle play shape via text */}
           <Text style={{ color: '#FFFFFF', fontSize: 11, lineHeight: 12, marginLeft: 2 }}>{'▶'}</Text>
         </View>
 
@@ -309,7 +273,7 @@ function CodeEditorCard() {
             style={{
               fontFamily: typography.family.sansSemibold,
               fontSize: 11,
-              color: C.text,
+              color: colors.text,
               lineHeight: 16,
             }}>
             Console Output
@@ -318,7 +282,7 @@ function CodeEditorCard() {
             style={{
               fontFamily: typography.family.mono,
               fontSize: 11,
-              color: C.orange,
+              color: '#FF914E',
               lineHeight: 16,
             }}>
             "Ready to play?"
@@ -331,6 +295,8 @@ function CodeEditorCard() {
 
 // ─── Progress Dots ───────────────────────────────────────────────────────────
 function ProgressDots({ total = 4, active = 0 }: { total?: number; active?: number }) {
+  const { colors } = useTheme();
+
   return (
     <View style={{ flexDirection: 'row', gap: 6, justifyContent: 'center', alignItems: 'center' }}>
       {Array.from({ length: total }).map((_, i) => (
@@ -340,7 +306,7 @@ function ProgressDots({ total = 4, active = 0 }: { total?: number; active?: numb
             height: 8,
             width: i === active ? 24 : 8,
             borderRadius: 4,
-            backgroundColor: i === active ? C.primary : colors.light.outlineVariant,
+            backgroundColor: i === active ? colors.primary : colors.outlineVariant,
           }}
         />
       ))}
@@ -351,20 +317,21 @@ function ProgressDots({ total = 4, active = 0 }: { total?: number; active?: numb
 // ─── Main Screen ─────────────────────────────────────────────────────────────
 export default function OnboardingScreen() {
   const router = useRouter();
+  const { colors, mode } = useTheme();
   const insets = useSafeAreaInsets();
 
   const handleNext = () => {
-    // Navigate to Onboarding 2 (placeholder exists at app/onboarding2.tsx)
     router.push('/onboarding2');
   };
 
   const handleSkip = () => {
-    // TODO: connect to post-onboarding destination once the auth/home flow is finalised.
-    // Do NOT change existing navigation or auth flow here.
+    router.replace('/(auth)/login');
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: C.bg }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
+
       <ScrollView
         bounces={false}
         contentContainerStyle={{
@@ -375,7 +342,7 @@ export default function OnboardingScreen() {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}>
 
-        {/* ── Top navigation bar ── */}
+        {/* Top navigation bar */}
         <View
           style={{
             flexDirection: 'row',
@@ -388,7 +355,7 @@ export default function OnboardingScreen() {
             style={{
               fontFamily: typography.family.sansBold,
               fontSize: 18,
-              color: C.primary,
+              color: colors.primary,
               lineHeight: 24,
             }}>
             Pemula Code
@@ -404,7 +371,7 @@ export default function OnboardingScreen() {
               style={{
                 fontFamily: typography.family.sansMedium,
                 fontSize: 15,
-                color: C.textMuted,
+                color: colors.onSurfaceVariant,
                 lineHeight: 22,
               }}>
               Skip
@@ -412,7 +379,7 @@ export default function OnboardingScreen() {
           </Pressable>
         </View>
 
-        {/* ── Illustration + content ── */}
+        {/* Illustration + content */}
         <View
           style={{
             flex: 1,
@@ -420,32 +387,28 @@ export default function OnboardingScreen() {
             paddingTop: spacing[4],
             gap: spacing[6],
           }}>
-
-          {/* Code editor illustration */}
           <CodeEditorCard />
 
-          {/* Title */}
           <View style={{ alignItems: 'center', paddingTop: spacing[3] }}>
             <Text
               style={{
                 fontFamily: typography.family.sansBold,
                 fontSize: 26,
                 lineHeight: 34,
-                color: C.text,
+                color: colors.text,
                 textAlign: 'center',
               }}>
               {'Practice with '}
-              <Text style={{ color: C.primary }}>Interactive Coding</Text>
+              <Text style={{ color: colors.primary }}>Interactive Coding</Text>
             </Text>
           </View>
 
-          {/* Description */}
           <Text
             style={{
               fontFamily: typography.family.sans,
               fontSize: 15,
               lineHeight: 24,
-              color: C.textMuted,
+              color: colors.onSurfaceVariant,
               textAlign: 'center',
               paddingHorizontal: spacing[2],
             }}>
@@ -453,11 +416,10 @@ export default function OnboardingScreen() {
             playground designed for mobile-first learners.
           </Text>
 
-          {/* Progress dots — 3 total, first dot active (Onboarding 1 of 3) */}
           <ProgressDots total={3} active={0} />
         </View>
 
-        {/* ── Next button ── */}
+        {/* Next button */}
         <View
           style={{
             paddingHorizontal: spacing[5],
@@ -470,7 +432,7 @@ export default function OnboardingScreen() {
             onPress={handleNext}
             style={({ pressed }) => ({
               alignItems: 'center',
-              backgroundColor: pressed ? C.primaryPressed : C.primary,
+              backgroundColor: pressed ? colors.primaryPressed : colors.primary,
               borderRadius: radius.full,
               elevation: 8,
               flexDirection: 'row',
@@ -478,7 +440,7 @@ export default function OnboardingScreen() {
               justifyContent: 'center',
               minHeight: 56,
               paddingHorizontal: spacing[6],
-              shadowColor: C.primary,
+              shadowColor: colors.primary,
               shadowOffset: { width: 0, height: 8 },
               shadowOpacity: 0.28,
               shadowRadius: 16,
@@ -488,7 +450,7 @@ export default function OnboardingScreen() {
               style={{
                 fontFamily: typography.family.sansBold,
                 fontSize: 16,
-                color: C.primaryFg,
+                color: colors.onPrimary,
                 lineHeight: 24,
                 letterSpacing: 0.3,
               }}>

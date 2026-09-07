@@ -21,10 +21,11 @@ import {
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { LessonSection, type SectionData } from '@/components/lesson/LessonSection';
 import { AppText } from '@/components/ui/AppText';
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useTheme } from '@/context/ThemeContext';
+import { useTranslation } from '@/translations';
 
 import htmlLessons from '@/data/lessons/html.json';
 import cssLessons from '@/data/lessons/css.json';
@@ -53,6 +54,8 @@ type LessonDataFile = {
 
 export default function LessonDetailScreen() {
   const router = useRouter();
+  const { colors: c, mode } = useTheme();
+  const { t } = useTranslation();
   const { courseId, moduleId } = useLocalSearchParams<{
     courseId?: string;
     moduleId?: string;
@@ -63,24 +66,24 @@ export default function LessonDetailScreen() {
     if (courseId === 'css') {
       return {
         accent: '#00629d',
-        accentFixed: '#cbe6ff',
+        accentFixed: mode === 'dark' ? '#16324d' : '#cbe6ff',
         accentPressed: '#004c7d',
       };
     }
     if (courseId === 'javascript') {
       return {
-        accent: colors.light.primary,
-        accentFixed: colors.light.primaryFixed,
-        accentPressed: colors.light.primaryPressed,
+        accent: c.primary,
+        accentFixed: c.primaryFixed,
+        accentPressed: c.primaryPressed,
       };
     }
     // HTML default
     return {
-      accent: colors.light.secondary,
-      accentFixed: colors.light.secondaryFixed,
-      accentPressed: colors.light.secondaryPressed,
+      accent: c.secondary,
+      accentFixed: c.secondaryFixed,
+      accentPressed: c.secondaryPressed,
     };
-  }, [courseId]);
+  }, [courseId, c, mode]);
 
   // Load lesson dataset
   const lessonFile: LessonDataFile | null = useMemo(() => {
@@ -114,7 +117,6 @@ export default function LessonDetailScreen() {
   const lesson: LessonItem | undefined = availableLessons[currentLessonIndex];
 
   // Each module has exactly 1 page of lesson content — navbar is isolated per module
-  const totalLessons = 1;
   const hasPrevious = false; // No cross-module Previous navigation
   const hasNext = false;     // Each lesson leads directly to its Module Quiz
 
@@ -129,8 +131,8 @@ export default function LessonDetailScreen() {
 
   if (!lesson) {
     return (
-      <ScreenContainer style={{ backgroundColor: colors.light.background }}>
-        <AppText color={colors.light.text}>Lesson content not found.</AppText>
+      <ScreenContainer style={{ backgroundColor: c.background }}>
+        <AppText color={c.text}>Lesson content not found.</AppText>
       </ScreenContainer>
     );
   }
@@ -138,8 +140,8 @@ export default function LessonDetailScreen() {
   return (
     <ScreenContainer
       padded={false}
-      style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" />
+      style={{ backgroundColor: c.background }}>
+      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
 
       {/* ═══════════════════════════════════════
           1. TOP APP BAR
@@ -147,7 +149,7 @@ export default function LessonDetailScreen() {
       <View
         style={{
           alignItems: 'center',
-          backgroundColor: colors.light.background,
+          backgroundColor: c.background,
           flexDirection: 'row',
           height: 60,
           justifyContent: 'space-between',
@@ -173,14 +175,14 @@ export default function LessonDetailScreen() {
           style={({ pressed }) => ({
             alignItems: 'center',
             backgroundColor: pressed
-              ? colors.light.surfaceContainerHigh
-              : colors.light.surfaceContainerLow,
+              ? c.surfaceContainerHigh
+              : c.surfaceContainerLow,
             borderRadius: radius.full,
             height: 40,
             justifyContent: 'center',
             width: 40,
           })}>
-          <ArrowLeft color={colors.light.text} size={20} />
+          <ArrowLeft color={c.text} size={20} />
         </Pressable>
 
         {/* Center: Lesson Title & Read Time */}
@@ -197,7 +199,7 @@ export default function LessonDetailScreen() {
             {lesson.title}
           </AppText>
           <AppText
-            color={colors.light.onSurfaceVariant}
+            color={c.onSurfaceVariant}
             style={{
               fontFamily: typography.family.mono,
               fontSize: 11,
@@ -298,7 +300,7 @@ export default function LessonDetailScreen() {
                   fontFamily: typography.family.sansBold,
                   fontSize: 12,
                 }}>
-                Module {lesson.moduleNumber}
+                Modul {lesson.moduleNumber}
               </AppText>
             </View>
 
@@ -348,8 +350,8 @@ export default function LessonDetailScreen() {
         {lesson.objectives && lesson.objectives.length > 0 && (
           <View
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              borderColor: colors.light.outlineVariant,
+              backgroundColor: c.surfaceContainerLowest,
+              borderColor: c.outlineVariant,
               borderRadius: radius['2xl'],
               borderWidth: 1,
               elevation: 2,
@@ -365,12 +367,12 @@ export default function LessonDetailScreen() {
               }}>
               <CheckCircle2 color={theme.accent} size={22} />
               <AppText
-                color={colors.light.text}
+                color={c.text}
                 style={{
                   fontFamily: typography.family.sansBold,
                   fontSize: 18,
                 }}>
-                Learning Objectives
+                Tujuan Pembelajaran
               </AppText>
             </View>
 
@@ -391,13 +393,13 @@ export default function LessonDetailScreen() {
                     />
                   ) : (
                     <Circle
-                      color={colors.light.outline}
+                      color={c.outline}
                       size={18}
                       style={{ marginTop: 2 }}
                     />
                   )}
                   <AppText
-                    color={colors.light.text}
+                    color={c.text}
                     style={{
                       flex: 1,
                       fontSize: 14,
@@ -432,11 +434,11 @@ export default function LessonDetailScreen() {
                       fontFamily: typography.family.sansBold,
                       fontSize: 13,
                     }}>
-                    Mentor Tip
+                    Tips Mentor
                   </AppText>
                 </View>
                 <AppText
-                  color={colors.light.text}
+                  color={c.text}
                   style={{
                     fontSize: 13,
                     lineHeight: 19,
@@ -455,8 +457,8 @@ export default function LessonDetailScreen() {
           <View
             style={{
               alignItems: 'center',
-              backgroundColor: colors.light.surfaceContainerLow,
-              borderColor: colors.light.outlineVariant,
+              backgroundColor: c.surfaceContainerLow,
+              borderColor: c.outlineVariant,
               borderRadius: radius.xl,
               borderWidth: 1,
               flexDirection: 'row',
@@ -477,7 +479,7 @@ export default function LessonDetailScreen() {
             </View>
             <View style={{ flex: 1 }}>
               <AppText
-                color={colors.light.text}
+                color={c.text}
                 style={{
                   fontFamily: typography.family.sansBold,
                   fontSize: 14,
@@ -485,7 +487,7 @@ export default function LessonDetailScreen() {
                 {lesson.relatedResource.title}
               </AppText>
               <AppText
-                color={colors.light.onSurfaceVariant}
+                color={c.onSurfaceVariant}
                 style={{
                   fontSize: 12,
                   lineHeight: 17,
@@ -505,8 +507,8 @@ export default function LessonDetailScreen() {
       <View
         style={{
           alignItems: 'center',
-          backgroundColor: '#ffffff',
-          borderTopColor: colors.light.outlineVariant,
+          backgroundColor: c.background,
+          borderTopColor: c.outlineVariant,
           borderTopWidth: 1,
           bottom: 0, // Positioned flush at bottom of screen (bottom tab bar hidden)
           elevation: 12,
@@ -533,9 +535,9 @@ export default function LessonDetailScreen() {
             alignItems: 'center',
             backgroundColor: hasPrevious
               ? pressed
-                ? colors.light.surfaceContainerHigh
-                : colors.light.surfaceContainerLow
-              : colors.light.surfaceContainerLow,
+                ? c.surfaceContainerHigh
+                : c.surfaceContainerLow
+              : c.surfaceContainerLow,
             borderRadius: radius.xl,
             flexDirection: 'row',
             gap: spacing[1],
@@ -544,22 +546,22 @@ export default function LessonDetailScreen() {
             paddingHorizontal: spacing[4],
           })}>
           <ChevronLeft
-            color={hasPrevious ? colors.light.text : colors.light.outline}
+            color={hasPrevious ? c.text : c.outline}
             size={18}
           />
           <AppText
-            color={hasPrevious ? colors.light.text : colors.light.outline}
+            color={hasPrevious ? c.text : c.outline}
             style={{
               fontFamily: typography.family.sansBold,
               fontSize: 14,
             }}>
-            Previous
+            {t('previous')}
           </AppText>
         </Pressable>
 
         {/* Progress Counter indicator */}
         <AppText
-          color={colors.light.onSurfaceVariant}
+          color={c.onSurfaceVariant}
           style={{
             fontFamily: typography.family.mono,
             fontSize: 13,
@@ -569,7 +571,7 @@ export default function LessonDetailScreen() {
 
         {/* Next Lesson / Quiz Button */}
         <Pressable
-          accessibilityLabel={hasNext ? 'Next Lesson' : 'Take Quiz'}
+          accessibilityLabel={hasNext ? t('next') : t('startLearning')}
           accessibilityRole="button"
           onPress={handleNext}
           style={({ pressed }) => ({
@@ -588,7 +590,7 @@ export default function LessonDetailScreen() {
               fontFamily: typography.family.sansBold,
               fontSize: 14,
             }}>
-            {hasNext ? 'Next Lesson' : 'Start Quiz'}
+            Mulai Kuis
           </AppText>
           <ChevronRight color="#ffffff" size={18} />
         </Pressable>

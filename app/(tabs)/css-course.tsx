@@ -1,21 +1,24 @@
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { ArrowLeft, Bell, Palette, Sparkles } from 'lucide-react-native';
+import { ArrowLeft, Bell, Palette } from 'lucide-react-native';
 import React from 'react';
 import { Image, Pressable, ScrollView, View } from 'react-native';
 
 import { CourseModuleCard, type CourseModule } from '@/components/course/CourseModuleCard';
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useTheme } from '@/context/ThemeContext';
 import cssCourseData from '@/data/courses/css.json';
 import { useProgressStore } from '@/stores/progress-store';
+import { useTranslation } from '@/translations';
 
 export default function CssCourseScreen() {
   const router = useRouter();
+  const { colors: c, mode } = useTheme();
+  const { t } = useTranslation();
   const storeModules = useProgressStore((state) => state.modules);
   const getCourseProgress = useProgressStore((state) => state.getCourseProgress);
 
@@ -31,8 +34,8 @@ export default function CssCourseScreen() {
   });
 
   return (
-    <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" />
+    <ScreenContainer padded={false} style={{ backgroundColor: c.background }}>
+      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
 
       <ScrollView
         style={{ flex: 1 }}
@@ -46,7 +49,7 @@ export default function CssCourseScreen() {
         <View
           style={{
             alignItems: 'center',
-            backgroundColor: colors.light.background,
+            backgroundColor: c.background,
             flexDirection: 'row',
             height: 60,
             justifyContent: 'space-between',
@@ -65,14 +68,14 @@ export default function CssCourseScreen() {
               style={({ pressed }) => ({
                 alignItems: 'center',
                 backgroundColor: pressed
-                  ? colors.light.surfaceContainerHigh
-                  : colors.light.surfaceContainerLow,
+                  ? c.surfaceContainerHigh
+                  : c.surfaceContainerLow,
                 borderRadius: radius.full,
                 height: 40,
                 justifyContent: 'center',
                 width: 40,
               })}>
-              <ArrowLeft color={colors.light.text} size={20} />
+              <ArrowLeft color={c.text} size={20} />
             </Pressable>
 
             <Pressable
@@ -81,7 +84,7 @@ export default function CssCourseScreen() {
               style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[3] }}>
               <View
                 style={{
-                  borderColor: colors.light.primary,
+                  borderColor: c.primary,
                   borderRadius: radius.full,
                   borderWidth: 2,
                   height: 40,
@@ -95,7 +98,7 @@ export default function CssCourseScreen() {
                 />
               </View>
               <AppText
-                color={colors.light.primary}
+                color={c.primary}
                 style={{
                   fontFamily: typography.family.sansBold,
                   fontSize: 20,
@@ -115,18 +118,18 @@ export default function CssCourseScreen() {
             style={({ pressed }) => ({
               alignItems: 'center',
               backgroundColor: pressed
-                ? colors.light.surfaceContainerHigh
-                : colors.light.surfaceContainerLow,
+                ? c.surfaceContainerHigh
+                : c.surfaceContainerLow,
               borderRadius: radius.full,
               height: 40,
               justifyContent: 'center',
               width: 40,
             })}>
-            <Bell color={colors.light.primary} size={20} />
+            <Bell color={c.primary} size={20} />
           </Pressable>
         </View>
 
-        {/* 2. HERO SECTION */}
+        {/* 2. COURSE HERO SECTION */}
         <View style={{ marginTop: spacing[4], paddingHorizontal: spacing[5] }}>
           <View
             style={{
@@ -149,7 +152,7 @@ export default function CssCourseScreen() {
               <Palette color="#ffffff" size={120} />
             </View>
 
-            {/* Badge */}
+            {/* Tag */}
             <AppText
               color="rgba(255, 255, 255, 0.85)"
               style={{
@@ -158,10 +161,10 @@ export default function CssCourseScreen() {
                 letterSpacing: 1.5,
                 fontWeight: 'bold',
               }}>
-              TRACK: STYLING & LAYOUT
+              {t('certificationTrack')}
             </AppText>
 
-            {/* Heading */}
+            {/* Course Title */}
             <AppText
               color="#ffffff"
               style={{
@@ -170,10 +173,10 @@ export default function CssCourseScreen() {
                 lineHeight: 34,
                 marginTop: spacing[2],
               }}>
-              Mastering CSS Core
+              Advanced CSS
             </AppText>
 
-            {/* Description */}
+            {/* Course Subtitle */}
             <AppText
               color="rgba(255, 255, 255, 0.9)"
               style={{
@@ -181,10 +184,10 @@ export default function CssCourseScreen() {
                 lineHeight: 21,
                 marginTop: spacing[2],
               }}>
-              Learn how to paint the web with precision. From the box model to advanced responsive layouts.
+              {t('cssStylingDesc')}
             </AppText>
 
-            {/* Progress Container inside Hero */}
+            {/* Progress Card Inside Hero */}
             <View
               style={{
                 backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -204,7 +207,7 @@ export default function CssCourseScreen() {
                     fontFamily: typography.family.mono,
                     fontSize: 13,
                   }}>
-                  Total Progress
+                  {t('totalProgress')}
                 </AppText>
                 <AppText
                   color="#ffffff"
@@ -239,26 +242,18 @@ export default function CssCourseScreen() {
           </View>
         </View>
 
-        {/* 3. SECTION "Learning Path" */}
+        {/* 3. CURRICULUM MODULES */}
         <View style={{ marginTop: spacing[6], paddingHorizontal: spacing[5] }}>
-          <View
+          <AppText
+            color={c.text}
             style={{
-              alignItems: 'center',
-              flexDirection: 'row',
-              gap: spacing[2],
+              fontFamily: typography.family.sansBold,
+              fontSize: 20,
+              lineHeight: 28,
               marginBottom: spacing[4],
             }}>
-            <Sparkles color="#00629d" size={20} />
-            <AppText
-              color={colors.light.text}
-              style={{
-                fontFamily: typography.family.sansBold,
-                fontSize: 20,
-                lineHeight: 28,
-              }}>
-              Learning Path
-            </AppText>
-          </View>
+            {t('curriculumModules')}
+          </AppText>
 
           <View style={{ gap: spacing[4] }}>
             {modules.map((mod) => (
@@ -266,7 +261,7 @@ export default function CssCourseScreen() {
                 key={mod.id}
                 module={mod}
                 accentColor="#00629d"
-                accentFixed="#cfe5ff"
+                accentFixed={mode === 'dark' ? '#16324d' : '#cfe5ff'}
                 onPress={() => {
                   if (mod.status === 'available' || mod.status === 'in_progress' || mod.status === 'completed') {
                     router.push(

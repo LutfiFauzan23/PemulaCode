@@ -13,10 +13,11 @@ import { Image, Pressable, ScrollView, View } from 'react-native';
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useTheme } from '@/context/ThemeContext';
+import { useTranslation } from '@/translations';
 import { TAB_BAR_CLEARANCE } from './_layout';
 
 // ======================================================
@@ -70,6 +71,8 @@ const PODIUM_COLORS = ['#FFD166', '#C0C0C0', '#CD7F32']; // gold, silver, bronze
 
 export default function LeaderboardScreen() {
   const router = useRouter();
+  const { colors, mode } = useTheme();
+  const { t } = useTranslation();
   const [period, setPeriod] = useState<Period>('Weekly');
 
   const leaders = LEADERS[period];
@@ -81,8 +84,8 @@ export default function LeaderboardScreen() {
   const formatXp = (xp: number) => (xp >= 1000 ? `${(xp / 1000).toFixed(1)}k` : `${xp}`);
 
   return (
-    <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" />
+    <ScreenContainer padded={false} style={{ backgroundColor: colors.background }}>
+      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
 
       <ScrollView
         bounces={false}
@@ -92,7 +95,7 @@ export default function LeaderboardScreen() {
         <View
           style={{
             alignItems: 'center',
-            backgroundColor: colors.light.background,
+            backgroundColor: colors.background,
             flexDirection: 'row',
             height: 60,
             justifyContent: 'space-between',
@@ -105,7 +108,7 @@ export default function LeaderboardScreen() {
             style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[3] }}>
             <View
               style={{
-                borderColor: colors.light.primary,
+                borderColor: colors.primary,
                 borderRadius: radius.full,
                 borderWidth: 2,
                 height: 40,
@@ -119,9 +122,9 @@ export default function LeaderboardScreen() {
               />
             </View>
             <AppText
-              color={colors.light.primary}
+              color={colors.primary}
               style={{ fontFamily: typography.family.sansBold, fontSize: 20, lineHeight: 28 }}>
-              Leaderboard
+              {t('leaderboard')}
             </AppText>
           </Pressable>
 
@@ -133,14 +136,14 @@ export default function LeaderboardScreen() {
             style={({ pressed }) => ({
               alignItems: 'center',
               backgroundColor: pressed
-                ? colors.light.surfaceContainerHigh
-                : colors.light.surfaceContainerLow,
+                ? colors.surfaceContainerHigh
+                : colors.surfaceContainerLow,
               borderRadius: radius.full,
               height: 40,
               justifyContent: 'center',
               width: 40,
             })}>
-            <Bell color={colors.light.text} size={20} />
+            <Bell color={colors.text} size={20} />
           </Pressable>
         </View>
 
@@ -154,7 +157,7 @@ export default function LeaderboardScreen() {
           }}>
           {(['Weekly', 'Monthly', 'AllTime'] as Period[]).map((p) => {
             const isActive = period === p;
-            const label = p === 'AllTime' ? 'All-Time' : p;
+            const label = p === 'Weekly' ? t('weekly') : p === 'Monthly' ? t('monthly') : t('allTime');
             return (
               <Pressable
                 key={p}
@@ -164,9 +167,9 @@ export default function LeaderboardScreen() {
                 style={({ pressed }) => ({
                   alignItems: 'center',
                   backgroundColor: isActive
-                    ? colors.light.primary
-                    : colors.light.surfaceContainerLow,
-                  borderColor: isActive ? colors.light.primary : colors.light.outlineVariant,
+                    ? colors.primary
+                    : colors.surfaceContainerLow,
+                  borderColor: isActive ? colors.primary : colors.outlineVariant,
                   borderRadius: radius.full,
                   borderWidth: 1,
                   flex: 1,
@@ -174,7 +177,7 @@ export default function LeaderboardScreen() {
                   paddingVertical: spacing[3],
                 })}>
                 <AppText
-                  color={isActive ? '#ffffff' : colors.light.onSurfaceVariant}
+                  color={isActive ? '#ffffff' : colors.onSurfaceVariant}
                   style={{
                     fontFamily: typography.family.sansBold,
                     fontSize: 13,
@@ -213,20 +216,20 @@ export default function LeaderboardScreen() {
         {/* Ranked List */}
         <View style={{ marginTop: spacing[6], paddingHorizontal: spacing[5] }}>
           <AppText
-            color={colors.light.text}
+            color={colors.text}
             style={{
               fontFamily: typography.family.sansBold,
               fontSize: 18,
               lineHeight: 26,
               marginBottom: spacing[3],
             }}>
-            Rankings
+            {t('leaderboard')}
           </AppText>
 
           <View
             style={{
-              backgroundColor: colors.light.surfaceContainerLowest,
-              borderColor: colors.light.outlineVariant,
+              backgroundColor: colors.surfaceContainerLowest,
+              borderColor: colors.outlineVariant,
               borderRadius: radius.xl,
               borderWidth: 1,
               overflow: 'hidden',
@@ -259,7 +262,7 @@ export default function LeaderboardScreen() {
           <View
             style={{
               alignItems: 'center',
-              backgroundColor: colors.light.primary,
+              backgroundColor: colors.primary,
               borderRadius: radius.xl,
               elevation: 8,
               flexDirection: 'row',
@@ -307,12 +310,12 @@ export default function LeaderboardScreen() {
               <AppText
                 color="#ffffff"
                 style={{ fontFamily: typography.family.sansBold, fontSize: 14 }}>
-                Your Rank
+                {t('yourRank')}
               </AppText>
               <AppText
                 color="rgba(255,255,255,0.85)"
                 style={{ fontFamily: typography.family.mono, fontSize: 12, marginTop: 1 }}>
-                Keep climbing!
+                {t('keepClimbing')}
               </AppText>
             </View>
 
@@ -337,7 +340,6 @@ export default function LeaderboardScreen() {
 }
 
 function Platform_bottom() {
-  // matches _layout.tsx bottom navbar offset so the sticky bar sits just above it
   return 92;
 }
 
@@ -356,6 +358,7 @@ function PodiumSlot({
   rank: 1 | 2 | 3;
   user: LeaderUser;
 }) {
+  const { colors } = useTheme();
   const accent = PODIUM_COLORS[rank - 1];
 
   return (
@@ -385,7 +388,7 @@ function PodiumSlot({
       </View>
 
       <AppText
-        color={colors.light.text}
+        color={colors.text}
         numberOfLines={1}
         style={{
           fontFamily: typography.family.sansBold,
@@ -397,7 +400,7 @@ function PodiumSlot({
         {user.name}
       </AppText>
       <AppText
-        color={colors.light.onSurfaceVariant}
+        color={colors.onSurfaceVariant}
         style={{ fontFamily: typography.family.mono, fontSize: 11, marginTop: 1 }}>
         {formatXp(user.xp)} XP
       </AppText>
@@ -438,14 +441,16 @@ function RankRow({
   rank: number;
   user: LeaderUser;
 }) {
+  const { colors } = useTheme();
+
   return (
     <View
       style={{
         alignItems: 'center',
         backgroundColor: user.isCurrentUser
-          ? colors.light.primaryFixed
-          : colors.light.surfaceContainerLowest,
-        borderBottomColor: colors.light.outlineVariant,
+          ? colors.primaryFixed
+          : colors.surfaceContainerLowest,
+        borderBottomColor: colors.outlineVariant,
         borderBottomWidth: isLast ? 0 : 1,
         flexDirection: 'row',
         gap: spacing[3],
@@ -454,7 +459,7 @@ function RankRow({
       }}>
       <View style={{ alignItems: 'center', width: 24 }}>
         <AppText
-          color={user.isCurrentUser ? colors.light.primary : colors.light.onSurfaceVariant}
+          color={user.isCurrentUser ? colors.primary : colors.onSurfaceVariant}
           style={{ fontFamily: typography.family.sansBold, fontSize: 14 }}>
           {rank}
         </AppText>
@@ -462,7 +467,7 @@ function RankRow({
 
       <View
         style={{
-          borderColor: colors.light.outlineVariant,
+          borderColor: colors.outlineVariant,
           borderRadius: radius.full,
           borderWidth: 1,
           height: 40,
@@ -478,15 +483,15 @@ function RankRow({
 
       <View style={{ flex: 1 }}>
         <AppText
-          color={colors.light.text}
+          color={colors.text}
           numberOfLines={1}
           style={{ fontFamily: typography.family.sansBold, fontSize: 15 }}>
           {user.isCurrentUser ? 'You' : user.name}
         </AppText>
         <View style={{ alignItems: 'center', flexDirection: 'row', gap: 3, marginTop: 1 }}>
-          <Flame color={colors.light.secondary} size={12} fill={colors.light.secondary} />
-          <AppText color={colors.light.onSurfaceVariant} style={{ fontSize: 12 }}>
-            {user.streak} day streak
+          <Flame color={colors.secondary} size={12} fill={colors.secondary} />
+          <AppText color={colors.onSurfaceVariant} style={{ fontSize: 12 }}>
+            {user.streak} {t('dayStreak')}
           </AppText>
         </View>
       </View>
@@ -494,16 +499,16 @@ function RankRow({
       <View
         style={{
           alignItems: 'center',
-          backgroundColor: colors.light.surfaceContainerLow,
+          backgroundColor: colors.surfaceContainerLow,
           borderRadius: radius.full,
           flexDirection: 'row',
           gap: spacing[1],
           paddingHorizontal: spacing[3],
           paddingVertical: spacing[1],
         }}>
-        <Trophy color={colors.light.onSurfaceVariant} size={12} />
+        <Trophy color={colors.onSurfaceVariant} size={12} />
         <AppText
-          color={colors.light.text}
+          color={colors.text}
           style={{ fontFamily: typography.family.sansBold, fontSize: 13 }}>
           {formatXp(user.xp)}
         </AppText>

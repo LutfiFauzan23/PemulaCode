@@ -8,10 +8,11 @@ import React from 'react';
 import { Image, Pressable, View } from 'react-native';
 
 import { AppText } from '@/components/ui/AppText';
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useTheme } from '@/context/ThemeContext';
+import { useTranslation } from '@/translations';
 
 // ─────────────────────────────────────────────
 // Types
@@ -46,11 +47,13 @@ function getDifficultyStyle(
   accentColor: string,
   accentFixed: string,
   isDisabled: boolean,
+  outlineColor: string,
+  surfaceHighColor: string,
 ): { bg: string; text: string } {
   if (isDisabled) {
     return {
-      bg: colors.light.surfaceContainerHigh,
-      text: colors.light.outline,
+      bg: surfaceHighColor,
+      text: outlineColor,
     };
   }
   return { bg: accentFixed, text: accentColor };
@@ -64,10 +67,12 @@ function StatusIndicator({
   status,
   accentColor,
   accentFixed,
+  outlineColor,
 }: {
   status: ModuleStatus;
   accentColor: string;
   accentFixed: string;
+  outlineColor: string;
 }) {
   if (status === 'completed') {
     return (
@@ -108,7 +113,7 @@ function StatusIndicator({
     );
   }
   if (status === 'locked' || status === 'coming_soon' || status === 'upcoming') {
-    return <Lock color={colors.light.outline} size={20} />;
+    return <Lock color={outlineColor} size={20} />;
   }
   return null;
 }
@@ -118,6 +123,9 @@ function StatusIndicator({
 // ─────────────────────────────────────────────
 
 export function CourseModuleCard({ module, accentColor, accentFixed, onPress }: Props) {
+  const { colors: c } = useTheme();
+  const { t } = useTranslation();
+
   const isCompleted = module.status === 'completed';
   const isInProgress = module.status === 'in_progress';
   const isAvailable = module.status === 'available';
@@ -131,6 +139,8 @@ export function CourseModuleCard({ module, accentColor, accentFixed, onPress }: 
     accentColor,
     accentFixed,
     isDisabled,
+    c.outline,
+    c.surfaceContainerHigh,
   );
 
   const cardContent = (
@@ -165,7 +175,7 @@ export function CourseModuleCard({ module, accentColor, accentFixed, onPress }: 
 
           {/* Duration */}
           <AppText
-            color={isDisabled ? colors.light.outline : colors.light.onSurfaceVariant}
+            color={isDisabled ? c.outline : c.onSurfaceVariant}
             style={{ fontFamily: typography.family.mono, fontSize: 12 }}>
             {module.duration}
           </AppText>
@@ -176,12 +186,13 @@ export function CourseModuleCard({ module, accentColor, accentFixed, onPress }: 
           status={module.status}
           accentColor={accentColor}
           accentFixed={accentFixed}
+          outlineColor={c.outline}
         />
       </View>
 
       {/* ── Title ── */}
       <AppText
-        color={isDisabled ? colors.light.textMuted : colors.light.text}
+        color={isDisabled ? c.textMuted : c.text}
         style={{
           fontFamily: typography.family.sansBold,
           fontSize: 18,
@@ -192,7 +203,7 @@ export function CourseModuleCard({ module, accentColor, accentFixed, onPress }: 
 
       {/* ── Description ── */}
       <AppText
-        color={isDisabled ? colors.light.outline : colors.light.onSurfaceVariant}
+        color={isDisabled ? c.outline : c.onSurfaceVariant}
         style={{ fontSize: 14, lineHeight: 20, marginTop: spacing[1] }}>
         {module.description}
       </AppText>
@@ -212,7 +223,7 @@ export function CourseModuleCard({ module, accentColor, accentFixed, onPress }: 
             <Image
               source={{ uri: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100' }}
               style={{
-                borderColor: '#ffffff',
+                borderColor: c.surfaceContainerLowest,
                 borderRadius: radius.full,
                 borderWidth: 2,
                 height: 24,
@@ -222,7 +233,7 @@ export function CourseModuleCard({ module, accentColor, accentFixed, onPress }: 
             <Image
               source={{ uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100' }}
               style={{
-                borderColor: '#ffffff',
+                borderColor: c.surfaceContainerLowest,
                 borderRadius: radius.full,
                 borderWidth: 2,
                 height: 24,
@@ -231,7 +242,7 @@ export function CourseModuleCard({ module, accentColor, accentFixed, onPress }: 
               }}
             />
             <AppText
-              color={colors.light.onSurfaceVariant}
+              color={c.onSurfaceVariant}
               style={{
                 fontFamily: typography.family.mono,
                 fontSize: 11,
@@ -246,7 +257,7 @@ export function CourseModuleCard({ module, accentColor, accentFixed, onPress }: 
             <AppText
               color={accentColor}
               style={{ fontFamily: typography.family.sansBold, fontSize: 14 }}>
-              Review Lesson
+              {t('reviewLesson')}
             </AppText>
             <ChevronRight color={accentColor} size={16} />
           </View>
@@ -271,7 +282,7 @@ export function CourseModuleCard({ module, accentColor, accentFixed, onPress }: 
           <AppText
             color="#ffffff"
             style={{ fontFamily: typography.family.sansBold, fontSize: 15 }}>
-            Start Learning
+            {t('startLearning')}
           </AppText>
           <Play color="#ffffff" size={16} fill="#ffffff" />
         </View>
@@ -317,7 +328,7 @@ export function CourseModuleCard({ module, accentColor, accentFixed, onPress }: 
             <AppText
               color="#ffffff"
               style={{ fontFamily: typography.family.sansBold, fontSize: 15 }}>
-              Continue Learning
+              {t('continueLearning')}
             </AppText>
             <Play color="#ffffff" size={16} fill="#ffffff" />
           </View>
@@ -334,11 +345,11 @@ export function CourseModuleCard({ module, accentColor, accentFixed, onPress }: 
             marginTop: spacing[4],
             paddingTop: spacing[2],
           }}>
-          <Lock color={colors.light.outline} size={14} />
+          <Lock color={c.outline} size={14} />
           <AppText
-            color={colors.light.outline}
+            color={c.outline}
             style={{ fontFamily: typography.family.mono, fontSize: 12 }}>
-            {module.unlockRequirement ?? 'Complete previous module quiz to unlock'}
+            {module.unlockRequirement ?? t('completeQuizToUnlock')}
           </AppText>
         </View>
       )}
@@ -353,11 +364,11 @@ export function CourseModuleCard({ module, accentColor, accentFixed, onPress }: 
             marginTop: spacing[4],
             paddingTop: spacing[2],
           }}>
-          <Lock color={colors.light.outline} size={14} />
+          <Lock color={c.outline} size={14} />
           <AppText
-            color={colors.light.outline}
+            color={c.outline}
             style={{ fontFamily: typography.family.mono, fontSize: 12, fontWeight: 'bold' }}>
-            Coming Soon
+            {t('comingSoon')}
           </AppText>
         </View>
       )}
@@ -369,8 +380,8 @@ export function CourseModuleCard({ module, accentColor, accentFixed, onPress }: 
     return (
       <View
         style={{
-          backgroundColor: colors.light.surfaceContainerLow,
-          borderColor: colors.light.outlineVariant,
+          backgroundColor: c.surfaceContainerLow,
+          borderColor: c.outlineVariant,
           borderRadius: radius['2xl'],
           borderWidth: 1,
           opacity: isComingSoon ? 0.55 : 0.7,
@@ -388,8 +399,8 @@ export function CourseModuleCard({ module, accentColor, accentFixed, onPress }: 
       accessibilityRole="button"
       onPress={onPress}
       style={({ pressed }) => ({
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        borderColor: colors.light.outlineVariant,
+        backgroundColor: c.surfaceContainerLowest,
+        borderColor: c.outlineVariant,
         borderLeftColor: accentColor,
         borderLeftWidth: 4,
         borderRadius: radius['2xl'],
@@ -406,4 +417,3 @@ export function CourseModuleCard({ module, accentColor, accentFixed, onPress }: 
     </Pressable>
   );
 }
-

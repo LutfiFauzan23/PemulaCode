@@ -1,6 +1,6 @@
 import { SafeAreaView, type ViewProps, type ViewStyle } from 'react-native';
 
-import { colors } from '@/constants/colors';
+import { useTheme } from '@/context/ThemeContext';
 import { spacing } from '@/constants/spacing';
 
 export type ScreenContainerProps = ViewProps & {
@@ -15,8 +15,10 @@ export function ScreenContainer({
   style,
   ...props
 }: ScreenContainerProps) {
+  const { colors: c } = useTheme();
+
   const containerStyle: ViewStyle = {
-    backgroundColor: colors.light.background,
+    backgroundColor: c.background,
     flex: 1,
     paddingHorizontal: padded ? spacing[4] : 0,
     paddingVertical: padded ? spacing[4] : 0,

@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
-  ArrowLeft,
   Bell,
   ChevronRight,
   Globe,
@@ -9,6 +8,7 @@ import {
   LogOut,
   Moon,
   ShieldCheck,
+  Sun,
   User,
 } from 'lucide-react-native';
 
@@ -18,30 +18,38 @@ import {
   Image,
   Pressable,
   ScrollView,
-  Switch,
   View,
 } from 'react-native';
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
+import { useTheme } from '@/context/ThemeContext';
 import { appConfig } from '@/constants/app';
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useSettingsStore } from '@/stores/settings-store';
+import { useTranslation } from '@/translations';
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const { colors, mode, setMode, toggleTheme } = useTheme();
+  const { t } = useTranslation();
+  const language = useSettingsStore((state) => state.language);
+  const setLanguage = useSettingsStore((state) => state.setLanguage);
+
+  const [showLanguagePicker, setShowLanguagePicker] = useState(false);
+
+  const isDarkMode = mode === 'dark';
 
   const handleSignOut = () => {
     Alert.alert(
-      'Sign Out',
-      'Are you sure you want to sign out from Pemula Code?',
+      t('confirmSignOut'),
+      t('confirmSignOutMessage'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('cancel'), style: 'cancel' },
         {
-          text: 'Sign Out',
+          text: t('signOut'),
           style: 'destructive',
           onPress: () => router.replace('/(auth)/login'),
         },
@@ -50,8 +58,8 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" />
+    <ScreenContainer padded={false} style={{ backgroundColor: colors.background }}>
+      <StatusBar style={isDarkMode ? 'light' : 'dark'} />
 
       <ScrollView
         style={{ flex: 1 }}
@@ -65,7 +73,7 @@ export default function SettingsScreen() {
         <View
           style={{
             alignItems: 'center',
-            backgroundColor: colors.light.background,
+            backgroundColor: colors.background,
             flexDirection: 'row',
             height: 60,
             justifyContent: 'space-between',
@@ -87,25 +95,29 @@ export default function SettingsScreen() {
             style={({ pressed }) => ({
               alignItems: 'center',
               backgroundColor: pressed
-                ? colors.light.surfaceContainerHigh
-                : colors.light.surfaceContainerLow,
+                ? colors.surfaceContainerHigh
+                : colors.surfaceContainerLow,
               borderRadius: radius.full,
               height: 40,
               justifyContent: 'center',
               width: 40,
             })}>
-            <ArrowLeft color={colors.light.primary} size={20} />
+            <ChevronRight
+              color={colors.primary}
+              size={20}
+              style={{ transform: [{ rotate: '180deg' }] }}
+            />
           </Pressable>
 
           {/* Center: Title */}
           <AppText
-            color={colors.light.primary}
+            color={colors.primary}
             style={{
               fontFamily: typography.family.sansBold,
               fontSize: 20,
               lineHeight: 28,
             }}>
-            Settings
+            {t('settings')}
           </AppText>
 
           {/* Right: Profile Avatar */}
@@ -114,7 +126,7 @@ export default function SettingsScreen() {
             accessibilityRole="button"
             onPress={() => router.push('/(tabs)/profile')}
             style={({ pressed }) => ({
-              borderColor: colors.light.primary,
+              borderColor: colors.primary,
               borderRadius: radius.full,
               borderWidth: 2,
               height: 40,
@@ -133,7 +145,7 @@ export default function SettingsScreen() {
         {/* 2. SECTION 1 — GENERAL PREFERENCES */}
         <View style={{ marginTop: spacing[5], paddingHorizontal: spacing[5] }}>
           <AppText
-            color={colors.light.primary}
+            color={colors.primary}
             style={{
               fontFamily: typography.family.mono,
               fontSize: 13,
@@ -142,19 +154,19 @@ export default function SettingsScreen() {
               marginBottom: spacing[3],
               textTransform: 'uppercase',
             }}>
-            General Preferences
+            {t('generalPreferences')}
           </AppText>
 
           {/* Card Container */}
           <View
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              borderColor: colors.light.outlineVariant,
+              backgroundColor: colors.surfaceContainerLowest,
+              borderColor: colors.outlineVariant,
               borderRadius: radius['2xl'],
               borderWidth: 1,
               elevation: 4,
               overflow: 'hidden',
-              shadowColor: colors.light.primary,
+              shadowColor: colors.primary,
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.08,
               shadowRadius: 12,
@@ -172,60 +184,91 @@ export default function SettingsScreen() {
                 <View
                   style={{
                     alignItems: 'center',
-                    backgroundColor: colors.light.primaryFixed,
+                    backgroundColor: colors.primaryFixed,
                     borderRadius: radius.xl,
                     height: 40,
                     justifyContent: 'center',
                     width: 40,
                   }}>
-                  <Moon color={colors.light.primary} size={20} />
+                  {isDarkMode ? (
+                    <Moon color={colors.primary} size={20} />
+                  ) : (
+                    <Sun color={colors.primary} size={20} />
+                  )}
                 </View>
                 <View style={{ flex: 1 }}>
                   <AppText
-                    color={colors.light.text}
+                    color={colors.text}
                     style={{
                       fontFamily: typography.family.sansBold,
                       fontSize: 16,
                       lineHeight: 22,
                     }}>
-                    Dark Mode
+                    {t('darkMode')}
                   </AppText>
                   <AppText
-                    color={colors.light.onSurfaceVariant}
+                    color={colors.onSurfaceVariant}
                     style={{
                       fontSize: 13,
                       lineHeight: 18,
                       marginTop: spacing[1],
                     }}>
-                    Adjust interface appearance
+                    {t('adjustAppearance')}
                   </AppText>
                 </View>
               </View>
 
-              <Switch
-                accessibilityLabel="Toggle Dark Mode"
-                onValueChange={setIsDarkMode}
-                thumbColor="#ffffff"
-                trackColor={{
-                  false: colors.light.surfaceContainerHigh,
-                  true: colors.light.primary,
-                }}
-                value={isDarkMode}
-              />
+              {/* Minimalist Light / Dark Toggle Switch */}
+              <Pressable
+                accessibilityLabel={isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                accessibilityRole="switch"
+                accessibilityState={{ checked: isDarkMode }}
+                onPress={toggleTheme}
+                style={({ pressed }) => ({
+                  backgroundColor: isDarkMode ? colors.primary : (colors.surfaceContainerHigh || '#e2e8f0'),
+                  borderRadius: 16,
+                  height: 32,
+                  justifyContent: 'center',
+                  opacity: pressed ? 0.85 : 1,
+                  padding: 3,
+                  width: 56,
+                })}>
+                <View
+                  style={{
+                    alignItems: 'center',
+                    alignSelf: isDarkMode ? 'flex-end' : 'flex-start',
+                    backgroundColor: '#ffffff',
+                    borderRadius: 13,
+                    elevation: 3,
+                    height: 26,
+                    justifyContent: 'center',
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.15,
+                    shadowRadius: 3,
+                    width: 26,
+                  }}>
+                  {isDarkMode ? (
+                    <Moon color={colors.primary} size={15} />
+                  ) : (
+                    <Sun color="#f59e0b" size={15} />
+                  )}
+                </View>
+              </Pressable>
             </View>
 
             {/* Divider */}
-            <View style={{ backgroundColor: colors.light.outlineVariant, height: 1, marginHorizontal: spacing[4] }} />
+            <View style={{ backgroundColor: colors.outlineVariant, height: 1, marginHorizontal: spacing[4] }} />
 
             {/* Item 2: Language */}
             <Pressable
               accessibilityLabel="Language Settings"
               accessibilityRole="button"
-              onPress={() => {}}
+              onPress={() => setShowLanguagePicker(!showLanguagePicker)}
               style={({ pressed }) => ({
                 alignItems: 'center',
                 backgroundColor: pressed
-                  ? colors.light.surfaceContainerLow
+                  ? colors.surfaceContainerLow
                   : 'transparent',
                 flexDirection: 'row',
                 justifyContent: 'space-between',
@@ -235,41 +278,156 @@ export default function SettingsScreen() {
                 <View
                   style={{
                     alignItems: 'center',
-                    backgroundColor: colors.light.primaryFixed,
+                    backgroundColor: colors.primaryFixed,
                     borderRadius: radius.xl,
                     height: 40,
                     justifyContent: 'center',
                     width: 40,
                   }}>
-                  <Globe color={colors.light.primary} size={20} />
+                  <Globe color={colors.primary} size={20} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <AppText
-                    color={colors.light.text}
+                    color={colors.text}
                     style={{
                       fontFamily: typography.family.sansBold,
                       fontSize: 16,
                       lineHeight: 22,
                     }}>
-                    Language
+                    {t('language')}
                   </AppText>
                   <AppText
-                    color={colors.light.onSurfaceVariant}
+                    color={colors.onSurfaceVariant}
                     style={{
                       fontSize: 13,
                       lineHeight: 18,
                       marginTop: spacing[1],
                     }}>
-                    English (United States)
+                    {language === 'id' ? t('indonesia') : t('english')}
                   </AppText>
                 </View>
               </View>
 
-              <ChevronRight color={colors.light.outline} size={20} />
+              <ChevronRight
+                color={colors.outline}
+                size={20}
+                style={{
+                  transform: [{ rotate: showLanguagePicker ? '90deg' : '0deg' }],
+                }}
+              />
             </Pressable>
 
+            {/* Language Picker (inline expanded) */}
+            {showLanguagePicker && (
+              <View
+                style={{
+                  backgroundColor: colors.surfaceContainerLow,
+                  borderTopColor: colors.outlineVariant,
+                  borderTopWidth: 1,
+                  paddingHorizontal: spacing[5],
+                  paddingVertical: spacing[3],
+                  gap: spacing[2],
+                }}>
+                {/* Indonesia option */}
+                <Pressable
+                  accessibilityLabel="Select Indonesia"
+                  accessibilityRole="radio"
+                  onPress={() => { setLanguage('id'); setShowLanguagePicker(false); }}
+                  style={({ pressed }) => ({
+                    alignItems: 'center',
+                    backgroundColor: language === 'id'
+                      ? colors.primaryFixed
+                      : pressed
+                      ? colors.surfaceContainerHigh
+                      : 'transparent',
+                    borderColor: language === 'id' ? colors.primary : colors.outlineVariant,
+                    borderRadius: radius.xl,
+                    borderWidth: 1.5,
+                    flexDirection: 'row',
+                    gap: spacing[3],
+                    paddingHorizontal: spacing[4],
+                    paddingVertical: spacing[3],
+                  })}>
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      borderColor: language === 'id' ? colors.primary : colors.outline,
+                      borderRadius: radius.full,
+                      borderWidth: 2,
+                      height: 20,
+                      justifyContent: 'center',
+                      width: 20,
+                    }}>
+                    {language === 'id' && (
+                      <View
+                        style={{
+                          backgroundColor: colors.primary,
+                          borderRadius: radius.full,
+                          height: 10,
+                          width: 10,
+                        }}
+                      />
+                    )}
+                  </View>
+                  <AppText
+                    color={language === 'id' ? colors.primary : colors.text}
+                    style={{ fontFamily: typography.family.sansBold, fontSize: 15 }}>
+                    🇮🇩  {t('indonesia')}
+                  </AppText>
+                </Pressable>
+
+                {/* English option */}
+                <Pressable
+                  accessibilityLabel="Select English"
+                  accessibilityRole="radio"
+                  onPress={() => { setLanguage('en'); setShowLanguagePicker(false); }}
+                  style={({ pressed }) => ({
+                    alignItems: 'center',
+                    backgroundColor: language === 'en'
+                      ? colors.primaryFixed
+                      : pressed
+                      ? colors.surfaceContainerHigh
+                      : 'transparent',
+                    borderColor: language === 'en' ? colors.primary : colors.outlineVariant,
+                    borderRadius: radius.xl,
+                    borderWidth: 1.5,
+                    flexDirection: 'row',
+                    gap: spacing[3],
+                    paddingHorizontal: spacing[4],
+                    paddingVertical: spacing[3],
+                  })}>
+                  <View
+                    style={{
+                      alignItems: 'center',
+                      borderColor: language === 'en' ? colors.primary : colors.outline,
+                      borderRadius: radius.full,
+                      borderWidth: 2,
+                      height: 20,
+                      justifyContent: 'center',
+                      width: 20,
+                    }}>
+                    {language === 'en' && (
+                      <View
+                        style={{
+                          backgroundColor: colors.primary,
+                          borderRadius: radius.full,
+                          height: 10,
+                          width: 10,
+                        }}
+                      />
+                    )}
+                  </View>
+                  <AppText
+                    color={language === 'en' ? colors.primary : colors.text}
+                    style={{ fontFamily: typography.family.sansBold, fontSize: 15 }}>
+                    🇺🇸  {t('english')}
+                  </AppText>
+                </Pressable>
+              </View>
+            )}
+
             {/* Divider */}
-            <View style={{ backgroundColor: colors.light.outlineVariant, height: 1, marginHorizontal: spacing[4] }} />
+            <View style={{ backgroundColor: colors.outlineVariant, height: 1, marginHorizontal: spacing[4] }} />
 
             {/* Item 3: Notification Settings */}
             <Pressable
@@ -279,7 +437,7 @@ export default function SettingsScreen() {
               style={({ pressed }) => ({
                 alignItems: 'center',
                 backgroundColor: pressed
-                  ? colors.light.surfaceContainerLow
+                  ? colors.surfaceContainerLow
                   : 'transparent',
                 flexDirection: 'row',
                 justifyContent: 'space-between',
@@ -289,37 +447,37 @@ export default function SettingsScreen() {
                 <View
                   style={{
                     alignItems: 'center',
-                    backgroundColor: colors.light.primaryFixed,
+                    backgroundColor: colors.primaryFixed,
                     borderRadius: radius.xl,
                     height: 40,
                     justifyContent: 'center',
                     width: 40,
                   }}>
-                  <Bell color={colors.light.primary} size={20} />
+                  <Bell color={colors.primary} size={20} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <AppText
-                    color={colors.light.text}
+                    color={colors.text}
                     style={{
                       fontFamily: typography.family.sansBold,
                       fontSize: 16,
                       lineHeight: 22,
                     }}>
-                    Notification Settings
+                    {t('notificationSettings')}
                   </AppText>
                   <AppText
-                    color={colors.light.onSurfaceVariant}
+                    color={colors.onSurfaceVariant}
                     style={{
                       fontSize: 13,
                       lineHeight: 18,
                       marginTop: spacing[1],
                     }}>
-                    Manage alerts and reminders
+                    {t('manageAlerts')}
                   </AppText>
                 </View>
               </View>
 
-              <ChevronRight color={colors.light.outline} size={20} />
+              <ChevronRight color={colors.outline} size={20} />
             </Pressable>
 
           </View>
@@ -328,7 +486,7 @@ export default function SettingsScreen() {
         {/* 3. SECTION 2 — ACCOUNT & SAFETY */}
         <View style={{ marginTop: spacing[6], paddingHorizontal: spacing[5] }}>
           <AppText
-            color={colors.light.primary}
+            color={colors.primary}
             style={{
               fontFamily: typography.family.mono,
               fontSize: 13,
@@ -337,19 +495,19 @@ export default function SettingsScreen() {
               marginBottom: spacing[3],
               textTransform: 'uppercase',
             }}>
-            Account & Safety
+            {t('accountSafety')}
           </AppText>
 
           {/* Card Container */}
           <View
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              borderColor: colors.light.outlineVariant,
+              backgroundColor: colors.surfaceContainerLowest,
+              borderColor: colors.outlineVariant,
               borderRadius: radius['2xl'],
               borderWidth: 1,
               elevation: 4,
               overflow: 'hidden',
-              shadowColor: colors.light.primary,
+              shadowColor: colors.primary,
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.08,
               shadowRadius: 12,
@@ -363,7 +521,7 @@ export default function SettingsScreen() {
               style={({ pressed }) => ({
                 alignItems: 'center',
                 backgroundColor: pressed
-                  ? colors.light.surfaceContainerLow
+                  ? colors.surfaceContainerLow
                   : 'transparent',
                 flexDirection: 'row',
                 justifyContent: 'space-between',
@@ -373,41 +531,41 @@ export default function SettingsScreen() {
                 <View
                   style={{
                     alignItems: 'center',
-                    backgroundColor: colors.light.primaryFixed,
+                    backgroundColor: colors.primaryFixed,
                     borderRadius: radius.xl,
                     height: 40,
                     justifyContent: 'center',
                     width: 40,
                   }}>
-                  <User color={colors.light.primary} size={20} />
+                  <User color={colors.primary} size={20} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <AppText
-                    color={colors.light.text}
+                    color={colors.text}
                     style={{
                       fontFamily: typography.family.sansBold,
                       fontSize: 16,
                       lineHeight: 22,
                     }}>
-                    My Profile
+                    {t('myProfile')}
                   </AppText>
                   <AppText
-                    color={colors.light.onSurfaceVariant}
+                    color={colors.onSurfaceVariant}
                     style={{
                       fontSize: 13,
                       lineHeight: 18,
                       marginTop: spacing[1],
                     }}>
-                    View stats, badges, and account details
+                    {t('viewStats')}
                   </AppText>
                 </View>
               </View>
 
-              <ChevronRight color={colors.light.outline} size={20} />
+              <ChevronRight color={colors.outline} size={20} />
             </Pressable>
 
             {/* Divider */}
-            <View style={{ backgroundColor: colors.light.outlineVariant, height: 1, marginHorizontal: spacing[4] }} />
+            <View style={{ backgroundColor: colors.outlineVariant, height: 1, marginHorizontal: spacing[4] }} />
 
             {/* Item 2: Privacy */}
             <Pressable
@@ -417,7 +575,7 @@ export default function SettingsScreen() {
               style={({ pressed }) => ({
                 alignItems: 'center',
                 backgroundColor: pressed
-                  ? colors.light.surfaceContainerLow
+                  ? colors.surfaceContainerLow
                   : 'transparent',
                 flexDirection: 'row',
                 justifyContent: 'space-between',
@@ -427,43 +585,43 @@ export default function SettingsScreen() {
                 <View
                   style={{
                     alignItems: 'center',
-                    backgroundColor: colors.light.primaryFixed,
+                    backgroundColor: colors.primaryFixed,
                     borderRadius: radius.xl,
                     height: 40,
                     justifyContent: 'center',
                     width: 40,
                   }}>
-                  <ShieldCheck color={colors.light.primary} size={20} />
+                  <ShieldCheck color={colors.primary} size={20} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <AppText
-                    color={colors.light.text}
+                    color={colors.text}
                     style={{
                       fontFamily: typography.family.sansBold,
                       fontSize: 16,
                       lineHeight: 22,
                     }}>
-                    Privacy
+                    {t('privacy')}
                   </AppText>
                   <AppText
-                    color={colors.light.onSurfaceVariant}
+                    color={colors.onSurfaceVariant}
                     style={{
                       fontSize: 13,
                       lineHeight: 18,
                       marginTop: spacing[1],
                     }}>
-                    Data usage and visibility
+                    {t('dataUsage')}
                   </AppText>
                 </View>
               </View>
 
-              <ChevronRight color={colors.light.outline} size={20} />
+              <ChevronRight color={colors.outline} size={20} />
             </Pressable>
 
             {/* Divider */}
-            <View style={{ backgroundColor: colors.light.outlineVariant, height: 1, marginHorizontal: spacing[4] }} />
+            <View style={{ backgroundColor: colors.outlineVariant, height: 1, marginHorizontal: spacing[4] }} />
 
-            {/* Item 2: About Application */}
+            {/* Item 3: About Application */}
             <Pressable
               accessibilityLabel="About Application"
               accessibilityRole="button"
@@ -471,7 +629,7 @@ export default function SettingsScreen() {
               style={({ pressed }) => ({
                 alignItems: 'center',
                 backgroundColor: pressed
-                  ? colors.light.surfaceContainerLow
+                  ? colors.surfaceContainerLow
                   : 'transparent',
                 flexDirection: 'row',
                 justifyContent: 'space-between',
@@ -481,37 +639,37 @@ export default function SettingsScreen() {
                 <View
                   style={{
                     alignItems: 'center',
-                    backgroundColor: colors.light.primaryFixed,
+                    backgroundColor: colors.primaryFixed,
                     borderRadius: radius.xl,
                     height: 40,
                     justifyContent: 'center',
                     width: 40,
                   }}>
-                  <Info color={colors.light.primary} size={20} />
+                  <Info color={colors.primary} size={20} />
                 </View>
                 <View style={{ flex: 1 }}>
                   <AppText
-                    color={colors.light.text}
+                    color={colors.text}
                     style={{
                       fontFamily: typography.family.sansBold,
                       fontSize: 16,
                       lineHeight: 22,
                     }}>
-                    About Application
+                    {t('aboutApplication')}
                   </AppText>
                   <AppText
-                    color={colors.light.onSurfaceVariant}
+                    color={colors.onSurfaceVariant}
                     style={{
                       fontSize: 13,
                       lineHeight: 18,
                       marginTop: spacing[1],
                     }}>
-                    Version {appConfig.version ?? '2.4.0'} (Stable)
+                    {t('version')} {appConfig.version ?? '2.4.0'} ({t('stable')})
                   </AppText>
                 </View>
               </View>
 
-              <ChevronRight color={colors.light.outline} size={20} />
+              <ChevronRight color={colors.outline} size={20} />
             </Pressable>
 
           </View>
@@ -525,8 +683,8 @@ export default function SettingsScreen() {
             onPress={handleSignOut}
             style={({ pressed }) => ({
               alignItems: 'center',
-              backgroundColor: pressed ? '#fef2f2' : 'rgba(255, 255, 255, 0.95)',
-              borderColor: '#fecaca',
+              backgroundColor: pressed ? colors.surfaceContainerHigh : colors.surfaceContainerLowest,
+              borderColor: colors.error,
               borderRadius: radius['2xl'],
               borderWidth: 1,
               elevation: 2,
@@ -534,20 +692,21 @@ export default function SettingsScreen() {
               gap: spacing[3],
               paddingHorizontal: spacing[5],
               paddingVertical: spacing[4],
-              shadowColor: colors.light.error,
+              shadowColor: colors.error,
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.05,
               shadowRadius: 8,
+              opacity: pressed ? 0.85 : 1,
             })}>
-            <LogOut color={colors.light.error} size={20} />
+            <LogOut color={colors.error} size={20} />
             <AppText
-              color={colors.light.error}
+              color={colors.error}
               style={{
                 fontFamily: typography.family.sansBold,
                 fontSize: 16,
                 lineHeight: 22,
               }}>
-              Sign Out
+              {t('signOut')}
             </AppText>
           </Pressable>
         </View>
@@ -555,7 +714,7 @@ export default function SettingsScreen() {
         {/* 5. BRANDING / FOOTER */}
         <View style={{ alignItems: 'center', marginTop: spacing[8], paddingHorizontal: spacing[5] }}>
           <AppText
-            color={colors.light.primary}
+            color={colors.primary}
             style={{
               fontFamily: typography.family.sansBold,
               fontSize: 15,
@@ -564,14 +723,14 @@ export default function SettingsScreen() {
             Pemula Code
           </AppText>
           <AppText
-            color="#94a3b8"
+            color={colors.outline}
             style={{
               fontFamily: typography.family.mono,
               fontSize: 11,
               letterSpacing: 1.5,
               marginTop: spacing[1],
             }}>
-            MADE WITH PRIDE FOR GEN Z
+            {t('madeWithPride')}
           </AppText>
         </View>
 

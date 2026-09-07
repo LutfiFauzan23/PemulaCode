@@ -14,10 +14,11 @@ import { Alert, Pressable, ScrollView, View } from 'react-native';
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useTheme } from '@/context/ThemeContext';
+import { useTranslation } from '@/translations';
 
 import cssQuizData from '@/data/quizzes/css.json';
 import htmlQuizData from '@/data/quizzes/html.json';
@@ -44,6 +45,8 @@ const OPTION_LABELS = ['A', 'B', 'C', 'D', 'E'];
 
 export default function QuizScreen() {
   const router = useRouter();
+  const { colors: c, mode } = useTheme();
+  const { t } = useTranslation();
   const { courseId, moduleId } = useLocalSearchParams<{
     courseId?: string;
     moduleId?: string;
@@ -69,23 +72,23 @@ export default function QuizScreen() {
     if (normalizedCourseId === 'css') {
       return {
         accent: '#00629d',
-        accentFixed: '#cfe5ff',
+        accentFixed: mode === 'dark' ? '#16324d' : '#cfe5ff',
         accentPressed: '#004c7d',
       };
     }
     if (normalizedCourseId === 'javascript' || normalizedCourseId === 'js') {
       return {
-        accent: colors.light.primary,
-        accentFixed: colors.light.primaryFixed,
-        accentPressed: colors.light.primaryPressed,
+        accent: c.primary,
+        accentFixed: c.primaryFixed,
+        accentPressed: c.primaryPressed,
       };
     }
     return {
-      accent: colors.light.secondary,
-      accentFixed: colors.light.secondaryFixed,
-      accentPressed: colors.light.secondaryPressed,
+      accent: c.secondary,
+      accentFixed: c.secondaryFixed,
+      accentPressed: c.secondaryPressed,
     };
-  }, [normalizedCourseId]);
+  }, [normalizedCourseId, c, mode]);
 
   // Load target quiz data
   const quizData: QuizData | null = useMemo(() => {
@@ -99,86 +102,102 @@ export default function QuizScreen() {
     }
 
     if (!sourceMap) return null;
+    return sourceMap[resolvedQuizKey] || sourceMap[`${normalizedCourseId}-01`] || null;
+  }, [normalizedCourseId, resolvedQuizKey]);
 
-    // 1. Direct match
-    if (sourceMap[rawModuleId]) return sourceMap[rawModuleId];
-
-    // 2. Normalized key match (e.g. html-02)
-    if (sourceMap[resolvedQuizKey]) return sourceMap[resolvedQuizKey];
-
-    // 3. Fallback alias (e.g. html-module-1 -> html-01)
-    const normalizedKey = rawModuleId.replace('module-', '0');
-    if (sourceMap[normalizedKey]) return sourceMap[normalizedKey];
-
-    // 4. Default to first quiz in map
-    const firstKey = Object.keys(sourceMap)[0];
-    return sourceMap[firstKey] || null;
-  }, [normalizedCourseId, rawModuleId, resolvedQuizKey]);
-
-  // Quiz state
+  // Quiz State
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<(number | null)[]>(
-    Array(5).fill(null),
-  );
+  const [userAnswers, setUserAnswers] = useState<(number | null)[]>([]);
+  const [currentSelection, setCurrentSelection] = useState<number | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [finalScore, setFinalScore] = useState(0);
+  const [earnedXP, setEarnedXP] = useState(0);
 
-  // Reset quiz state whenever course or module changes
+  // Initialize answers array when quiz data loads
   useEffect(() => {
-    setCurrentQuestionIndex(0);
-    setSelectedAnswers(Array(quizData?.questions.length || 5).fill(null));
-    setIsSubmitted(false);
-  }, [normalizedCourseId, rawModuleId, quizData?.moduleId]);
+    if (quizData) {
+      setUserAnswers(new Array(quizData.questions.length).fill(null));
+      setCurrentQuestionIndex(0);
+      setCurrentSelection(null);
+      setIsSubmitted(false);
+      setFinalScore(0);
+      setEarnedXP(0);
+    }
+  }, [quizData]);
 
-  const questions = quizData?.questions || [];
-  const totalQuestions = questions.length || 5;
-  const currentQuestion = questions[currentQuestionIndex];
-  const currentSelection = selectedAnswers[currentQuestionIndex];
+  if (!quizData) {
+    return (
+      <ScreenContainer style={{ backgroundColor: c.background }}>
+        <AppText color={c.text}>Quiz content not found.</AppText>
+      </ScreenContainer>
+    );
+  }
 
-  // Calculate score
-  const correctCount = useMemo(() => {
-    if (!questions.length) return 0;
-    return selectedAnswers.reduce((acc: number, selected, idx) => {
-      if (selected !== null && selected === questions[idx]?.correctAnswer) {
-        return acc + 1;
-      }
-      return acc;
-    }, 0);
-  }, [selectedAnswers, questions]);
+  const currentQuestion = quizData.questions[currentQuestionIndex];
+  const totalQuestions = quizData.questions.length;
 
-  const isPassed = correctCount >= 4;
-
-  const handleSelectOption = (optionIndex: number) => {
-    const updated = [...selectedAnswers];
-    updated[currentQuestionIndex] = optionIndex;
-    setSelectedAnswers(updated);
+  const handleSelectOption = (index: number) => {
+    if (isSubmitted) return;
+    setCurrentSelection(index);
   };
 
   const handleNextOrSubmit = () => {
+    if (currentSelection === null) return;
+
+    // Save current selection
+    const updatedAnswers = [...userAnswers];
+    updatedAnswers[currentQuestionIndex] = currentSelection;
+    setUserAnswers(updatedAnswers);
+
     if (currentQuestionIndex < totalQuestions - 1) {
-      setCurrentQuestionIndex((prev) => prev + 1);
+      // Go to next question
+      const nextIndex = currentQuestionIndex + 1;
+      setCurrentQuestionIndex(nextIndex);
+      setCurrentSelection(updatedAnswers[nextIndex]);
     } else {
-      // Final question submitted
+      // Calculate results and submit
+      let correctCount = 0;
+      quizData.questions.forEach((q, idx) => {
+        if (updatedAnswers[idx] === q.correctAnswer) {
+          correctCount += 1;
+        }
+      });
+
+      const scorePercentage = Math.round((correctCount / totalQuestions) * 100);
+      const isPassed = scorePercentage >= 70;
+      const xpGained = correctCount * 15 + (isPassed ? 25 : 0);
+
+      setFinalScore(correctCount);
+      setEarnedXP(xpGained);
       setIsSubmitted(true);
-      if (correctCount >= 4 && quizData) {
-        completeQuiz(quizData.courseId, quizData.moduleId);
-      }
+
+      // Persist progress to store
+      completeQuiz(normalizedCourseId, resolvedQuizKey);
     }
   };
 
-  const handleTryAgain = () => {
+  const handleRetryQuiz = () => {
+    setUserAnswers(new Array(totalQuestions).fill(null));
     setCurrentQuestionIndex(0);
-    setSelectedAnswers(Array(totalQuestions).fill(null));
+    setCurrentSelection(null);
     setIsSubmitted(false);
+    setFinalScore(0);
+    setEarnedXP(0);
   };
 
   const handleBackPress = () => {
-    if (!isSubmitted && selectedAnswers.some((ans) => ans !== null)) {
+    if (isSubmitted) {
+      router.replace('/(tabs)/learn');
+      return;
+    }
+
+    if (currentQuestionIndex > 0) {
       Alert.alert(
-        'Exit Quiz?',
-        'Your answers will not be saved. Are you sure you want to leave?',
+        'Keluar dari Kuis?',
+        'Progres kuis saat ini akan hilang jika kamu keluar sekarang.',
         [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Exit', style: 'destructive', onPress: () => router.back() },
+          { text: 'Batal', style: 'cancel' },
+          { text: 'Keluar', style: 'destructive', onPress: () => router.back() },
         ],
       );
     } else {
@@ -188,8 +207,8 @@ export default function QuizScreen() {
 
   if (!quizData || !currentQuestion) {
     return (
-      <ScreenContainer style={{ backgroundColor: colors.light.background }}>
-        <AppText color={colors.light.text}>Quiz content not found.</AppText>
+      <ScreenContainer style={{ backgroundColor: c.background }}>
+        <AppText color={c.text}>Quiz content not found.</AppText>
       </ScreenContainer>
     );
   }
@@ -198,17 +217,19 @@ export default function QuizScreen() {
   // 1. RESULT VIEW (AFTER QUIZ SUBMISSION)
   // ════════════════════════════════════════════════════
   if (isSubmitted) {
+    const isPassed = Math.round((finalScore / totalQuestions) * 100) >= 70;
+
     return (
       <ScreenContainer
         padded={false}
-        style={{ backgroundColor: colors.light.background }}>
-        <StatusBar style="dark" />
+        style={{ backgroundColor: c.background }}>
+        <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
 
         {/* Top Bar */}
         <View
           style={{
             alignItems: 'center',
-            backgroundColor: colors.light.background,
+            backgroundColor: c.background,
             flexDirection: 'row',
             height: 60,
             paddingHorizontal: spacing[5],
@@ -218,28 +239,28 @@ export default function QuizScreen() {
             accessibilityLabel="Go back"
             accessibilityRole="button"
             hitSlop={8}
-            onPress={() => router.back()}
+            onPress={() => router.replace('/(tabs)/learn')}
             style={({ pressed }) => ({
               alignItems: 'center',
               backgroundColor: pressed
-                ? colors.light.surfaceContainerHigh
-                : colors.light.surfaceContainerLow,
+                ? c.surfaceContainerHigh
+                : c.surfaceContainerLow,
               borderRadius: radius.full,
               height: 40,
               justifyContent: 'center',
               width: 40,
             })}>
-            <ArrowLeft color={colors.light.text} size={20} />
+            <ArrowLeft color={c.text} size={20} />
           </Pressable>
 
           <AppText
-            color={colors.light.text}
+            color={c.text}
             style={{
               fontFamily: typography.family.sansBold,
               fontSize: 18,
               marginLeft: spacing[4],
             }}>
-            Quiz Results
+            Hasil Kuis
           </AppText>
         </View>
 
@@ -254,23 +275,23 @@ export default function QuizScreen() {
           <View
             style={{
               alignItems: 'center',
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              borderColor: colors.light.outlineVariant,
+              backgroundColor: c.surfaceContainerLowest,
+              borderColor: c.outlineVariant,
               borderRadius: radius['2xl'],
               borderWidth: 1,
               elevation: 6,
               padding: spacing[6],
-              shadowColor: isPassed ? theme.accent : colors.light.error,
+              shadowColor: isPassed ? theme.accent : c.danger,
               shadowOffset: { width: 0, height: 6 },
               shadowOpacity: 0.1,
               shadowRadius: 16,
               width: '100%',
             }}>
-            {/* Icon Header */}
+            {/* Header Icon */}
             <View
               style={{
                 alignItems: 'center',
-                backgroundColor: isPassed ? theme.accentFixed : '#ffebe9',
+                backgroundColor: isPassed ? theme.accentFixed : (mode === 'dark' ? '#5c1d1d' : '#ffdad6'),
                 borderRadius: radius.full,
                 height: 80,
                 justifyContent: 'center',
@@ -280,68 +301,86 @@ export default function QuizScreen() {
               {isPassed ? (
                 <Trophy color={theme.accent} size={40} />
               ) : (
-                <AlertCircle color={colors.light.error} size={40} />
+                <AlertCircle color={c.danger} size={40} />
               )}
             </View>
 
             {/* Title */}
             <AppText
-              color={colors.light.text}
+              color={c.text}
               style={{
                 fontFamily: typography.family.sansBold,
                 fontSize: 24,
+                lineHeight: 32,
                 textAlign: 'center',
               }}>
-              {isPassed ? 'Quiz Passed!' : 'Quiz Not Passed'}
+              {isPassed ? t('quizComplete') : t('quizNotPassed')}
             </AppText>
 
             {/* Score */}
             <AppText
-              color={isPassed ? theme.accent : colors.light.error}
+              color={isPassed ? theme.accent : c.danger}
               style={{
-                fontFamily: typography.family.sansBold,
-                fontSize: 32,
+                fontFamily: typography.family.mono,
+                fontSize: 42,
+                fontWeight: 'bold',
                 marginTop: spacing[2],
               }}>
-              {correctCount} / {totalQuestions}
+              {finalScore}/{totalQuestions}
             </AppText>
 
-            {/* Subtext */}
             <AppText
-              color={colors.light.onSurfaceVariant}
+              color={c.onSurfaceVariant}
               style={{
-                fontSize: 14,
-                lineHeight: 21,
+                fontSize: 15,
+                lineHeight: 22,
                 marginTop: spacing[2],
                 textAlign: 'center',
               }}>
               {isPassed
-                ? 'Great job! You have successfully completed this quiz and unlocked the next step.'
-                : 'Review the lesson and try again. You need at least 4 out of 5 to pass.'}
+                ? 'Selamat! Kamu berhasil menyelesaikan kuis ini dan membuka modul berikutnya.'
+                : 'Jangan berkecil hati. Pelajari kembali materinya dan coba kuis ini sekali lagi.'}
             </AppText>
 
-            {/* Action Buttons */}
-            {isPassed ? (
+            {/* XP Gained Badge */}
+            {isPassed && (
+              <View
+                style={{
+                  alignItems: 'center',
+                  backgroundColor: theme.accentFixed,
+                  borderRadius: radius.xl,
+                  flexDirection: 'row',
+                  gap: spacing[2],
+                  marginTop: spacing[4],
+                  paddingHorizontal: spacing[4],
+                  paddingVertical: spacing[2],
+                }}>
+                <Sparkles color={theme.accent} size={18} />
+                <AppText
+                  color={theme.accent}
+                  style={{
+                    fontFamily: typography.family.sansBold,
+                    fontSize: 15,
+                  }}>
+                  +{earnedXP} XP Didapatkan!
+                </AppText>
+              </View>
+            )}
+
+            {/* Actions */}
+            <View style={{ gap: spacing[3], marginTop: spacing[6], width: '100%' }}>
               <Pressable
-                accessibilityLabel="Continue to Course"
+                accessibilityLabel="Continue to Learn Hub"
                 accessibilityRole="button"
-                onPress={() => {
-                  if (quizData.courseId === 'html') {
-                    router.replace('/(tabs)/html-course');
-                  } else if (quizData.courseId === 'css') {
-                    router.replace('/(tabs)/css-course');
-                  } else {
-                    router.replace(`/(tabs)/course-detail?courseId=${quizData.courseId}`);
-                  }
-                }}
+                onPress={() => router.replace('/(tabs)/learn')}
                 style={({ pressed }) => ({
                   alignItems: 'center',
                   backgroundColor: pressed ? theme.accentPressed : theme.accent,
                   borderRadius: radius.xl,
+                  flexDirection: 'row',
+                  gap: spacing[2],
+                  height: 52,
                   justifyContent: 'center',
-                  marginTop: spacing[6],
-                  minHeight: 50,
-                  opacity: pressed ? 0.9 : 1,
                   width: '100%',
                 })}>
                 <AppText
@@ -350,68 +389,40 @@ export default function QuizScreen() {
                     fontFamily: typography.family.sansBold,
                     fontSize: 16,
                   }}>
-                  Continue
+                  Lanjutkan
+                </AppText>
+                <ChevronRight color="#ffffff" size={20} />
+              </Pressable>
+
+              <Pressable
+                accessibilityLabel="Retry Quiz"
+                accessibilityRole="button"
+                onPress={handleRetryQuiz}
+                style={({ pressed }) => ({
+                  alignItems: 'center',
+                  backgroundColor: pressed
+                    ? c.surfaceContainerHigh
+                    : c.surfaceContainerLow,
+                  borderColor: c.outlineVariant,
+                  borderRadius: radius.xl,
+                  borderWidth: 1,
+                  flexDirection: 'row',
+                  gap: spacing[2],
+                  height: 52,
+                  justifyContent: 'center',
+                  width: '100%',
+                })}>
+                <RotateCcw color={c.text} size={18} />
+                <AppText
+                  color={c.text}
+                  style={{
+                    fontFamily: typography.family.sansBold,
+                    fontSize: 16,
+                  }}>
+                  {t('tryAgain')}
                 </AppText>
               </Pressable>
-            ) : (
-              <View style={{ gap: spacing[3], marginTop: spacing[6], width: '100%' }}>
-                <Pressable
-                  accessibilityLabel="Try Again"
-                  accessibilityRole="button"
-                  onPress={handleTryAgain}
-                  style={({ pressed }) => ({
-                    alignItems: 'center',
-                    backgroundColor: pressed ? theme.accentPressed : theme.accent,
-                    borderRadius: radius.xl,
-                    flexDirection: 'row',
-                    gap: spacing[2],
-                    justifyContent: 'center',
-                    minHeight: 48,
-                    opacity: pressed ? 0.9 : 1,
-                    width: '100%',
-                  })}>
-                  <RotateCcw color="#ffffff" size={18} />
-                  <AppText
-                    color="#ffffff"
-                    style={{
-                      fontFamily: typography.family.sansBold,
-                      fontSize: 15,
-                    }}>
-                    Try Again
-                  </AppText>
-                </Pressable>
-
-                <Pressable
-                  accessibilityLabel="Review Lesson"
-                  accessibilityRole="button"
-                  onPress={() =>
-                    router.replace(
-                      `/(tabs)/lesson-detail?courseId=${quizData.courseId}&moduleId=${quizData.moduleId}`,
-                    )
-                  }
-                  style={({ pressed }) => ({
-                    alignItems: 'center',
-                    backgroundColor: pressed
-                      ? colors.light.surfaceContainerHigh
-                      : colors.light.surfaceContainerLow,
-                    borderColor: colors.light.outlineVariant,
-                    borderRadius: radius.xl,
-                    borderWidth: 1,
-                    justifyContent: 'center',
-                    minHeight: 48,
-                    width: '100%',
-                  })}>
-                  <AppText
-                    color={colors.light.text}
-                    style={{
-                      fontFamily: typography.family.sansBold,
-                      fontSize: 15,
-                    }}>
-                    Review Lesson
-                  </AppText>
-                </Pressable>
-              </View>
-            )}
+            </View>
           </View>
         </View>
       </ScreenContainer>
@@ -424,14 +435,14 @@ export default function QuizScreen() {
   return (
     <ScreenContainer
       padded={false}
-      style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" />
+      style={{ backgroundColor: c.background }}>
+      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
 
       {/* Top App Bar */}
       <View
         style={{
           alignItems: 'center',
-          backgroundColor: colors.light.background,
+          backgroundColor: c.background,
           flexDirection: 'row',
           height: 60,
           justifyContent: 'space-between',
@@ -447,19 +458,19 @@ export default function QuizScreen() {
             style={({ pressed }) => ({
               alignItems: 'center',
               backgroundColor: pressed
-                ? colors.light.surfaceContainerHigh
-                : colors.light.surfaceContainerLow,
+                ? c.surfaceContainerHigh
+                : c.surfaceContainerLow,
               borderRadius: radius.full,
               height: 40,
               justifyContent: 'center',
               width: 40,
             })}>
-            <ArrowLeft color={colors.light.text} size={20} />
+            <ArrowLeft color={c.text} size={20} />
           </Pressable>
 
           <View>
             <AppText
-              color={colors.light.text}
+              color={c.text}
               style={{
                 fontFamily: typography.family.sansBold,
                 fontSize: 18,
@@ -500,12 +511,12 @@ export default function QuizScreen() {
             marginBottom: spacing[2],
           }}>
           <AppText
-            color={colors.light.onSurfaceVariant}
+            color={c.onSurfaceVariant}
             style={{
               fontFamily: typography.family.mono,
               fontSize: 13,
             }}>
-            Question {currentQuestionIndex + 1} of {totalQuestions}
+            Soal {currentQuestionIndex + 1} dari {totalQuestions}
           </AppText>
           <AppText
             color={theme.accent}
@@ -552,8 +563,8 @@ export default function QuizScreen() {
         {/* Question Box */}
         <View
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            borderColor: colors.light.outlineVariant,
+            backgroundColor: c.surfaceContainerLowest,
+            borderColor: c.outlineVariant,
             borderRadius: radius['2xl'],
             borderWidth: 1,
             elevation: 2,
@@ -568,11 +579,11 @@ export default function QuizScreen() {
               fontWeight: 'bold',
               marginBottom: spacing[2],
             }}>
-            QUESTION {currentQuestionIndex + 1}
+            PERTANYAAN {currentQuestionIndex + 1}
           </AppText>
 
           <AppText
-            color={colors.light.text}
+            color={c.text}
             style={{
               fontFamily: typography.family.sansBold,
               fontSize: 18,
@@ -599,11 +610,11 @@ export default function QuizScreen() {
                   backgroundColor: isSelected
                     ? theme.accentFixed
                     : pressed
-                    ? colors.light.surfaceContainerHigh
-                    : 'rgba(255, 255, 255, 0.95)',
+                    ? c.surfaceContainerHigh
+                    : c.surfaceContainerLowest,
                   borderColor: isSelected
                     ? theme.accent
-                    : colors.light.outlineVariant,
+                    : c.outlineVariant,
                   borderWidth: isSelected ? 2 : 1,
                   borderRadius: radius.xl,
                   flexDirection: 'row',
@@ -618,14 +629,14 @@ export default function QuizScreen() {
                     alignItems: 'center',
                     backgroundColor: isSelected
                       ? theme.accent
-                      : colors.light.surfaceContainerLow,
+                      : c.surfaceContainerLow,
                     borderRadius: radius.lg,
                     height: 34,
                     justifyContent: 'center',
                     width: 34,
                   }}>
                   <AppText
-                    color={isSelected ? '#ffffff' : colors.light.text}
+                    color={isSelected ? '#ffffff' : c.text}
                     style={{
                       fontFamily: typography.family.mono,
                       fontSize: 14,
@@ -637,7 +648,7 @@ export default function QuizScreen() {
 
                 {/* Option Text */}
                 <AppText
-                  color={colors.light.text}
+                  color={c.text}
                   style={{
                     flex: 1,
                     fontFamily: isSelected
@@ -658,8 +669,8 @@ export default function QuizScreen() {
       <View
         style={{
           alignItems: 'center',
-          backgroundColor: '#ffffff',
-          borderTopColor: colors.light.outlineVariant,
+          backgroundColor: c.background,
+          borderTopColor: c.outlineVariant,
           borderTopWidth: 1,
           bottom: 0,
           elevation: 12,
@@ -680,8 +691,8 @@ export default function QuizScreen() {
         <Pressable
           accessibilityLabel={
             currentQuestionIndex === totalQuestions - 1
-              ? 'Submit Quiz'
-              : 'Next Question'
+              ? t('submitQuiz')
+              : t('next')
           }
           accessibilityRole="button"
           disabled={currentSelection === null}
@@ -693,7 +704,7 @@ export default function QuizScreen() {
                 ? pressed
                   ? theme.accentPressed
                   : theme.accent
-                : colors.light.outlineVariant,
+                : c.outlineVariant,
             borderRadius: radius.xl,
             flexDirection: 'row',
             gap: spacing[2],
@@ -709,8 +720,8 @@ export default function QuizScreen() {
               fontSize: 15,
             }}>
             {currentQuestionIndex === totalQuestions - 1
-              ? 'Submit Quiz'
-              : 'Next Question'}
+              ? t('submitQuiz')
+              : t('next')}
           </AppText>
           {currentQuestionIndex === totalQuestions - 1 ? (
             <CheckCircle2 color="#ffffff" size={18} />

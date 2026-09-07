@@ -5,11 +5,12 @@ import { Animated, Easing, SafeAreaView, View } from 'react-native';
 
 import { AppLogo } from '@/components/branding/AppLogo';
 import { AppText } from '@/components/ui/AppText';
-import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
+import { useTheme } from '@/context/ThemeContext';
 
 export default function SplashScreen() {
   const router = useRouter();
+  const { colors, mode } = useTheme();
   const animationProgress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -45,8 +46,8 @@ export default function SplashScreen() {
   return (
     <SafeAreaView
       className="flex-1 items-center justify-center"
-      style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" />
+      style={{ backgroundColor: colors.background }}>
+      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
 
       <View className="items-center justify-center px-6">
         {/* App Logo */}
@@ -67,7 +68,7 @@ export default function SplashScreen() {
           }}>
           <AppText
             className="text-center"
-            color={colors.light.onSurface}
+            color={colors.onSurface}
             numberOfLines={1}
             style={{
               fontFamily: typography.family.sansExtraBold,
@@ -78,7 +79,7 @@ export default function SplashScreen() {
           </AppText>
           <AppText
             className="mt-1 text-center"
-            color={colors.light.onSurfaceVariant}
+            color={colors.onSurfaceVariant}
             numberOfLines={2}
             style={{
               fontSize: 16,
@@ -92,4 +93,3 @@ export default function SplashScreen() {
     </SafeAreaView>
   );
 }
-

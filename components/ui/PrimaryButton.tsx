@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
 import { ActivityIndicator, Pressable, type PressableProps } from 'react-native';
 
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
+import { useTheme } from '@/context/ThemeContext';
 import { AppText } from './AppText';
 
 export type PrimaryButtonProps = Omit<PressableProps, 'children'> & {
@@ -27,6 +27,7 @@ export function PrimaryButton({
   title,
   ...props
 }: PrimaryButtonProps) {
+  const { colors } = useTheme();
   const isDisabled = disabled || loading;
 
   return (
@@ -39,10 +40,10 @@ export function PrimaryButton({
         {
           alignItems: 'center',
           backgroundColor: isDisabled
-            ? colors.light.disabled
+            ? colors.disabled
             : state.pressed
-              ? colors.light.primaryPressed
-              : colors.light.primary,
+              ? colors.primaryPressed
+              : colors.primary,
           borderRadius: radius.md,
           flexDirection: 'row',
           gap: spacing[2],
@@ -55,8 +56,8 @@ export function PrimaryButton({
         typeof style === 'function' ? style(state) : style,
       ]}
       {...props}>
-      {loading ? <ActivityIndicator color={colors.light.primaryForeground} /> : leftIcon}
-      <AppText color={colors.light.primaryForeground} variant="body-semibold">
+      {loading ? <ActivityIndicator color={colors.primaryForeground} /> : leftIcon}
+      <AppText color={colors.primaryForeground} variant="body-semibold">
         {title}
       </AppText>
       {rightIcon}

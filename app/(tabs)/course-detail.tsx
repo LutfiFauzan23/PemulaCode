@@ -21,10 +21,11 @@ import {
 } from '@/components/course/CourseModuleCard';
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useTheme } from '@/context/ThemeContext';
+import { useTranslation } from '@/translations';
 
 // ─────────────────────────────────────────────
 // Local JSON data imports
@@ -73,6 +74,8 @@ function HeroIcon({
 
 export default function CourseDetailScreen() {
   const router = useRouter();
+  const { colors: c, mode } = useTheme();
+  const { t } = useTranslation();
   const { courseId } = useLocalSearchParams<{ courseId: string }>();
 
   const storeModules = useProgressStore((state) => state.modules);
@@ -89,8 +92,8 @@ export default function CourseDetailScreen() {
   // Fallback if invalid courseId
   if (!baseCourse) {
     return (
-      <ScreenContainer style={{ backgroundColor: colors.light.background }}>
-        <AppText color={colors.light.text}>Course not found.</AppText>
+      <ScreenContainer style={{ backgroundColor: c.background }}>
+        <AppText color={c.text}>Course not found.</AppText>
       </ScreenContainer>
     );
   }
@@ -112,8 +115,8 @@ export default function CourseDetailScreen() {
   return (
     <ScreenContainer
       padded={false}
-      style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" />
+      style={{ backgroundColor: c.background }}>
+      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
 
       <ScrollView
         style={{ flex: 1 }}
@@ -127,7 +130,7 @@ export default function CourseDetailScreen() {
         <View
           style={{
             alignItems: 'center',
-            backgroundColor: colors.light.background,
+            backgroundColor: c.background,
             flexDirection: 'row',
             height: 60,
             justifyContent: 'space-between',
@@ -147,14 +150,14 @@ export default function CourseDetailScreen() {
               style={({ pressed }) => ({
                 alignItems: 'center',
                 backgroundColor: pressed
-                  ? colors.light.surfaceContainerHigh
-                  : colors.light.surfaceContainerLow,
+                  ? c.surfaceContainerHigh
+                  : c.surfaceContainerLow,
                 borderRadius: radius.full,
                 height: 40,
                 justifyContent: 'center',
                 width: 40,
               })}>
-              <ArrowLeft color={colors.light.text} size={20} />
+              <ArrowLeft color={c.text} size={20} />
             </Pressable>
 
             <Pressable
@@ -197,8 +200,8 @@ export default function CourseDetailScreen() {
             style={({ pressed }) => ({
               alignItems: 'center',
               backgroundColor: pressed
-                ? colors.light.surfaceContainerHigh
-                : colors.light.surfaceContainerLow,
+                ? c.surfaceContainerHigh
+                : c.surfaceContainerLow,
               borderRadius: radius.full,
               height: 40,
               justifyContent: 'center',
@@ -291,7 +294,7 @@ export default function CourseDetailScreen() {
                 <AppText
                   color="#ffffff"
                   style={{ fontFamily: typography.family.mono, fontSize: 13 }}>
-                  Total Progress
+                  Total Progres
                 </AppText>
                 <AppText
                   color="#ffffff"
@@ -331,14 +334,14 @@ export default function CourseDetailScreen() {
         ═══════════════════════════════════════ */}
         <View style={{ marginTop: spacing[6], paddingHorizontal: spacing[5] }}>
           <AppText
-            color={colors.light.text}
+            color={c.text}
             style={{
               fontFamily: typography.family.sansBold,
               fontSize: 20,
               lineHeight: 28,
               marginBottom: spacing[4],
             }}>
-            Curriculum Modules
+            Modul Kurikulum
           </AppText>
 
           <View style={{ gap: spacing[4] }}>

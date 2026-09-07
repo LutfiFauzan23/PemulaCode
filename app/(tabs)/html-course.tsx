@@ -1,21 +1,23 @@
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { ArrowLeft, Bell, Code } from 'lucide-react-native';
-import React from 'react';
 import { Image, Pressable, ScrollView, View } from 'react-native';
 
 import { CourseModuleCard, type CourseModule } from '@/components/course/CourseModuleCard';
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useTheme } from '@/context/ThemeContext';
 import htmlCourseData from '@/data/courses/html.json';
 import { useProgressStore } from '@/stores/progress-store';
+import { useTranslation } from '@/translations';
 
 export default function HtmlCourseScreen() {
   const router = useRouter();
+  const { colors: c, mode } = useTheme();
+  const { t } = useTranslation();
   const storeModules = useProgressStore((state) => state.modules);
   const getCourseProgress = useProgressStore((state) => state.getCourseProgress);
 
@@ -31,8 +33,8 @@ export default function HtmlCourseScreen() {
   });
 
   return (
-    <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" />
+    <ScreenContainer padded={false} style={{ backgroundColor: c.background }}>
+      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
 
       <ScrollView
         style={{ flex: 1 }}
@@ -46,7 +48,7 @@ export default function HtmlCourseScreen() {
         <View
           style={{
             alignItems: 'center',
-            backgroundColor: colors.light.background,
+            backgroundColor: c.background,
             flexDirection: 'row',
             height: 60,
             justifyContent: 'space-between',
@@ -65,14 +67,14 @@ export default function HtmlCourseScreen() {
               style={({ pressed }) => ({
                 alignItems: 'center',
                 backgroundColor: pressed
-                  ? colors.light.surfaceContainerHigh
-                  : colors.light.surfaceContainerLow,
+                  ? c.surfaceContainerHigh
+                  : c.surfaceContainerLow,
                 borderRadius: radius.full,
                 height: 40,
                 justifyContent: 'center',
                 width: 40,
               })}>
-              <ArrowLeft color={colors.light.text} size={20} />
+              <ArrowLeft color={c.text} size={20} />
             </Pressable>
 
             <Pressable
@@ -81,7 +83,7 @@ export default function HtmlCourseScreen() {
               style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[3] }}>
               <View
                 style={{
-                  borderColor: colors.light.primary,
+                  borderColor: c.primary,
                   borderRadius: radius.full,
                   borderWidth: 2,
                   height: 40,
@@ -95,7 +97,7 @@ export default function HtmlCourseScreen() {
                 />
               </View>
               <AppText
-                color={colors.light.primary}
+                color={c.primary}
                 style={{
                   fontFamily: typography.family.sansBold,
                   fontSize: 20,
@@ -115,14 +117,14 @@ export default function HtmlCourseScreen() {
             style={({ pressed }) => ({
               alignItems: 'center',
               backgroundColor: pressed
-                ? colors.light.surfaceContainerHigh
-                : colors.light.surfaceContainerLow,
+                ? c.surfaceContainerHigh
+                : c.surfaceContainerLow,
               borderRadius: radius.full,
               height: 40,
               justifyContent: 'center',
               width: 40,
             })}>
-            <Bell color={colors.light.primary} size={20} />
+            <Bell color={c.primary} size={20} />
           </Pressable>
         </View>
 
@@ -130,13 +132,13 @@ export default function HtmlCourseScreen() {
         <View style={{ marginTop: spacing[4], paddingHorizontal: spacing[5] }}>
           <View
             style={{
-              backgroundColor: colors.light.secondary,
+              backgroundColor: c.secondary,
               borderRadius: radius['2xl'],
               elevation: 8,
               overflow: 'hidden',
               padding: spacing[6],
               position: 'relative',
-              shadowColor: colors.light.secondary,
+              shadowColor: c.secondary,
               shadowOffset: { width: 0, height: 8 },
               shadowOpacity: 0.2,
               shadowRadius: 20,
@@ -158,7 +160,7 @@ export default function HtmlCourseScreen() {
                 letterSpacing: 1.5,
                 fontWeight: 'bold',
               }}>
-              CERTIFICATION TRACK
+              JALUR SERTIFIKASI
             </AppText>
 
             {/* Course Title */}
@@ -181,7 +183,7 @@ export default function HtmlCourseScreen() {
                 lineHeight: 21,
                 marginTop: spacing[2],
               }}>
-              Master the skeletal structure of the web with our industry-aligned curriculum.
+              Kuasai struktur dasar web dengan kurikulum berstandar industri.
             </AppText>
 
             {/* Progress Card Inside Hero */}
@@ -204,7 +206,7 @@ export default function HtmlCourseScreen() {
                     fontFamily: typography.family.mono,
                     fontSize: 13,
                   }}>
-                  Total Progress
+                  Total Progres
                 </AppText>
                 <AppText
                   color="#ffffff"
@@ -242,14 +244,14 @@ export default function HtmlCourseScreen() {
         {/* 3. CURRICULUM MODULES */}
         <View style={{ marginTop: spacing[6], paddingHorizontal: spacing[5] }}>
           <AppText
-            color={colors.light.text}
+            color={c.text}
             style={{
               fontFamily: typography.family.sansBold,
               fontSize: 20,
               lineHeight: 28,
               marginBottom: spacing[4],
             }}>
-            Curriculum Modules
+            Modul Kurikulum
           </AppText>
 
           <View style={{ gap: spacing[4] }}>
@@ -257,8 +259,8 @@ export default function HtmlCourseScreen() {
               <CourseModuleCard
                 key={mod.id}
                 module={mod}
-                accentColor={colors.light.secondary}
-                accentFixed={colors.light.secondaryFixed}
+                accentColor={c.secondary}
+                accentFixed={c.secondaryFixed}
                 onPress={() => {
                   if (mod.status === 'available' || mod.status === 'in_progress' || mod.status === 'completed') {
                     router.push(

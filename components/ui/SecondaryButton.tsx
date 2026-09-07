@@ -1,8 +1,8 @@
 import { ActivityIndicator, Pressable, type PressableProps } from 'react-native';
 
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
+import { useTheme } from '@/context/ThemeContext';
 import { AppText } from './AppText';
 
 export type SecondaryButtonProps = Omit<PressableProps, 'children'> & {
@@ -22,6 +22,7 @@ export function SecondaryButton({
   title,
   ...props
 }: SecondaryButtonProps) {
+  const { colors } = useTheme();
   const isDisabled = disabled || loading;
 
   return (
@@ -33,7 +34,7 @@ export function SecondaryButton({
       style={(state) => [
         {
           alignItems: 'center',
-          backgroundColor: state.pressed ? colors.light.secondaryPressed : colors.light.secondary,
+          backgroundColor: state.pressed ? colors.secondaryPressed : colors.secondary,
           borderRadius: radius.md,
           flexDirection: 'row',
           gap: spacing[2],
@@ -46,8 +47,8 @@ export function SecondaryButton({
         typeof style === 'function' ? style(state) : style,
       ]}
       {...props}>
-      {loading ? <ActivityIndicator color={colors.light.secondaryForeground} /> : null}
-      <AppText color={colors.light.secondaryForeground} variant="body-semibold">
+      {loading ? <ActivityIndicator color={colors.secondaryForeground} /> : null}
+      <AppText color={colors.secondaryForeground} variant="body-semibold">
         {title}
       </AppText>
     </Pressable>

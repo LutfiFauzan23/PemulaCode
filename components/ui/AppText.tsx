@@ -1,7 +1,7 @@
 import { Text, type TextProps, type TextStyle } from 'react-native';
 
-import { colors } from '@/constants/colors';
 import { typography } from '@/constants/typography';
+import { useTheme } from '@/context/ThemeContext';
 
 type AppTextVariant = 'body' | 'body-semibold' | 'title' | 'subtitle' | 'caption';
 
@@ -46,10 +46,12 @@ const variantStyles: Record<AppTextVariant, TextStyle> = {
 
 export function AppText({
   className,
-  color = colors.light.text,
+  color,
   style,
   variant = 'body',
   ...props
 }: AppTextProps) {
-  return <Text className={className} style={[{ color }, variantStyles[variant], style]} {...props} />;
+  const { colors } = useTheme();
+  const textColor = color ?? colors.text;
+  return <Text className={className} style={[{ color: textColor }, variantStyles[variant], style]} {...props} />;
 }

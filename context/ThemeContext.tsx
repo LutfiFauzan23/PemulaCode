@@ -1,31 +1,26 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
+import React, {
   createContext,
   useCallback,
   useContext,
   useEffect,
   useMemo,
-  useState,
 } from 'react';
-import { useColorScheme } from 'react-native';
 
 import { colors } from '@/constants/colors';
+import { useSettingsStore, ThemeMode } from '@/stores/settings-store';
 
 // ======================================================
 // TYPES
 // ======================================================
 
-type ThemeMode = 'light' | 'dark';
+export type ThemeColors = Record<keyof typeof colors.light, string>;
 
 interface ThemeContextValue {
-  colors: typeof colors.light;
-  isLoading: boolean;
+  colors: ThemeColors;
   mode: ThemeMode;
   setMode: (mode: ThemeMode) => void;
   toggleTheme: () => void;
 }
-
-const STORAGE_KEY = '@pemula_code/theme_mode';
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
@@ -34,58 +29,29 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 // ======================================================
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const systemScheme = useColorScheme();
+  const theme = useSettingsStore((state) => state.theme);
+  const setTheme = useSettingsStore((state) => state.setTheme);
+  const toggleThemeStore = useSettingsStore((state) => state.toggleTheme);
 
-  // Fallback to system preference until the stored value (if any) loads.
-  const [mode, setModeState] = useState<ThemeMode>(systemScheme === 'dark' ? 'dark' : 'light');
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Load persisted preference on mount.
-  useEffect(() => {
-    let isMounted = true;
-
-    AsyncStorage.getItem(STORAGE_KEY)
-      .then((stored) => {
-        if (!isMounted) return;
-
-        if (stored === 'light' || stored === 'dark') {
-          setModeState(stored);
-        } else if (systemScheme === 'dark' || systemScheme === 'light') {
-          setModeState(systemScheme);
-        }
-      })
-      .finally(() => {
-        if (isMounted) setIsLoading(false);
-      });
-
-    return () => {
-      isMounted = false;
-    };
-    // Only run once on mount - user's explicit choice should override
-    // system changes afterwards, so systemScheme is intentionally omitted.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const setMode = useCallback((next: ThemeMode) => {
-    setModeState(next);
-    AsyncStorage.setItem(STORAGE_KEY, next).catch(() => {
-      // Non-critical: if persistence fails, the mode still applies for this session.
-    });
-  }, []);
+  const setMode = useCallback(
+    (next: ThemeMode) => {
+      setTheme(next);
+    },
+    [setTheme],
+  );
 
   const toggleTheme = useCallback(() => {
-    setMode(mode === 'dark' ? 'light' : 'dark');
-  }, [mode, setMode]);
+    toggleThemeStore();
+  }, [toggleThemeStore]);
 
   const value = useMemo<ThemeContextValue>(
     () => ({
-      colors: colors[mode],
-      isLoading,
-      mode,
+      colors: colors[theme],
+      mode: theme,
       setMode,
       toggleTheme,
     }),
-    [mode, isLoading, setMode, toggleTheme]
+    [theme, setMode, toggleTheme],
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

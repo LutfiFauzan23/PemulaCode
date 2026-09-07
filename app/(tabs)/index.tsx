@@ -10,7 +10,7 @@ import {
   Search,
   Trophy,
 } from 'lucide-react-native';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import {
   Image,
   Pressable,
@@ -21,25 +21,27 @@ import {
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useTheme } from '@/context/ThemeContext';
+import { useTranslation } from '@/translations';
 
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { TAB_BAR_CLEARANCE } from './_layout';
 import { useProgressStore } from '@/stores/progress-store';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { colors: c, mode } = useTheme();
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const overallProgress = useProgressStore((state) => state.getOverallProgress());
   const htmlProgress = useProgressStore((state) => state.getCourseProgress('html'));
 
   return (
-    <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" />
+    <ScreenContainer padded={false} style={{ backgroundColor: c.background }}>
+      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
 
       <ScrollView
         bounces={false}
@@ -53,7 +55,7 @@ export default function HomeScreen() {
         <View
           style={{
             alignItems: 'center',
-            backgroundColor: colors.light.background,
+            backgroundColor: c.background,
             flexDirection: 'row',
             height: 60,
             justifyContent: 'space-between',
@@ -67,7 +69,7 @@ export default function HomeScreen() {
             style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[3] }}>
             <View
               style={{
-                borderColor: colors.light.primary,
+                borderColor: c.primary,
                 borderRadius: radius.full,
                 borderWidth: 2,
                 height: 40,
@@ -81,7 +83,7 @@ export default function HomeScreen() {
               />
             </View>
             <AppText
-              color={colors.light.primary}
+              color={c.primary}
               style={{
                 fontFamily: typography.family.sansBold,
                 fontSize: 20,
@@ -100,14 +102,14 @@ export default function HomeScreen() {
             style={({ pressed }) => ({
               alignItems: 'center',
               backgroundColor: pressed
-                ? colors.light.surfaceContainerHigh
-                : colors.light.surfaceContainerLow,
+                ? c.surfaceContainerHigh
+                : c.surfaceContainerLow,
               borderRadius: radius.full,
               height: 40,
               justifyContent: 'center',
               width: 40,
             })}>
-            <Bell color={colors.light.text} size={20} />
+            <Bell color={c.text} size={20} />
           </Pressable>
         </View>
 
@@ -123,23 +125,23 @@ export default function HomeScreen() {
           {/* Left: Greeting */}
           <View style={{ flex: 1 }}>
             <AppText
-              color={colors.light.onSurfaceVariant}
+              color={c.onSurfaceVariant}
               style={{
                 fontFamily: typography.family.mono,
                 fontSize: 14,
                 lineHeight: 20,
               }}>
-              G'day, Alex!
+              {t('helloLearner')}
             </AppText>
             <AppText
-              color={colors.light.text}
+              color={c.text}
               style={{
                 fontFamily: typography.family.sansBold,
                 fontSize: 26,
                 lineHeight: 34,
                 marginTop: spacing[1],
               }}>
-              Ready to code?
+              {t('readyToLearn')}
             </AppText>
           </View>
 
@@ -147,8 +149,8 @@ export default function HomeScreen() {
           <View
             style={{
               alignItems: 'center',
-              backgroundColor: colors.light.secondaryFixed,
-              borderColor: colors.light.secondary,
+              backgroundColor: c.secondaryFixed,
+              borderColor: c.secondary,
               borderRadius: radius.xl,
               borderWidth: 1,
               flexDirection: 'row',
@@ -156,9 +158,9 @@ export default function HomeScreen() {
               paddingHorizontal: spacing[3],
               paddingVertical: spacing[2],
             }}>
-            <Flame color={colors.light.secondary} size={22} fill={colors.light.secondary} />
+            <Flame color={c.secondary} size={22} fill={c.secondary} />
             <AppText
-              color={colors.light.secondary}
+              color={c.secondary}
               style={{
                 fontFamily: typography.family.sansBold,
                 fontSize: 18,
@@ -174,10 +176,10 @@ export default function HomeScreen() {
           <View
             style={{
               alignItems: 'center',
-              backgroundColor: colors.light.surfaceContainerLow,
+              backgroundColor: c.surfaceContainerLow,
               borderColor: isSearchFocused
-                ? colors.light.primary
-                : colors.light.outlineVariant,
+                ? c.primary
+                : c.outlineVariant,
               borderRadius: radius.xl,
               borderWidth: 1,
               flexDirection: 'row',
@@ -186,7 +188,7 @@ export default function HomeScreen() {
               paddingHorizontal: spacing[4],
             }}>
             <Search
-              color={isSearchFocused ? colors.light.primary : colors.light.outline}
+              color={isSearchFocused ? c.primary : c.outline}
               size={20}
             />
             <TextInput
@@ -194,10 +196,10 @@ export default function HomeScreen() {
               onBlur={() => setIsSearchFocused(false)}
               onChangeText={setSearchQuery}
               onFocus={() => setIsSearchFocused(true)}
-              placeholder="Search lessons, languages, or help..."
-              placeholderTextColor={colors.light.outline}
+              placeholder={t('searchMaterials')}
+              placeholderTextColor={c.outline}
               style={{
-                color: colors.light.text,
+                color: c.text,
                 flex: 1,
                 fontFamily: typography.family.sans,
                 fontSize: 15,
@@ -213,13 +215,13 @@ export default function HomeScreen() {
         <View style={{ marginTop: spacing[5], paddingHorizontal: spacing[5] }}>
           <View
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              borderColor: colors.light.outlineVariant,
+              backgroundColor: c.surfaceContainerLowest,
+              borderColor: c.outlineVariant,
               borderRadius: radius['2xl'],
               borderWidth: 1,
               elevation: 6,
               padding: spacing[5],
-              shadowColor: colors.light.primary,
+              shadowColor: c.primary,
               shadowOffset: { width: 0, height: 6 },
               shadowOpacity: 0.08,
               shadowRadius: 16,
@@ -232,16 +234,16 @@ export default function HomeScreen() {
                 justifyContent: 'space-between',
               }}>
               <AppText
-                color={colors.light.text}
+                color={c.text}
                 style={{
                   fontFamily: typography.family.sansBold,
                   fontSize: 18,
                   lineHeight: 26,
                 }}>
-                Overall Mastery
+                {t('overallMastery')}
               </AppText>
               <AppText
-                color={colors.light.primary}
+                color={c.primary}
                 style={{
                   fontFamily: typography.family.sansBold,
                   fontSize: 18,
@@ -254,7 +256,7 @@ export default function HomeScreen() {
             {/* Progress Bar */}
             <View
               style={{
-                backgroundColor: colors.light.primaryFixed,
+                backgroundColor: c.primaryFixed,
                 borderRadius: radius.full,
                 height: 12,
                 marginTop: spacing[3],
@@ -263,7 +265,7 @@ export default function HomeScreen() {
               }}>
               <View
                 style={{
-                  backgroundColor: colors.light.primary,
+                  backgroundColor: c.primary,
                   borderRadius: radius.full,
                   height: '100%',
                   width: `${overallProgress}%`,
@@ -276,14 +278,14 @@ export default function HomeScreen() {
               <View style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[2] }}>
                 <View
                   style={{
-                    backgroundColor: colors.light.secondary,
+                    backgroundColor: c.secondary,
                     borderRadius: 4,
                     height: 8,
                     width: 8,
                   }}
                 />
                 <AppText
-                  color={colors.light.onSurfaceVariant}
+                  color={c.onSurfaceVariant}
                   style={{
                     fontFamily: typography.family.mono,
                     fontSize: 13,
@@ -295,14 +297,14 @@ export default function HomeScreen() {
               <View style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[2] }}>
                 <View
                   style={{
-                    backgroundColor: colors.light.primary,
+                    backgroundColor: c.primary,
                     borderRadius: 4,
                     height: 8,
                     width: 8,
                   }}
                 />
                 <AppText
-                  color={colors.light.onSurfaceVariant}
+                  color={c.onSurfaceVariant}
                   style={{
                     fontFamily: typography.family.mono,
                     fontSize: 13,
@@ -319,13 +321,13 @@ export default function HomeScreen() {
         <View style={{ marginTop: spacing[5], paddingHorizontal: spacing[5] }}>
           <View
             style={{
-              backgroundColor: colors.light.primary,
+              backgroundColor: c.primary,
               borderRadius: radius['2xl'],
               elevation: 6,
               overflow: 'hidden',
               padding: spacing[5],
               position: 'relative',
-              shadowColor: colors.light.primary,
+              shadowColor: c.primary,
               shadowOffset: { width: 0, height: 6 },
               shadowOpacity: 0.2,
               shadowRadius: 16,
@@ -345,18 +347,18 @@ export default function HomeScreen() {
                 fontSize: 12,
                 letterSpacing: 1,
               }}>
-              DAILY CHALLENGE
+              {t('dailyChallenge')}
             </AppText>
 
             <AppText
-              color={colors.light.onPrimary}
+              color={c.onPrimary}
               style={{
                 fontFamily: typography.family.sansBold,
                 fontSize: 22,
                 lineHeight: 30,
                 marginTop: spacing[2],
               }}>
-              Array.map() Logic
+              {t('arrayMapLogic')}
             </AppText>
 
             <View style={{ alignItems: 'flex-start', marginTop: spacing[4] }}>
@@ -371,13 +373,13 @@ export default function HomeScreen() {
                   paddingVertical: spacing[3],
                 })}>
                 <AppText
-                  color={colors.light.primary}
+                  color={c.primary}
                   style={{
                     fontFamily: typography.family.sansBold,
                     fontSize: 14,
                     lineHeight: 20,
                   }}>
-                  Solve Now
+                  {t('solveNow')}
                 </AppText>
               </Pressable>
             </View>
@@ -394,15 +396,15 @@ export default function HomeScreen() {
               marginBottom: spacing[3],
             }}>
             <AppText
-              color={colors.light.text}
+              color={c.text}
               style={{
                 fontFamily: typography.family.sansBold,
                 fontSize: 20,
                 lineHeight: 28,
               }}>
-              Continue Learning
+              {htmlProgress > 0 ? t('continueLearning') : t('startLearning')}
             </AppText>
-            <PlayCircle color={colors.light.primary} size={22} />
+            <PlayCircle color={c.primary} size={22} />
           </View>
 
           <Pressable
@@ -414,7 +416,7 @@ export default function HomeScreen() {
               elevation: 6,
               overflow: 'hidden',
               opacity: pressed ? 0.92 : 1,
-              shadowColor: colors.light.primary,
+              shadowColor: c.primary,
               shadowOffset: { width: 0, height: 6 },
               shadowOpacity: 0.12,
               shadowRadius: 16,
@@ -441,7 +443,7 @@ export default function HomeScreen() {
                   <View style={{ alignItems: 'flex-start' }}>
                     <View
                       style={{
-                        backgroundColor: colors.light.secondary,
+                        backgroundColor: c.secondary,
                         borderRadius: radius.sm,
                         paddingHorizontal: spacing[2],
                         paddingVertical: spacing[1],
@@ -464,7 +466,7 @@ export default function HomeScreen() {
                       fontSize: 13,
                       marginTop: spacing[2],
                     }}>
-                    Module 1: Introduction to Tags
+                    {t('moduleTagIntro')}
                   </AppText>
                   <AppText
                     color="#ffffff"
@@ -474,7 +476,7 @@ export default function HomeScreen() {
                       lineHeight: 28,
                       marginTop: spacing[1],
                     }}>
-                    HTML Essentials
+                    {t('htmlEssentials')}
                   </AppText>
                 </View>
 
@@ -490,7 +492,7 @@ export default function HomeScreen() {
                     }}>
                     <View
                       style={{
-                        backgroundColor: colors.light.secondary,
+                        backgroundColor: c.secondary,
                         borderRadius: radius.full,
                         height: '100%',
                         width: `${htmlProgress}%`,
@@ -524,9 +526,9 @@ export default function HomeScreen() {
               onPress={() => router.push('/(tabs)/community')}
               style={({ pressed }) => ({
                 backgroundColor: pressed
-                  ? colors.light.surfaceContainer
-                  : colors.light.surfaceContainerLowest,
-                borderColor: colors.light.outlineVariant,
+                  ? c.surfaceContainer
+                  : c.surfaceContainerLowest,
+                borderColor: c.outlineVariant,
                 borderRadius: radius.xl,
                 borderWidth: 1,
                 padding: spacing[4],
@@ -535,32 +537,32 @@ export default function HomeScreen() {
               <View
                 style={{
                   alignItems: 'center',
-                  backgroundColor: colors.light.primaryFixed,
+                  backgroundColor: c.primaryFixed,
                   borderRadius: radius.full,
                   height: 44,
                   justifyContent: 'center',
                   marginBottom: spacing[3],
                   width: 44,
                 }}>
-                <MessageCircle color={colors.light.primary} size={22} />
+                <MessageCircle color={c.primary} size={22} />
               </View>
               <AppText
-                color={colors.light.text}
+                color={c.text}
                 style={{
                   fontFamily: typography.family.sansBold,
                   fontSize: 16,
                   lineHeight: 22,
                 }}>
-                Community
+                {t('community')}
               </AppText>
               <AppText
-                color={colors.light.onSurfaceVariant}
+                color={c.onSurfaceVariant}
                 style={{
                   fontSize: 13,
                   lineHeight: 18,
                   marginTop: spacing[1],
                 }}>
-                24 New posts
+                24 {t('discussions')}
               </AppText>
             </Pressable>
 
@@ -571,9 +573,9 @@ export default function HomeScreen() {
               onPress={() => router.push('/(tabs)/playground')}
               style={({ pressed }) => ({
                 backgroundColor: pressed
-                  ? colors.light.surfaceContainer
-                  : colors.light.surfaceContainerLowest,
-                borderColor: colors.light.outlineVariant,
+                  ? c.surfaceContainer
+                  : c.surfaceContainerLowest,
+                borderColor: c.outlineVariant,
                 borderRadius: radius.xl,
                 borderWidth: 1,
                 padding: spacing[4],
@@ -582,32 +584,32 @@ export default function HomeScreen() {
               <View
                 style={{
                   alignItems: 'center',
-                  backgroundColor: colors.light.secondaryFixed,
+                  backgroundColor: c.secondaryFixed,
                   borderRadius: radius.full,
                   height: 44,
                   justifyContent: 'center',
                   marginBottom: spacing[3],
                   width: 44,
                 }}>
-                <Code2 color={colors.light.secondary} size={22} />
+                <Code2 color={c.secondary} size={22} />
               </View>
               <AppText
-                color={colors.light.text}
+                color={c.text}
                 style={{
                   fontFamily: typography.family.sansBold,
                   fontSize: 16,
                   lineHeight: 22,
                 }}>
-                Playground
+                {t('playground')}
               </AppText>
               <AppText
-                color={colors.light.onSurfaceVariant}
+                color={c.onSurfaceVariant}
                 style={{
                   fontSize: 13,
                   lineHeight: 18,
                   marginTop: spacing[1],
                 }}>
-                3 Drafts saved
+                3 {t('draftsSaved')}
               </AppText>
             </Pressable>
 
@@ -618,9 +620,9 @@ export default function HomeScreen() {
               onPress={() => router.push('/(tabs)/leaderboard')}
               style={({ pressed }) => ({
                 backgroundColor: pressed
-                  ? colors.light.surfaceContainer
-                  : colors.light.surfaceContainerLowest,
-                borderColor: colors.light.outlineVariant,
+                  ? c.surfaceContainer
+                  : c.surfaceContainerLowest,
+                borderColor: c.outlineVariant,
                 borderRadius: radius.xl,
                 borderWidth: 1,
                 padding: spacing[4],
@@ -629,7 +631,7 @@ export default function HomeScreen() {
               <View
                 style={{
                   alignItems: 'center',
-                  backgroundColor: colors.light.tertiaryFixed,
+                  backgroundColor: c.tertiaryFixed,
                   borderRadius: radius.full,
                   height: 44,
                   justifyContent: 'center',
@@ -639,22 +641,22 @@ export default function HomeScreen() {
                 <Trophy color="#2563eb" size={22} />
               </View>
               <AppText
-                color={colors.light.text}
+                color={c.text}
                 style={{
                   fontFamily: typography.family.sansBold,
                   fontSize: 16,
                   lineHeight: 22,
                 }}>
-                Leaderboard
+                {t('leaderboard')}
               </AppText>
               <AppText
-                color={colors.light.onSurfaceVariant}
+                color={c.onSurfaceVariant}
                 style={{
                   fontSize: 13,
                   lineHeight: 18,
                   marginTop: spacing[1],
                 }}>
-                #42 globally
+                #42 {t('globalRank')}
               </AppText>
             </Pressable>
           </ScrollView>

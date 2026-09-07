@@ -4,7 +4,6 @@ import {
   Bell,
   Brain,
   Database,
-  Heart,
   MessageSquare,
   MoreHorizontal,
   Palette,
@@ -19,9 +18,7 @@ import {
 import React, { useState } from 'react';
 import {
   Image,
-  KeyboardAvoidingView,
   Modal,
-  Platform,
   Pressable,
   ScrollView,
   TextInput,
@@ -30,12 +27,11 @@ import {
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
-
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '@/context/ThemeContext';
+import { useTranslation } from '@/translations';
 
 interface PostData {
   accentColor: string;
@@ -59,22 +55,22 @@ const INITIAL_POSTS: PostData[] = [
     id: 'post-1',
     username: 'Alex Rivera',
     avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
-    time: '2h ago',
+    time: '2j yang lalu',
     category: 'JavaScript',
-    title: 'How do I center a div using modern CSS Grid?',
+    title: 'Bagaimana cara terbaik melakukan centering div dengan CSS Grid?',
     content:
-      "I'm struggling with the alignment properties. I've tried `justify-content` but it doesn't seem to work as expected when I have nested elements. Any pros here?",
+      'Saya sedang mencoba merapikan tata letak elemen HTML. Apakah ada tips praktis untuk centering elemen secara vertikal dan horizontal?',
     initialLikes: 124,
     initialComments: 42,
-    accentColor: colors.light.secondary, // Orange
+    accentColor: '#9b4500',
   },
   {
     id: 'post-2',
     username: 'Dev_Mia',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150',
-    time: '5h ago',
+    time: '5j yang lalu',
     category: 'Show & Tell',
-    title: 'Cleanest way to fetch API in React 18 🚀',
+    title: 'Cara paling bersih untuk fetch API di React 18 🚀',
     code: `const [data, setData] = useState(null);
 
 useEffect(() => {
@@ -87,25 +83,27 @@ useEffect(() => {
 }, [url]);`,
     initialLikes: 890,
     initialComments: 12,
-    accentColor: colors.light.primary, // Indigo
+    accentColor: '#4648d4',
   },
   {
     id: 'post-3',
     username: 'Master_Coda',
     avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150',
-    time: '10h ago',
-    category: 'Careers',
-    title: "Don't ignore documentation!",
+    time: '10j yang lalu',
+    category: 'Karir',
+    title: 'Jangan abaikan membaca dokumentasi resmi!',
     content:
-      "I see so many beginners jumping straight into tutorials. Spend 15 minutes reading the official docs before you start a new library. It's a superpower.",
+      'Banyak pemula langsung terjun membuat project tanpa membaca panduan dasar. Luangkan waktu 15 menit membaca dokumentasi resmi untuk memahami konsepnya.',
     initialLikes: 2100,
     initialComments: 156,
-    accentColor: '#00629d', // Blue/Tertiary
+    accentColor: '#00629d',
   },
 ];
 
 export default function CommunityScreen() {
   const router = useRouter();
+  const { colors: c, mode } = useTheme();
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [activeTopic, setActiveTopic] = useState('ReactJS');
@@ -155,8 +153,8 @@ export default function CommunityScreen() {
   };
 
   return (
-    <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" />
+    <ScreenContainer padded={false} style={{ backgroundColor: c.background }}>
+      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
 
       <View style={{ flex: 1, position: 'relative' }}>
         <ScrollView
@@ -171,7 +169,7 @@ export default function CommunityScreen() {
             <View
               style={{
                 alignItems: 'center',
-                backgroundColor: colors.light.background,
+                backgroundColor: c.background,
                 flexDirection: 'row',
                 height: 60,
                 justifyContent: 'space-between',
@@ -185,7 +183,7 @@ export default function CommunityScreen() {
                 style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[3] }}>
                 <View
                   style={{
-                    borderColor: colors.light.primary,
+                    borderColor: c.primary,
                     borderRadius: radius.full,
                     borderWidth: 2,
                     height: 40,
@@ -199,7 +197,7 @@ export default function CommunityScreen() {
                   />
                 </View>
                 <AppText
-                  color={colors.light.primary}
+                  color={c.primary}
                   style={{
                     fontFamily: typography.family.sansBold,
                     fontSize: 20,
@@ -218,14 +216,14 @@ export default function CommunityScreen() {
                 style={({ pressed }) => ({
                   alignItems: 'center',
                   backgroundColor: pressed
-                    ? colors.light.surfaceContainerHigh
-                    : colors.light.surfaceContainerLow,
+                    ? c.surfaceContainerHigh
+                    : c.surfaceContainerLow,
                   borderRadius: radius.full,
                   height: 40,
                   justifyContent: 'center',
                   width: 40,
                 })}>
-                <Bell color={colors.light.primary} size={20} />
+                <Bell color={c.primary} size={20} />
               </Pressable>
             </View>
 
@@ -234,10 +232,10 @@ export default function CommunityScreen() {
               <View
                 style={{
                   alignItems: 'center',
-                  backgroundColor: colors.light.surfaceContainerLow,
+                  backgroundColor: c.surfaceContainerLow,
                   borderColor: isSearchFocused
-                    ? colors.light.primary
-                    : colors.light.outlineVariant,
+                    ? c.primary
+                    : c.outlineVariant,
                   borderRadius: radius.xl,
                   borderWidth: 1,
                   flexDirection: 'row',
@@ -246,7 +244,7 @@ export default function CommunityScreen() {
                   paddingHorizontal: spacing[4],
                 }}>
                 <Search
-                  color={isSearchFocused ? colors.light.primary : colors.light.outline}
+                  color={isSearchFocused ? c.primary : c.outline}
                   size={20}
                 />
                 <TextInput
@@ -254,10 +252,10 @@ export default function CommunityScreen() {
                   onBlur={() => setIsSearchFocused(false)}
                   onChangeText={setSearchQuery}
                   onFocus={() => setIsSearchFocused(true)}
-                  placeholder="Search discussions..."
-                  placeholderTextColor={colors.light.outline}
+                  placeholder={t('searchDiscussions')}
+                  placeholderTextColor={c.outline}
                   style={{
-                    color: colors.light.text,
+                    color: c.text,
                     flex: 1,
                     fontFamily: typography.family.sans,
                     fontSize: 15,
@@ -280,22 +278,22 @@ export default function CommunityScreen() {
                   paddingHorizontal: spacing[5],
                 }}>
                 <AppText
-                  color={colors.light.text}
+                  color={c.text}
                   style={{
                     fontFamily: typography.family.sansBold,
                     fontSize: 18,
                     lineHeight: 26,
                   }}>
-                  Trending Topics
+                  {t('trendingTopics')}
                 </AppText>
                 <Pressable hitSlop={8} onPress={() => {}}>
                   <AppText
-                    color={colors.light.primary}
+                    color={c.primary}
                     style={{
                       fontFamily: typography.family.sansBold,
                       fontSize: 14,
                     }}>
-                    View all
+                    {t('seeAll')}
                   </AppText>
                 </Pressable>
               </View>
@@ -314,12 +312,12 @@ export default function CommunityScreen() {
                     alignItems: 'center',
                     backgroundColor:
                       activeTopic === 'ReactJS'
-                        ? colors.light.primary
-                        : colors.light.surfaceContainerLow,
+                        ? c.primary
+                        : c.surfaceContainerLow,
                     borderColor:
                       activeTopic === 'ReactJS'
-                        ? colors.light.primary
-                        : colors.light.outlineVariant,
+                        ? c.primary
+                        : c.outlineVariant,
                     borderRadius: radius.full,
                     borderWidth: 1,
                     flexDirection: 'row',
@@ -330,13 +328,13 @@ export default function CommunityScreen() {
                   })}>
                   <Terminal
                     color={
-                      activeTopic === 'ReactJS' ? '#ffffff' : colors.light.onSurfaceVariant
+                      activeTopic === 'ReactJS' ? '#ffffff' : c.onSurfaceVariant
                     }
                     size={16}
                   />
                   <AppText
                     color={
-                      activeTopic === 'ReactJS' ? '#ffffff' : colors.light.onSurfaceVariant
+                      activeTopic === 'ReactJS' ? '#ffffff' : c.onSurfaceVariant
                     }
                     style={{
                       fontFamily: typography.family.mono,
@@ -356,12 +354,12 @@ export default function CommunityScreen() {
                     alignItems: 'center',
                     backgroundColor:
                       activeTopic === 'TailwindCSS'
-                        ? colors.light.primary
-                        : colors.light.surfaceContainerLow,
+                        ? c.primary
+                        : c.surfaceContainerLow,
                     borderColor:
                       activeTopic === 'TailwindCSS'
-                        ? colors.light.primary
-                        : colors.light.outlineVariant,
+                        ? c.primary
+                        : c.outlineVariant,
                     borderRadius: radius.full,
                     borderWidth: 1,
                     flexDirection: 'row',
@@ -374,7 +372,7 @@ export default function CommunityScreen() {
                     color={
                       activeTopic === 'TailwindCSS'
                         ? '#ffffff'
-                        : colors.light.onSurfaceVariant
+                        : c.onSurfaceVariant
                     }
                     size={16}
                   />
@@ -382,7 +380,7 @@ export default function CommunityScreen() {
                     color={
                       activeTopic === 'TailwindCSS'
                         ? '#ffffff'
-                        : colors.light.onSurfaceVariant
+                        : c.onSurfaceVariant
                     }
                     style={{
                       fontFamily: typography.family.mono,
@@ -402,12 +400,12 @@ export default function CommunityScreen() {
                     alignItems: 'center',
                     backgroundColor:
                       activeTopic === 'SQL_Hacks'
-                        ? colors.light.primary
-                        : colors.light.surfaceContainerLow,
+                        ? c.primary
+                        : c.surfaceContainerLow,
                     borderColor:
                       activeTopic === 'SQL_Hacks'
-                        ? colors.light.primary
-                        : colors.light.outlineVariant,
+                        ? c.primary
+                        : c.outlineVariant,
                     borderRadius: radius.full,
                     borderWidth: 1,
                     flexDirection: 'row',
@@ -420,7 +418,7 @@ export default function CommunityScreen() {
                     color={
                       activeTopic === 'SQL_Hacks'
                         ? '#ffffff'
-                        : colors.light.onSurfaceVariant
+                        : c.onSurfaceVariant
                     }
                     size={16}
                   />
@@ -428,7 +426,7 @@ export default function CommunityScreen() {
                     color={
                       activeTopic === 'SQL_Hacks'
                         ? '#ffffff'
-                        : colors.light.onSurfaceVariant
+                        : c.onSurfaceVariant
                     }
                     style={{
                       fontFamily: typography.family.mono,
@@ -448,12 +446,12 @@ export default function CommunityScreen() {
                     alignItems: 'center',
                     backgroundColor:
                       activeTopic === 'LogicHelp'
-                        ? colors.light.primary
-                        : colors.light.surfaceContainerLow,
+                        ? c.primary
+                        : c.surfaceContainerLow,
                     borderColor:
-                      activeTopic === 'LogicTopic'
-                        ? colors.light.primary
-                        : colors.light.outlineVariant,
+                      activeTopic === 'LogicHelp'
+                        ? c.primary
+                        : c.outlineVariant,
                     borderRadius: radius.full,
                     borderWidth: 1,
                     flexDirection: 'row',
@@ -466,7 +464,7 @@ export default function CommunityScreen() {
                     color={
                       activeTopic === 'LogicHelp'
                         ? '#ffffff'
-                        : colors.light.onSurfaceVariant
+                        : c.onSurfaceVariant
                     }
                     size={16}
                   />
@@ -474,7 +472,7 @@ export default function CommunityScreen() {
                     color={
                       activeTopic === 'LogicHelp'
                         ? '#ffffff'
-                        : colors.light.onSurfaceVariant
+                        : c.onSurfaceVariant
                     }
                     style={{
                       fontFamily: typography.family.mono,
@@ -502,15 +500,15 @@ export default function CommunityScreen() {
                   <View
                     key={post.id}
                     style={{
-                      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-                      borderColor: colors.light.outlineVariant,
+                      backgroundColor: c.surfaceContainerLowest,
+                      borderColor: c.outlineVariant,
                       borderLeftColor: post.accentColor,
                       borderLeftWidth: 4,
                       borderRadius: radius['2xl'],
                       borderWidth: 1,
                       elevation: 4,
                       padding: spacing[5],
-                      shadowColor: colors.light.primary,
+                      shadowColor: c.primary,
                       shadowOffset: { width: 0, height: 4 },
                       shadowOpacity: 0.08,
                       shadowRadius: 12,
@@ -536,7 +534,7 @@ export default function CommunityScreen() {
                         />
                         <View>
                           <AppText
-                            color={colors.light.text}
+                            color={c.text}
                             style={{
                               fontFamily: typography.family.sansBold,
                               fontSize: 15,
@@ -545,13 +543,13 @@ export default function CommunityScreen() {
                             {post.username}
                           </AppText>
                           <AppText
-                            color={colors.light.onSurfaceVariant}
+                            color={c.onSurfaceVariant}
                             style={{
                               fontFamily: typography.family.mono,
                               fontSize: 12,
                               lineHeight: 16,
                             }}>
-                            {post.time} in {post.category}
+                            {post.time} {t('inCategory')} {post.category}
                           </AppText>
                         </View>
                       </View>
@@ -562,13 +560,13 @@ export default function CommunityScreen() {
                         accessibilityRole="button"
                         hitSlop={8}
                         onPress={() => handleOpenOptions(post.id)}>
-                        <MoreHorizontal color={colors.light.outline} size={20} />
+                        <MoreHorizontal color={c.outline} size={20} />
                       </Pressable>
                     </View>
 
                     {/* Post Title */}
                     <AppText
-                      color={colors.light.text}
+                      color={c.text}
                       style={{
                         fontFamily: typography.family.sansBold,
                         fontSize: 18,
@@ -580,7 +578,7 @@ export default function CommunityScreen() {
                     {/* Post Body Content */}
                     {post.content ? (
                       <AppText
-                        color={colors.light.onSurfaceVariant}
+                        color={c.onSurfaceVariant}
                         style={{
                           fontSize: 14,
                           lineHeight: 21,
@@ -642,18 +640,18 @@ export default function CommunityScreen() {
                           }}>
                           {isLiked ? (
                             <ThumbsUp
-                              color={colors.light.primary}
+                              color={c.primary}
                               size={18}
-                              fill={colors.light.primary}
+                              fill={c.primary}
                             />
                           ) : (
-                            <ThumbsUp color={colors.light.outline} size={18} />
+                            <ThumbsUp color={c.outline} size={18} />
                           )}
                           <AppText
                             color={
                               isLiked
-                                ? colors.light.primary
-                                : colors.light.onSurfaceVariant
+                                ? c.primary
+                                : c.onSurfaceVariant
                             }
                             style={{
                               fontFamily: typography.family.mono,
@@ -675,9 +673,9 @@ export default function CommunityScreen() {
                             flexDirection: 'row',
                             gap: spacing[1],
                           }}>
-                          <MessageSquare color={colors.light.outline} size={18} />
+                          <MessageSquare color={c.outline} size={18} />
                           <AppText
-                            color={colors.light.onSurfaceVariant}
+                            color={c.onSurfaceVariant}
                             style={{
                               fontFamily: typography.family.mono,
                               fontSize: 13,
@@ -693,7 +691,7 @@ export default function CommunityScreen() {
                             accessibilityRole="button"
                             hitSlop={8}
                             onPress={() => {}}>
-                            <Share2 color={colors.light.outline} size={18} />
+                            <Share2 color={c.outline} size={18} />
                           </Pressable>
                         ) : null}
                       </View>
@@ -706,7 +704,7 @@ export default function CommunityScreen() {
                               uri: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100',
                             }}
                             style={{
-                              borderColor: '#ffffff',
+                              borderColor: c.surfaceContainerLowest,
                               borderRadius: radius.full,
                               borderWidth: 2,
                               height: 24,
@@ -718,7 +716,7 @@ export default function CommunityScreen() {
                               uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100',
                             }}
                             style={{
-                              borderColor: '#ffffff',
+                              borderColor: c.surfaceContainerLowest,
                               borderRadius: radius.full,
                               borderWidth: 2,
                               height: 24,
@@ -743,8 +741,8 @@ export default function CommunityScreen() {
             style={({ pressed }) => ({
               alignItems: 'center',
               backgroundColor: pressed
-                ? colors.light.primaryPressed
-                : colors.light.primary,
+                ? c.primaryPressed
+                : c.primary,
               borderRadius: radius.xl,
               bottom: 24,
               elevation: 8,
@@ -752,7 +750,7 @@ export default function CommunityScreen() {
               justifyContent: 'center',
               position: 'absolute',
               right: 20,
-              shadowColor: colors.light.primary,
+              shadowColor: c.primary,
               shadowOffset: { width: 0, height: 6 },
               shadowOpacity: 0.25,
               shadowRadius: 12,
@@ -771,7 +769,7 @@ export default function CommunityScreen() {
         <Pressable
           onPress={() => setIsOptionsModalOpen(false)}
           style={{
-            backgroundColor: 'rgba(0,0,0,0.4)',
+            backgroundColor: 'rgba(0,0,0,0.5)',
             flex: 1,
             justifyContent: 'center',
             alignItems: 'center',
@@ -779,7 +777,7 @@ export default function CommunityScreen() {
           }}>
           <Pressable
             style={{
-              backgroundColor: '#ffffff',
+              backgroundColor: c.surfaceContainerLowest,
               borderRadius: radius['2xl'],
               padding: spacing[5],
               width: '100%',
@@ -787,32 +785,32 @@ export default function CommunityScreen() {
               gap: spacing[3],
             }}>
             <AppText
-              color={colors.light.text}
+              color={c.text}
               style={{ fontFamily: typography.family.sansBold, fontSize: 18, textAlign: 'center' }}>
-              Post Options
+              {t('postOptions')}
             </AppText>
             <Pressable
               onPress={() => setIsOptionsModalOpen(false)}
               style={{
-                backgroundColor: colors.light.surfaceContainerLow,
+                backgroundColor: c.surfaceContainerLow,
                 borderRadius: radius.lg,
                 paddingVertical: spacing[3],
                 alignItems: 'center',
               }}>
-              <AppText color={colors.light.primary} style={{ fontSize: 15, fontWeight: '600' }}>
-                Save Post
+              <AppText color={c.primary} style={{ fontSize: 15, fontWeight: '600' }}>
+                {t('savePost')}
               </AppText>
             </Pressable>
             <Pressable
               onPress={() => setIsOptionsModalOpen(false)}
               style={{
-                backgroundColor: colors.light.surfaceContainerLow,
+                backgroundColor: c.surfaceContainerLow,
                 borderRadius: radius.lg,
                 paddingVertical: spacing[3],
                 alignItems: 'center',
               }}>
-              <AppText color={colors.light.danger} style={{ fontSize: 15, fontWeight: '600' }}>
-                Report Post
+              <AppText color={c.danger} style={{ fontSize: 15, fontWeight: '600' }}>
+                {t('reportPost')}
               </AppText>
             </Pressable>
             <Pressable
@@ -821,8 +819,8 @@ export default function CommunityScreen() {
                 paddingVertical: spacing[2],
                 alignItems: 'center',
               }}>
-              <AppText color={colors.light.onSurfaceVariant} style={{ fontSize: 14 }}>
-                Cancel
+              <AppText color={c.onSurfaceVariant} style={{ fontSize: 14 }}>
+                {t('cancel')}
               </AppText>
             </Pressable>
           </Pressable>
@@ -837,13 +835,13 @@ export default function CommunityScreen() {
         onRequestClose={() => setIsCreatePostModalOpen(false)}>
         <View
           style={{
-            backgroundColor: 'rgba(0,0,0,0.4)',
+            backgroundColor: 'rgba(0,0,0,0.5)',
             flex: 1,
             justifyContent: 'flex-end',
           }}>
           <View
             style={{
-              backgroundColor: '#ffffff',
+              backgroundColor: c.surfaceContainerLowest,
               borderTopLeftRadius: radius['2xl'],
               borderTopRightRadius: radius['2xl'],
               padding: spacing[6],
@@ -856,24 +854,24 @@ export default function CommunityScreen() {
                 alignItems: 'center',
               }}>
               <AppText
-                color={colors.light.text}
+                color={c.text}
                 style={{ fontFamily: typography.family.sansBold, fontSize: 20 }}>
-                Create Post
+                {t('createNewPost')}
               </AppText>
               <Pressable hitSlop={8} onPress={() => setIsCreatePostModalOpen(false)}>
-                <X color={colors.light.outline} size={22} />
+                <X color={c.outline} size={22} />
               </Pressable>
             </View>
 
             <TextInput
               onChangeText={setNewPostTitle}
-              placeholder="Post Title"
-              placeholderTextColor={colors.light.outline}
+              placeholder={t('postTitle')}
+              placeholderTextColor={c.outline}
               style={{
-                borderColor: colors.light.outlineVariant,
+                borderColor: c.outlineVariant,
                 borderRadius: radius.lg,
                 borderWidth: 1,
-                color: colors.light.text,
+                color: c.text,
                 fontSize: 16,
                 paddingHorizontal: spacing[4],
                 paddingVertical: spacing[3],
@@ -884,13 +882,13 @@ export default function CommunityScreen() {
             <TextInput
               multiline
               onChangeText={setNewPostContent}
-              placeholder="What's on your mind?"
-              placeholderTextColor={colors.light.outline}
+              placeholder={t('whatToDiscuss')}
+              placeholderTextColor={c.outline}
               style={{
-                borderColor: colors.light.outlineVariant,
+                borderColor: c.outlineVariant,
                 borderRadius: radius.lg,
                 borderWidth: 1,
-                color: colors.light.text,
+                color: c.text,
                 fontSize: 15,
                 minHeight: 100,
                 paddingHorizontal: spacing[4],
@@ -907,13 +905,13 @@ export default function CommunityScreen() {
                 setNewPostContent('');
               }}
               style={{
-                backgroundColor: colors.light.primary,
+                backgroundColor: c.primary,
                 borderRadius: radius.xl,
                 paddingVertical: spacing[3],
                 alignItems: 'center',
               }}>
               <AppText color="#ffffff" style={{ fontFamily: typography.family.sansBold, fontSize: 16 }}>
-                Publish Post
+                {t('publish')}
               </AppText>
             </Pressable>
           </View>

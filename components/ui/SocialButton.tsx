@@ -1,10 +1,10 @@
 import { type ReactNode } from 'react';
 import { ActivityIndicator, Pressable, type PressableProps } from 'react-native';
 
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useTheme } from '@/context/ThemeContext';
 import { AppText } from './AppText';
 
 export type SocialButtonProps = Omit<PressableProps, 'children'> & {
@@ -27,6 +27,7 @@ export function SocialButton({
   title,
   ...props
 }: SocialButtonProps) {
+  const { colors } = useTheme();
   const isDisabled = disabled || loading;
 
   return (
@@ -40,9 +41,9 @@ export function SocialButton({
         {
           alignItems: 'center',
           backgroundColor: state.pressed
-            ? colors.light.surfaceContainer
-            : colors.light.surfaceContainerLow,
-          borderColor: colors.light.outlineVariant,
+            ? colors.surfaceContainer
+            : colors.surfaceContainerLow,
+          borderColor: colors.outlineVariant,
           borderRadius: radius.lg,
           borderWidth: 1,
           flexDirection: 'row',
@@ -57,12 +58,12 @@ export function SocialButton({
       ]}
       {...props}>
       {loading ? (
-        <ActivityIndicator color={colors.light.primary} />
+        <ActivityIndicator color={colors.primary} />
       ) : (
         icon
       )}
       <AppText
-        color={colors.light.text}
+        color={colors.text}
         numberOfLines={1}
         style={{ fontFamily: typography.family.sansSemibold, fontSize: 16, lineHeight: 24 }}>
         {title}

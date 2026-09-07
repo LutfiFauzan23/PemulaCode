@@ -3,7 +3,6 @@ import { StatusBar } from 'expo-status-bar';
 import {
   Bell,
   Bug,
-  Code,
   Code2,
   Globe,
   Palette,
@@ -11,7 +10,7 @@ import {
   Terminal,
   Zap,
 } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Image,
   Pressable,
@@ -22,15 +21,19 @@ import Svg, { Circle, G } from 'react-native-svg';
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useTheme } from '@/context/ThemeContext';
 import { useProgressStore } from '@/stores/progress-store';
+import { useTranslation } from '@/translations';
+
 import { TAB_BAR_CLEARANCE } from './_layout';
 
 export default function LearnScreen() {
   const router = useRouter();
+  const { colors: c, mode } = useTheme();
+  const { t } = useTranslation();
   const getCourseProgress = useProgressStore((state) => state.getCourseProgress);
   const getOverallProgress = useProgressStore((state) => state.getOverallProgress);
 
@@ -47,8 +50,8 @@ export default function LearnScreen() {
   const strokeDashoffset = circumference * (1 - progressPercent);
 
   return (
-    <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" />
+    <ScreenContainer padded={false} style={{ backgroundColor: c.background }}>
+      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
 
       <ScrollView
         bounces={false}
@@ -62,7 +65,7 @@ export default function LearnScreen() {
         <View
           style={{
             alignItems: 'center',
-            backgroundColor: colors.light.background,
+            backgroundColor: c.background,
             flexDirection: 'row',
             height: 60,
             justifyContent: 'space-between',
@@ -76,7 +79,7 @@ export default function LearnScreen() {
             style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[3] }}>
             <View
               style={{
-                borderColor: colors.light.primary,
+                borderColor: c.primary,
                 borderRadius: radius.full,
                 borderWidth: 2,
                 height: 40,
@@ -90,7 +93,7 @@ export default function LearnScreen() {
               />
             </View>
             <AppText
-              color={colors.light.primary}
+              color={c.primary}
               style={{
                 fontFamily: typography.family.sansBold,
                 fontSize: 20,
@@ -109,14 +112,14 @@ export default function LearnScreen() {
             style={({ pressed }) => ({
               alignItems: 'center',
               backgroundColor: pressed
-                ? colors.light.surfaceContainerHigh
-                : colors.light.surfaceContainerLow,
+                ? c.surfaceContainerHigh
+                : c.surfaceContainerLow,
               borderRadius: radius.full,
               height: 40,
               justifyContent: 'center',
               width: 40,
             })}>
-            <Bell color={colors.light.primary} size={20} />
+            <Bell color={c.primary} size={20} />
           </Pressable>
         </View>
 
@@ -127,22 +130,22 @@ export default function LearnScreen() {
             paddingHorizontal: spacing[5],
           }}>
           <AppText
-            color={colors.light.text}
+            color={c.text}
             style={{
               fontFamily: typography.family.sansBold,
               fontSize: 26,
               lineHeight: 34,
             }}>
-            Level Up Your Skills
+            {t('upgradeSkills')}
           </AppText>
           <AppText
-            color={colors.light.onSurfaceVariant}
+            color={c.onSurfaceVariant}
             style={{
               fontSize: 15,
               lineHeight: 22,
               marginTop: spacing[1],
             }}>
-            Pick up where you left off or start a new journey.
+            {t('continueOrStart')}
           </AppText>
         </View>
 
@@ -152,15 +155,15 @@ export default function LearnScreen() {
           {/* COURSE 1: HTML Foundation */}
           <View
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              borderColor: colors.light.outlineVariant,
-              borderLeftColor: colors.light.secondary,
+              backgroundColor: c.surfaceContainerLowest,
+              borderColor: c.outlineVariant,
+              borderLeftColor: c.secondary,
               borderLeftWidth: 4,
               borderRadius: radius['2xl'],
               borderWidth: 1,
               elevation: 4,
               padding: spacing[5],
-              shadowColor: colors.light.secondary,
+              shadowColor: c.secondary,
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.08,
               shadowRadius: 12,
@@ -176,16 +179,16 @@ export default function LearnScreen() {
               <View
                 style={{
                   alignItems: 'center',
-                  backgroundColor: colors.light.secondaryFixed,
+                  backgroundColor: c.secondaryFixed,
                   borderRadius: radius.lg,
                   flexDirection: 'row',
                   gap: spacing[1],
                   paddingHorizontal: spacing[2],
                   paddingVertical: spacing[1],
                 }}>
-                <Globe color={colors.light.secondary} size={16} />
+                <Globe color={c.secondary} size={16} />
                 <AppText
-                  color={colors.light.secondary}
+                  color={c.secondary}
                   style={{
                     fontFamily: typography.family.mono,
                     fontSize: 12,
@@ -196,26 +199,26 @@ export default function LearnScreen() {
               </View>
               <View
                 style={{
-                  backgroundColor: colors.light.secondaryFixed,
+                  backgroundColor: c.secondaryFixed,
                   borderRadius: radius.full,
                   paddingHorizontal: spacing[3],
                   paddingVertical: spacing[1],
                 }}>
                 <AppText
-                  color={colors.light.secondary}
+                  color={c.secondary}
                   style={{
                     fontFamily: typography.family.mono,
                     fontSize: 12,
                     fontWeight: '600',
                   }}>
-                  Easy
+                  {t('beginner')}
                 </AppText>
               </View>
             </View>
 
             {/* Course Title & Description */}
             <AppText
-              color={colors.light.text}
+              color={c.text}
               style={{
                 fontFamily: typography.family.sansBold,
                 fontSize: 20,
@@ -224,13 +227,13 @@ export default function LearnScreen() {
               HTML Foundation
             </AppText>
             <AppText
-              color={colors.light.onSurfaceVariant}
+              color={c.onSurfaceVariant}
               style={{
                 fontSize: 14,
                 lineHeight: 20,
                 marginTop: spacing[1],
               }}>
-              Master the bones of the web. Semantic tags and accessibility.
+              {t('htmlFoundationDesc')}
             </AppText>
 
             {/* Progress Info Row */}
@@ -242,28 +245,28 @@ export default function LearnScreen() {
                 marginTop: spacing[4],
               }}>
               <AppText
-                color={colors.light.secondary}
+                color={c.secondary}
                 style={{
                   fontFamily: typography.family.mono,
                   fontSize: 13,
                   fontWeight: 'bold',
                 }}>
-                {htmlProgress}% Complete
+                {htmlProgress}% {t('completed')}
               </AppText>
               <AppText
-                color={colors.light.onSurfaceVariant}
+                color={c.onSurfaceVariant}
                 style={{
                   fontFamily: typography.family.mono,
                   fontSize: 13,
                 }}>
-                0/2 Modules
+                {htmlProgress === 100 ? `2/2 ${t('modules')}` : htmlProgress > 0 ? `1/2 ${t('modules')}` : `0/2 ${t('modules')}`}
               </AppText>
             </View>
 
             {/* Progress Bar */}
             <View
               style={{
-                backgroundColor: colors.light.secondaryFixed,
+                backgroundColor: c.secondaryFixed,
                 borderRadius: radius.full,
                 height: 10,
                 marginTop: spacing[2],
@@ -272,7 +275,7 @@ export default function LearnScreen() {
               }}>
               <View
                 style={{
-                  backgroundColor: colors.light.secondary,
+                  backgroundColor: c.secondary,
                   borderRadius: radius.full,
                   height: '100%',
                   width: `${htmlProgress}%`,
@@ -288,8 +291,8 @@ export default function LearnScreen() {
               style={({ pressed }) => ({
                 alignItems: 'center',
                 backgroundColor: pressed
-                  ? colors.light.secondaryPressed
-                  : colors.light.secondary,
+                  ? c.secondaryPressed
+                  : c.secondary,
                 borderRadius: radius.xl,
                 flexDirection: 'row',
                 gap: spacing[2],
@@ -306,7 +309,7 @@ export default function LearnScreen() {
                   fontFamily: typography.family.sansBold,
                   fontSize: 15,
                 }}>
-                {htmlProgress > 0 ? 'Continue' : 'Start Learning'}
+                {htmlProgress > 0 ? t('continueLearning') : t('startLearning')}
               </AppText>
               <Play color="#ffffff" size={16} fill="#ffffff" />
             </Pressable>
@@ -316,8 +319,8 @@ export default function LearnScreen() {
           {/* COURSE 2: Advanced CSS */}
           <View
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              borderColor: colors.light.outlineVariant,
+              backgroundColor: c.surfaceContainerLowest,
+              borderColor: c.outlineVariant,
               borderLeftColor: '#00629d',
               borderLeftWidth: 4,
               borderRadius: radius['2xl'],
@@ -340,7 +343,7 @@ export default function LearnScreen() {
               <View
                 style={{
                   alignItems: 'center',
-                  backgroundColor: colors.light.tertiaryFixed,
+                  backgroundColor: c.tertiaryFixed,
                   borderRadius: radius.lg,
                   flexDirection: 'row',
                   gap: spacing[1],
@@ -360,7 +363,7 @@ export default function LearnScreen() {
               </View>
               <View
                 style={{
-                  backgroundColor: colors.light.tertiaryFixed,
+                  backgroundColor: c.tertiaryFixed,
                   borderRadius: radius.full,
                   paddingHorizontal: spacing[3],
                   paddingVertical: spacing[1],
@@ -372,14 +375,14 @@ export default function LearnScreen() {
                     fontSize: 12,
                     fontWeight: '600',
                   }}>
-                  Medium
+                  Menengah
                 </AppText>
               </View>
             </View>
 
             {/* Course Title & Description */}
             <AppText
-              color={colors.light.text}
+              color={c.text}
               style={{
                 fontFamily: typography.family.sansBold,
                 fontSize: 20,
@@ -388,13 +391,13 @@ export default function LearnScreen() {
               Advanced CSS
             </AppText>
             <AppText
-              color={colors.light.onSurfaceVariant}
+              color={c.onSurfaceVariant}
               style={{
                 fontSize: 14,
                 lineHeight: 20,
                 marginTop: spacing[1],
               }}>
-              Flexbox, Grid, and beautiful animations for modern UIs.
+              Flexbox, Grid, dan animasi modern untuk tampilan UI menarik.
             </AppText>
 
             {/* Progress Info Row */}
@@ -412,22 +415,22 @@ export default function LearnScreen() {
                   fontSize: 13,
                   fontWeight: 'bold',
                 }}>
-                {cssProgress}% Complete
+                {cssProgress}% Selesai
               </AppText>
               <AppText
-                color={colors.light.onSurfaceVariant}
+                color={c.onSurfaceVariant}
                 style={{
                   fontFamily: typography.family.mono,
                   fontSize: 13,
                 }}>
-                0/2 Modules
+                0/2 Modul
               </AppText>
             </View>
 
             {/* Progress Bar */}
             <View
               style={{
-                backgroundColor: colors.light.tertiaryFixed,
+                backgroundColor: c.tertiaryFixed,
                 borderRadius: radius.full,
                 height: 10,
                 marginTop: spacing[2],
@@ -468,7 +471,7 @@ export default function LearnScreen() {
                   fontFamily: typography.family.sansBold,
                   fontSize: 15,
                 }}>
-                {cssProgress > 0 ? 'Continue' : 'Start Learning'}
+                {cssProgress > 0 ? t('continueLearning') : t('startLearning')}
               </AppText>
               <Play color="#ffffff" size={16} fill="#ffffff" />
             </Pressable>
@@ -478,15 +481,15 @@ export default function LearnScreen() {
           {/* COURSE 3: JS Logic & APIs */}
           <View
             style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              borderColor: colors.light.outlineVariant,
-              borderLeftColor: colors.light.primary,
+              backgroundColor: c.surfaceContainerLowest,
+              borderColor: c.outlineVariant,
+              borderLeftColor: c.primary,
               borderLeftWidth: 4,
               borderRadius: radius['2xl'],
               borderWidth: 1,
               elevation: 4,
               padding: spacing[5],
-              shadowColor: colors.light.primary,
+              shadowColor: c.primary,
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.08,
               shadowRadius: 12,
@@ -502,16 +505,16 @@ export default function LearnScreen() {
               <View
                 style={{
                   alignItems: 'center',
-                  backgroundColor: colors.light.primaryFixed,
+                  backgroundColor: c.primaryFixed,
                   borderRadius: radius.lg,
                   flexDirection: 'row',
                   gap: spacing[1],
                   paddingHorizontal: spacing[2],
                   paddingVertical: spacing[1],
                 }}>
-                <Terminal color={colors.light.primary} size={16} />
+                <Terminal color={c.primary} size={16} />
                 <AppText
-                  color={colors.light.primary}
+                  color={c.primary}
                   style={{
                     fontFamily: typography.family.mono,
                     fontSize: 12,
@@ -522,26 +525,26 @@ export default function LearnScreen() {
               </View>
               <View
                 style={{
-                  backgroundColor: colors.light.primaryFixed,
+                  backgroundColor: c.primaryFixed,
                   borderRadius: radius.full,
                   paddingHorizontal: spacing[3],
                   paddingVertical: spacing[1],
                 }}>
                 <AppText
-                  color={colors.light.primary}
+                  color={c.primary}
                   style={{
                     fontFamily: typography.family.mono,
                     fontSize: 12,
                     fontWeight: '600',
                   }}>
-                  Hard
+                  Lanjutan
                 </AppText>
               </View>
             </View>
 
             {/* Course Title & Description */}
             <AppText
-              color={colors.light.text}
+              color={c.text}
               style={{
                 fontFamily: typography.family.sansBold,
                 fontSize: 20,
@@ -550,13 +553,13 @@ export default function LearnScreen() {
               JS Logic & APIs
             </AppText>
             <AppText
-              color={colors.light.onSurfaceVariant}
+              color={c.onSurfaceVariant}
               style={{
                 fontSize: 14,
                 lineHeight: 20,
                 marginTop: spacing[1],
               }}>
-              The brain of the web. DOM manipulation, async, and state.
+              Otak pemograman web. Manipulasi DOM, async, dan state.
             </AppText>
 
             {/* Progress Info Row */}
@@ -568,28 +571,28 @@ export default function LearnScreen() {
                 marginTop: spacing[4],
               }}>
               <AppText
-                color={colors.light.primary}
+                color={c.primary}
                 style={{
                   fontFamily: typography.family.mono,
                   fontSize: 13,
                   fontWeight: 'bold',
                 }}>
-                {jsProgress}% Complete
+                {jsProgress}% Selesai
               </AppText>
               <AppText
-                color={colors.light.onSurfaceVariant}
+                color={c.onSurfaceVariant}
                 style={{
                   fontFamily: typography.family.mono,
                   fontSize: 13,
                 }}>
-                0/2 Modules
+                0/2 Modul
               </AppText>
             </View>
 
             {/* Progress Bar */}
             <View
               style={{
-                backgroundColor: colors.light.primaryFixed,
+                backgroundColor: c.primaryFixed,
                 borderRadius: radius.full,
                 height: 10,
                 marginTop: spacing[2],
@@ -598,7 +601,7 @@ export default function LearnScreen() {
               }}>
               <View
                 style={{
-                  backgroundColor: colors.light.primary,
+                  backgroundColor: c.primary,
                   borderRadius: radius.full,
                   height: '100%',
                   width: `${jsProgress}%`,
@@ -614,8 +617,8 @@ export default function LearnScreen() {
               style={({ pressed }) => ({
                 alignItems: 'center',
                 backgroundColor: pressed
-                  ? colors.light.primaryPressed
-                  : colors.light.primary,
+                  ? c.primaryPressed
+                  : c.primary,
                 borderRadius: radius.xl,
                 flexDirection: 'row',
                 gap: spacing[2],
@@ -632,7 +635,7 @@ export default function LearnScreen() {
                   fontFamily: typography.family.sansBold,
                   fontSize: 15,
                 }}>
-                {jsProgress > 0 ? 'Continue' : 'Start Learning'}
+                {jsProgress > 0 ? t('continueLearning') : t('startLearning')}
               </AppText>
               <Play color="#ffffff" size={16} fill="#ffffff" />
             </Pressable>
@@ -645,13 +648,13 @@ export default function LearnScreen() {
           <View
             style={{
               alignItems: 'center',
-              backgroundColor: 'rgba(255, 255, 255, 0.95)',
-              borderColor: colors.light.outlineVariant,
+              backgroundColor: c.surfaceContainerLowest,
+              borderColor: c.outlineVariant,
               borderRadius: radius['2xl'],
               borderWidth: 1,
               elevation: 4,
               padding: spacing[6],
-              shadowColor: colors.light.primary,
+              shadowColor: c.primary,
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.08,
               shadowRadius: 12,
@@ -666,7 +669,7 @@ export default function LearnScreen() {
                     cx="45"
                     cy="45"
                     r={circleRadius}
-                    stroke={colors.light.primaryFixed}
+                    stroke={c.primaryFixed}
                     strokeWidth={strokeWidth}
                     fill="none"
                   />
@@ -675,7 +678,7 @@ export default function LearnScreen() {
                     cx="45"
                     cy="45"
                     r={circleRadius}
-                    stroke={colors.light.primary}
+                    stroke={c.primary}
                     strokeWidth={strokeWidth}
                     strokeDasharray={circumference}
                     strokeDashoffset={strokeDashoffset}
@@ -693,7 +696,7 @@ export default function LearnScreen() {
                   position: 'absolute',
                 }}>
                 <AppText
-                  color={colors.light.text}
+                  color={c.text}
                   style={{
                     fontFamily: typography.family.sansBold,
                     fontSize: 22,
@@ -702,21 +705,21 @@ export default function LearnScreen() {
                   75
                 </AppText>
                 <AppText
-                  color={colors.light.onSurfaceVariant}
+                  color={c.onSurfaceVariant}
                   style={{
                     fontFamily: typography.family.mono,
                     fontSize: 10,
                     fontWeight: 'bold',
                     marginTop: -2,
                   }}>
-                  EXP
+                  XP
                 </AppText>
               </View>
             </View>
 
             {/* Daily Goal Text */}
             <AppText
-              color={colors.light.text}
+              color={c.text}
               style={{
                 fontFamily: typography.family.sansBold,
                 fontSize: 18,
@@ -724,17 +727,17 @@ export default function LearnScreen() {
                 marginTop: spacing[4],
                 textAlign: 'center',
               }}>
-              Daily Goal: 75% Complete
+              Target Harian: 75% Selesai
             </AppText>
             <AppText
-              color={colors.light.onSurfaceVariant}
+              color={c.onSurfaceVariant}
               style={{
                 fontSize: 14,
                 lineHeight: 20,
                 marginTop: spacing[1],
                 textAlign: 'center',
               }}>
-              You're doing great! Complete one more JS lesson to reach your daily XP target.
+              Hebat! Selesaikan 1 modul lagi untuk mencapai target XP harianmu.
             </AppText>
 
             {/* Weekly Activity Graph (5 vertical bars) */}
@@ -750,7 +753,7 @@ export default function LearnScreen() {
               {/* Bar 1 (Active) */}
               <View
                 style={{
-                  backgroundColor: colors.light.primary,
+                  backgroundColor: c.primary,
                   borderRadius: radius.sm,
                   height: 42,
                   width: 18,
@@ -759,7 +762,7 @@ export default function LearnScreen() {
               {/* Bar 2 (Active) */}
               <View
                 style={{
-                  backgroundColor: colors.light.primary,
+                  backgroundColor: c.primary,
                   borderRadius: radius.sm,
                   height: 56,
                   width: 18,
@@ -768,7 +771,7 @@ export default function LearnScreen() {
               {/* Bar 3 (Active) */}
               <View
                 style={{
-                  backgroundColor: colors.light.primary,
+                  backgroundColor: c.primary,
                   borderRadius: radius.sm,
                   height: 60,
                   width: 18,
@@ -777,7 +780,7 @@ export default function LearnScreen() {
               {/* Bar 4 (Inactive) */}
               <View
                 style={{
-                  backgroundColor: colors.light.surfaceContainerLow,
+                  backgroundColor: c.surfaceContainerLow,
                   borderRadius: radius.sm,
                   height: 18,
                   width: 18,
@@ -786,7 +789,7 @@ export default function LearnScreen() {
               {/* Bar 5 (Inactive) */}
               <View
                 style={{
-                  backgroundColor: colors.light.surfaceContainerLow,
+                  backgroundColor: c.surfaceContainerLow,
                   borderRadius: radius.sm,
                   height: 24,
                   width: 18,
@@ -799,7 +802,7 @@ export default function LearnScreen() {
         {/* 5. QUICK DRILLS SECTION */}
         <View style={{ marginTop: spacing[6], marginBottom: spacing[4] }}>
           <AppText
-            color={colors.light.text}
+            color={c.text}
             style={{
               fontFamily: typography.family.sansBold,
               fontSize: 20,
@@ -807,7 +810,7 @@ export default function LearnScreen() {
               marginBottom: spacing[3],
               paddingHorizontal: spacing[5],
             }}>
-            Quick Drills
+            Latihan Cepat
           </AppText>
 
           <ScrollView
@@ -823,9 +826,9 @@ export default function LearnScreen() {
               style={({ pressed }) => ({
                 alignItems: 'center',
                 backgroundColor: pressed
-                  ? colors.light.surfaceContainer
-                  : colors.light.surfaceContainerLowest,
-                borderColor: colors.light.outlineVariant,
+                  ? c.surfaceContainer
+                  : c.surfaceContainerLowest,
+                borderColor: c.outlineVariant,
                 borderRadius: radius.xl,
                 borderWidth: 1,
                 padding: spacing[4],
@@ -834,17 +837,17 @@ export default function LearnScreen() {
               <View
                 style={{
                   alignItems: 'center',
-                  backgroundColor: colors.light.secondaryFixed,
+                  backgroundColor: c.secondaryFixed,
                   borderRadius: radius.full,
                   height: 48,
                   justifyContent: 'center',
                   marginBottom: spacing[3],
                   width: 48,
                 }}>
-                <Zap color={colors.light.secondary} size={24} />
+                <Zap color={c.secondary} size={24} />
               </View>
               <AppText
-                color={colors.light.text}
+                color={c.text}
                 style={{
                   fontFamily: typography.family.sansBold,
                   fontSize: 14,
@@ -863,9 +866,9 @@ export default function LearnScreen() {
               style={({ pressed }) => ({
                 alignItems: 'center',
                 backgroundColor: pressed
-                  ? colors.light.surfaceContainer
-                  : colors.light.surfaceContainerLowest,
-                borderColor: colors.light.outlineVariant,
+                  ? c.surfaceContainer
+                  : c.surfaceContainerLowest,
+                borderColor: c.outlineVariant,
                 borderRadius: radius.xl,
                 borderWidth: 1,
                 padding: spacing[4],
@@ -874,7 +877,7 @@ export default function LearnScreen() {
               <View
                 style={{
                   alignItems: 'center',
-                  backgroundColor: colors.light.tertiaryFixed,
+                  backgroundColor: c.tertiaryFixed,
                   borderRadius: radius.full,
                   height: 48,
                   justifyContent: 'center',
@@ -884,7 +887,7 @@ export default function LearnScreen() {
                 <Palette color="#00629d" size={24} />
               </View>
               <AppText
-                color={colors.light.text}
+                color={c.text}
                 style={{
                   fontFamily: typography.family.sansBold,
                   fontSize: 14,
@@ -903,9 +906,9 @@ export default function LearnScreen() {
               style={({ pressed }) => ({
                 alignItems: 'center',
                 backgroundColor: pressed
-                  ? colors.light.surfaceContainer
-                  : colors.light.surfaceContainerLowest,
-                borderColor: colors.light.outlineVariant,
+                  ? c.surfaceContainer
+                  : c.surfaceContainerLowest,
+                borderColor: c.outlineVariant,
                 borderRadius: radius.xl,
                 borderWidth: 1,
                 padding: spacing[4],
@@ -914,17 +917,17 @@ export default function LearnScreen() {
               <View
                 style={{
                   alignItems: 'center',
-                  backgroundColor: colors.light.primaryFixed,
+                  backgroundColor: c.primaryFixed,
                   borderRadius: radius.full,
                   height: 48,
                   justifyContent: 'center',
                   marginBottom: spacing[3],
                   width: 48,
                 }}>
-                <Code2 color={colors.light.primary} size={24} />
+                <Code2 color={c.primary} size={24} />
               </View>
               <AppText
-                color={colors.light.text}
+                color={c.text}
                 style={{
                   fontFamily: typography.family.sansBold,
                   fontSize: 14,
@@ -943,9 +946,9 @@ export default function LearnScreen() {
               style={({ pressed }) => ({
                 alignItems: 'center',
                 backgroundColor: pressed
-                  ? colors.light.surfaceContainer
-                  : colors.light.surfaceContainerLowest,
-                borderColor: colors.light.outlineVariant,
+                  ? c.surfaceContainer
+                  : c.surfaceContainerLowest,
+                borderColor: c.outlineVariant,
                 borderRadius: radius.xl,
                 borderWidth: 1,
                 padding: spacing[4],
@@ -954,17 +957,17 @@ export default function LearnScreen() {
               <View
                 style={{
                   alignItems: 'center',
-                  backgroundColor: '#ffdad6',
+                  backgroundColor: mode === 'dark' ? '#5c1d1d' : '#ffdad6',
                   borderRadius: radius.full,
                   height: 48,
                   justifyContent: 'center',
                   marginBottom: spacing[3],
                   width: 48,
                 }}>
-                <Bug color={colors.light.danger} size={24} />
+                <Bug color={c.danger} size={24} />
               </View>
               <AppText
-                color={colors.light.text}
+                color={c.text}
                 style={{
                   fontFamily: typography.family.sansBold,
                   fontSize: 14,

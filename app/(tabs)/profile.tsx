@@ -12,16 +12,20 @@ import { Image, Pressable, ScrollView, View } from 'react-native';
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
-import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useTheme } from '@/context/ThemeContext';
+import { useTranslation } from '@/translations';
 import { TAB_BAR_CLEARANCE } from './_layout';
 
 export default function ProfileScreen() {
+  const { colors: c, mode } = useTheme();
+  const { t } = useTranslation();
+
   return (
-    <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
-      <StatusBar style="dark" />
+    <ScreenContainer padded={false} style={{ backgroundColor: c.background }}>
+      <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
 
       <ScrollView
         bounces={false}
@@ -41,12 +45,12 @@ export default function ProfileScreen() {
             paddingTop: spacing[2],
           }}>
           <AppText
-            color={colors.light.primary}
+            color={c.primary}
             style={{
               fontFamily: typography.family.sansBold,
               fontSize: 22,
             }}>
-            My Profile
+            Profil Saya
           </AppText>
         </View>
 
@@ -54,22 +58,22 @@ export default function ProfileScreen() {
         <View
           style={{
             alignItems: 'center',
-            backgroundColor: 'rgba(255, 255, 255, 0.95)',
-            borderColor: colors.light.outlineVariant,
+            backgroundColor: c.surfaceContainerLowest,
+            borderColor: c.outlineVariant,
             borderRadius: radius['2xl'],
             borderWidth: 1,
             elevation: 4,
             marginHorizontal: spacing[5],
             marginTop: spacing[4],
             padding: spacing[6],
-            shadowColor: colors.light.primary,
+            shadowColor: c.primary,
             shadowOffset: { width: 0, height: 4 },
             shadowOpacity: 0.08,
             shadowRadius: 12,
           }}>
           <View
             style={{
-              borderColor: colors.light.primary,
+              borderColor: c.primary,
               borderRadius: radius.full,
               borderWidth: 3,
               height: 80,
@@ -84,7 +88,7 @@ export default function ProfileScreen() {
           </View>
 
           <AppText
-            color={colors.light.text}
+            color={c.text}
             style={{
               fontFamily: typography.family.sansBold,
               fontSize: 20,
@@ -94,7 +98,7 @@ export default function ProfileScreen() {
           </AppText>
 
           <AppText
-            color={colors.light.onSurfaceVariant}
+            color={c.onSurfaceVariant}
             style={{
               fontSize: 14,
               marginTop: 2,
@@ -105,7 +109,7 @@ export default function ProfileScreen() {
           {/* Quick Stats Grid */}
           <View
             style={{
-              borderColor: colors.light.outlineVariant,
+              borderColor: c.outlineVariant,
               borderRadius: radius.xl,
               borderWidth: 1,
               flexDirection: 'row',
@@ -115,9 +119,9 @@ export default function ProfileScreen() {
               width: '100%',
             }}>
             <View style={{ alignItems: 'center' }}>
-              <Zap color={colors.light.primary} size={20} />
+              <Zap color={c.primary} size={20} />
               <AppText
-                color={colors.light.text}
+                color={c.text}
                 style={{
                   fontFamily: typography.family.sansBold,
                   fontSize: 16,
@@ -126,45 +130,45 @@ export default function ProfileScreen() {
                 320 XP
               </AppText>
               <AppText
-                color={colors.light.onSurfaceVariant}
+                color={c.onSurfaceVariant}
                 style={{ fontSize: 12 }}>
                 Total XP
               </AppText>
             </View>
 
             <View style={{ alignItems: 'center' }}>
-              <BookOpen color={colors.light.secondary} size={20} />
+              <BookOpen color={c.secondary} size={20} />
               <AppText
-                color={colors.light.text}
+                color={c.text}
                 style={{
                   fontFamily: typography.family.sansBold,
                   fontSize: 16,
                   marginTop: 4,
                 }}>
-                6 Lessons
+                6 Modul
               </AppText>
               <AppText
-                color={colors.light.onSurfaceVariant}
+                color={c.onSurfaceVariant}
                 style={{ fontSize: 12 }}>
-                Completed
+                Selesai
               </AppText>
             </View>
 
             <View style={{ alignItems: 'center' }}>
               <Award color="#00629d" size={20} />
               <AppText
-                color={colors.light.text}
+                color={c.text}
                 style={{
                   fontFamily: typography.family.sansBold,
                   fontSize: 16,
                   marginTop: 4,
                 }}>
-                3 Badges
+                3 Lencana
               </AppText>
               <AppText
-                color={colors.light.onSurfaceVariant}
+                color={c.onSurfaceVariant}
                 style={{ fontSize: 12 }}>
-                Earned
+                Diterima
               </AppText>
             </View>
           </View>
@@ -176,7 +180,7 @@ export default function ProfileScreen() {
             accessibilityRole="button"
             style={({ pressed }) => ({
               alignItems: 'center',
-              backgroundColor: pressed ? colors.light.surfaceContainerHigh : colors.light.surfaceContainerLow,
+              backgroundColor: pressed ? c.surfaceContainerHigh : c.surfaceContainerLow,
               borderRadius: radius.xl,
               flexDirection: 'row',
               justifyContent: 'space-between',
@@ -184,19 +188,19 @@ export default function ProfileScreen() {
               paddingVertical: spacing[4],
             })}>
             <View style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[3] }}>
-              <User color={colors.light.primary} size={20} />
-              <AppText color={colors.light.text} style={{ fontFamily: typography.family.sansBold, fontSize: 15 }}>
-                Account Settings
+              <User color={c.primary} size={20} />
+              <AppText color={c.text} style={{ fontFamily: typography.family.sansBold, fontSize: 15 }}>
+                Pengaturan Akun
               </AppText>
             </View>
-            <ChevronRight color={colors.light.outline} size={18} />
+            <ChevronRight color={c.outline} size={18} />
           </Pressable>
 
           <Pressable
             accessibilityRole="button"
             style={({ pressed }) => ({
               alignItems: 'center',
-              backgroundColor: pressed ? colors.light.surfaceContainerHigh : colors.light.surfaceContainerLow,
+              backgroundColor: pressed ? c.surfaceContainerHigh : c.surfaceContainerLow,
               borderRadius: radius.xl,
               flexDirection: 'row',
               justifyContent: 'space-between',
@@ -204,12 +208,12 @@ export default function ProfileScreen() {
               paddingVertical: spacing[4],
             })}>
             <View style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[3] }}>
-              <Shield color={colors.light.primary} size={20} />
-              <AppText color={colors.light.text} style={{ fontFamily: typography.family.sansBold, fontSize: 15 }}>
-                Privacy & Security
+              <Shield color={c.primary} size={20} />
+              <AppText color={c.text} style={{ fontFamily: typography.family.sansBold, fontSize: 15 }}>
+                Privasi & Keamanan
               </AppText>
             </View>
-            <ChevronRight color={colors.light.outline} size={18} />
+            <ChevronRight color={c.outline} size={18} />
           </Pressable>
         </View>
 
