@@ -52,10 +52,22 @@ type LessonDataFile = {
   lessons: LessonItem[];
 };
 
+const localizedLessonTitles: Record<string, string> = {
+  'html-01': 'Pengenalan Tag',
+  'html-02': 'Data & Validasi',
+  'html-03': 'Pohon & Hierarki DOM',
+  'css-01': 'Selector & Specificity',
+  'css-02': 'Model Kotak',
+  'css-03': 'Layout Flexbox',
+  'js-01': 'Variabel & Tipe Data',
+  'js-02': 'Fungsi & Scope',
+  'js-03': 'Manipulasi DOM',
+};
+
 export default function LessonDetailScreen() {
   const router = useRouter();
   const { colors: c, mode } = useTheme();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { courseId, moduleId } = useLocalSearchParams<{
     courseId?: string;
     moduleId?: string;
@@ -115,6 +127,9 @@ export default function LessonDetailScreen() {
   }, [availableLessons, moduleId]);
 
   const lesson: LessonItem | undefined = availableLessons[currentLessonIndex];
+  const lessonTitle = lesson && language === 'id'
+    ? localizedLessonTitles[lesson.id] ?? lesson.title
+    : lesson?.title;
 
   // Each module has exactly 1 page of lesson content — navbar is isolated per module
   const hasPrevious = false; // No cross-module Previous navigation
@@ -196,7 +211,7 @@ export default function LessonDetailScreen() {
               lineHeight: 22,
               textAlign: 'center',
             }}>
-            {lesson.title}
+            {lessonTitle}
           </AppText>
           <AppText
             color={c.onSurfaceVariant}
@@ -300,7 +315,7 @@ export default function LessonDetailScreen() {
                   fontFamily: typography.family.sansBold,
                   fontSize: 12,
                 }}>
-                Modul {lesson.moduleNumber}
+                {t('module')} {lesson.moduleNumber}
               </AppText>
             </View>
 
@@ -330,7 +345,7 @@ export default function LessonDetailScreen() {
               fontSize: 22,
               lineHeight: 28,
             }}>
-            {lesson.title}
+            {lessonTitle}
           </AppText>
         </View>
 
@@ -372,7 +387,7 @@ export default function LessonDetailScreen() {
                   fontFamily: typography.family.sansBold,
                   fontSize: 18,
                 }}>
-                Tujuan Pembelajaran
+                {t('learningObjectives')}
               </AppText>
             </View>
 
@@ -434,7 +449,7 @@ export default function LessonDetailScreen() {
                       fontFamily: typography.family.sansBold,
                       fontSize: 13,
                     }}>
-                    Tips Mentor
+                    {t('mentorTip')}
                   </AppText>
                 </View>
                 <AppText
@@ -590,7 +605,7 @@ export default function LessonDetailScreen() {
               fontFamily: typography.family.sansBold,
               fontSize: 14,
             }}>
-            Mulai Kuis
+              {t('startQuiz')}
           </AppText>
           <ChevronRight color="#ffffff" size={18} />
         </Pressable>

@@ -173,7 +173,7 @@ export default function CssCourseScreen() {
                 lineHeight: 34,
                 marginTop: spacing[2],
               }}>
-              Advanced CSS
+              {t('advancedCssCourse')}
             </AppText>
 
             {/* Course Subtitle */}

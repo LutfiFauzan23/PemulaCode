@@ -31,6 +31,21 @@ export type CourseModule = {
   unlockRequirement: string | null;
 };
 
+const localizedModuleContent: Record<string, Record<string, readonly [string, string]>> = {
+  id: {
+    'html-01': ['Pengenalan Tag', 'Pelajari sintaks dasar HTML dan cara menyusun halaman web pertamamu.'],
+    'html-02': ['Data & Validasi', 'Kuasai form HTML, kontrol input, field wajib, dan validasi browser.'],
+    'html-03': ['Pohon & Hierarki DOM', 'Pahami hubungan parent-child dan struktur dokumen bertingkat.'],
+    'css-01': ['Selector & Specificity', 'Kuasai selector elemen, class, ID, universal, dan aturan specificity CSS.'],
+    'css-02': ['Model Kotak', 'Pahami content, padding, border, margin, serta pengaruh box-sizing.'],
+    'css-03': ['Layout Flexbox', 'Bangun layout satu dimensi dengan container, alignment, dan wrapping.'],
+    'js-01': ['Variabel & Tipe Data', 'Pelajari let, const, string, number, boolean, array, object, dan typeof.'],
+    'js-02': ['Fungsi & Scope', 'Pahami deklarasi fungsi, parameter, return value, serta scope.'],
+    'js-03': ['Manipulasi DOM', 'Cari dan ubah elemen HTML, tangani event, dan perbarui UI.'],
+  },
+  en: {},
+};
+
 type Props = {
   module: CourseModule;
   accentColor: string;
@@ -124,7 +139,10 @@ function StatusIndicator({
 
 export function CourseModuleCard({ module, accentColor, accentFixed, onPress }: Props) {
   const { colors: c } = useTheme();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
+  const localizedContent = localizedModuleContent[language][module.id as keyof typeof localizedModuleContent.id];
+  const title = localizedContent?.[0] ?? module.title;
+  const description = localizedContent?.[1] ?? module.description;
 
   const isCompleted = module.status === 'completed';
   const isInProgress = module.status === 'in_progress';
@@ -198,14 +216,14 @@ export function CourseModuleCard({ module, accentColor, accentFixed, onPress }: 
           fontSize: 18,
           lineHeight: 25,
         }}>
-        {module.title}
+        {title}
       </AppText>
 
       {/* ── Description ── */}
       <AppText
         color={isDisabled ? c.outline : c.onSurfaceVariant}
         style={{ fontSize: 14, lineHeight: 20, marginTop: spacing[1] }}>
-        {module.description}
+        {description}
       </AppText>
 
       {/* ── COMPLETED: learner avatars + Review Lesson ── */}
@@ -395,7 +413,7 @@ export function CourseModuleCard({ module, accentColor, accentFixed, onPress }: 
   // Active modules (available / completed / in_progress) are pressable
   return (
     <Pressable
-      accessibilityLabel={`Module: ${module.title}`}
+      accessibilityLabel={`${t('module')}: ${title}`}
       accessibilityRole="button"
       onPress={onPress}
       style={({ pressed }) => ({

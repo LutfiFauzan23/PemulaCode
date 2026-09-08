@@ -15,12 +15,6 @@ import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
 import { useTheme } from '@/context/ThemeContext';
 
-const CHIPS = [
-  { icon: Code2, label: 'Playground' },
-  { icon: BookOpenCheck, label: 'Kurikulum' },
-  { icon: Trophy, label: 'Ranking' },
-];
-
 import { useTranslation } from '@/translations';
 
 export default function WelcomeScreen() {

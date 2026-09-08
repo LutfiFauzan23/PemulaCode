@@ -15,6 +15,7 @@ import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
 import { useTheme } from '@/context/ThemeContext';
+import { useTranslation } from '@/translations';
 
 // ─── Syntax-highlighted code line helper ────────────────────────────────────
 type CodeSpan = { text: string; color: string };
@@ -318,6 +319,7 @@ function ProgressDots({ total = 4, active = 0 }: { total?: number; active?: numb
 export default function OnboardingScreen() {
   const router = useRouter();
   const { colors, mode } = useTheme();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
   const handleNext = () => {
@@ -362,7 +364,7 @@ export default function OnboardingScreen() {
           </Text>
 
           <Pressable
-            accessibilityLabel="Skip onboarding"
+            accessibilityLabel={t('skipOnboarding')}
             accessibilityRole="button"
             hitSlop={12}
             onPress={handleSkip}
@@ -374,7 +376,7 @@ export default function OnboardingScreen() {
                 color: colors.onSurfaceVariant,
                 lineHeight: 22,
               }}>
-              Skip
+              {t('skip')}
             </Text>
           </Pressable>
         </View>
@@ -398,8 +400,7 @@ export default function OnboardingScreen() {
                 color: colors.text,
                 textAlign: 'center',
               }}>
-              {'Practice with '}
-              <Text style={{ color: colors.primary }}>Interactive Coding</Text>
+              {t('practiceInteractive')}
             </Text>
           </View>
 
@@ -412,8 +413,7 @@ export default function OnboardingScreen() {
               textAlign: 'center',
               paddingHorizontal: spacing[2],
             }}>
-            No need for complex setups. Write, run, and debug code directly in our built-in
-            playground designed for mobile-first learners.
+            {t('noNeedSetup')}
           </Text>
 
           <ProgressDots total={3} active={0} />
@@ -427,7 +427,7 @@ export default function OnboardingScreen() {
             paddingBottom: spacing[2],
           }}>
           <Pressable
-            accessibilityLabel="Next — go to onboarding step 2"
+            accessibilityLabel={t('goToOnboardingStep2')}
             accessibilityRole="button"
             onPress={handleNext}
             style={({ pressed }) => ({
@@ -454,7 +454,7 @@ export default function OnboardingScreen() {
                 lineHeight: 24,
                 letterSpacing: 0.3,
               }}>
-              Next  →
+              {t('next')}
             </Text>
           </Pressable>
         </View>

@@ -160,7 +160,7 @@ export default function HtmlCourseScreen() {
                 letterSpacing: 1.5,
                 fontWeight: 'bold',
               }}>
-              JALUR SERTIFIKASI
+              {t('certificationTrack')}
             </AppText>
 
             {/* Course Title */}
@@ -172,7 +172,7 @@ export default function HtmlCourseScreen() {
                 lineHeight: 34,
                 marginTop: spacing[2],
               }}>
-              HTML Essentials
+              {t('htmlEssentials')}
             </AppText>
 
             {/* Course Subtitle */}
@@ -183,7 +183,7 @@ export default function HtmlCourseScreen() {
                 lineHeight: 21,
                 marginTop: spacing[2],
               }}>
-              Kuasai struktur dasar web dengan kurikulum berstandar industri.
+              {t('htmlSubTitle')}
             </AppText>
 
             {/* Progress Card Inside Hero */}
@@ -206,7 +206,7 @@ export default function HtmlCourseScreen() {
                     fontFamily: typography.family.mono,
                     fontSize: 13,
                   }}>
-                  Total Progres
+                  {t('totalProgress')}
                 </AppText>
                 <AppText
                   color="#ffffff"
@@ -251,7 +251,7 @@ export default function HtmlCourseScreen() {
               lineHeight: 28,
               marginBottom: spacing[4],
             }}>
-            Modul Kurikulum
+            {t('curriculumModules')}
           </AppText>
 
           <View style={{ gap: spacing[4] }}>

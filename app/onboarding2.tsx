@@ -15,6 +15,7 @@ import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
 import { useTheme } from '@/context/ThemeContext';
+import { useTranslation } from '@/translations';
 
 // ─── Floating animation hook ─────────────
 function useFloatAnimation(amplitude = 8, duration = 2400, phase = 0) {
@@ -447,6 +448,7 @@ function ProgressDots() {
 export default function Onboarding2Screen() {
   const router = useRouter();
   const { colors, mode } = useTheme();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
   const handleNext = () => {
@@ -511,8 +513,7 @@ export default function Onboarding2Screen() {
               color: colors.text,
               textAlign: 'center',
             }}>
-            {'Join the Community\n'}
-            <Text style={{ color: colors.primary }}>{'& Track Progress'}</Text>
+            {t('joinCommunityTrack')}
           </Text>
 
           <Text
@@ -524,7 +525,7 @@ export default function Onboarding2Screen() {
               textAlign: 'center',
               paddingHorizontal: spacing[2],
             }}>
-            {"Don't learn alone. Collaborate with thousands of fellow developers, share code, and monitor your skill growth with advanced analytics."}
+            {t('dontLearnAlone')}
           </Text>
 
           <ProgressDots />
@@ -538,7 +539,7 @@ export default function Onboarding2Screen() {
             paddingBottom: spacing[2],
           }}>
           <Pressable
-            accessibilityLabel="Next — go to onboarding step 3"
+            accessibilityLabel={t('goToOnboardingStep3')}
             accessibilityRole="button"
             onPress={handleNext}
             style={({ pressed }) => ({
@@ -565,12 +566,12 @@ export default function Onboarding2Screen() {
                 lineHeight: 24,
                 letterSpacing: 0.3,
               }}>
-              Next  →
+              {t('next')}
             </Text>
           </Pressable>
 
           <Pressable
-            accessibilityLabel="Back to previous onboarding step"
+            accessibilityLabel={t('goBackToPreviousStep')}
             accessibilityRole="button"
             onPress={handleBack}
             style={({ pressed }) => ({
@@ -590,7 +591,7 @@ export default function Onboarding2Screen() {
                 color: colors.primary,
                 lineHeight: 22,
               }}>
-              Back
+              {t('back')}
             </Text>
           </Pressable>
         </View>

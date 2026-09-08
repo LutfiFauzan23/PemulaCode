@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import {
+  ArrowLeft,
   Bell,
   Check,
   Copy,
@@ -129,7 +130,19 @@ export default function PlaygroundScreen() {
               paddingHorizontal: spacing[5],
               paddingTop: spacing[2],
             }}>
-            {/* Left: Avatar + Title */}
+            {/* Left: Back + Avatar + Title */}
+            <View style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[3] }}>
+            <Pressable
+              accessibilityLabel={t('back')}
+              accessibilityRole="button"
+              hitSlop={8}
+              onPress={() => {
+                if (router.canGoBack()) router.back();
+                else router.replace('/(tabs)');
+              }}
+              style={{ alignItems: 'center', justifyContent: 'center' }}>
+              <ArrowLeft color={c.primary} size={20} />
+            </Pressable>
             <Pressable
               accessibilityLabel="Profile Avatar"
               accessibilityRole="button"
@@ -159,6 +172,7 @@ export default function PlaygroundScreen() {
                 Pemula Code
               </AppText>
             </Pressable>
+            </View>
 
             {/* Right: Bell Notification */}
             <Pressable

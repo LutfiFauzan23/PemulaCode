@@ -1,6 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
+import { useRouter } from 'expo-router';
 import {
   Award,
+  ArrowLeft,
   BookOpen,
   ChevronRight,
   Shield,
@@ -17,11 +19,14 @@ import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
 import { useTheme } from '@/context/ThemeContext';
 import { useTranslation } from '@/translations';
+import { useProfileStore } from '@/stores/profile-store';
 import { TAB_BAR_CLEARANCE } from './_layout';
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const { colors: c, mode } = useTheme();
   const { t } = useTranslation();
+  const avatarUri = useProfileStore((state) => state.avatarUri);
 
   return (
     <ScreenContainer padded={false} style={{ backgroundColor: c.background }}>
@@ -40,17 +45,34 @@ export default function ProfileScreen() {
             alignItems: 'center',
             flexDirection: 'row',
             height: 60,
-            justifyContent: 'space-between',
             paddingHorizontal: spacing[5],
             paddingTop: spacing[2],
           }}>
+          <Pressable
+            accessibilityLabel={t('back')}
+            accessibilityRole="button"
+            hitSlop={8}
+            onPress={() => {
+              if (router.canGoBack()) {
+                router.back();
+              } else {
+                router.replace('/(tabs)/settings');
+              }
+            }}
+            style={({ pressed }) => ({
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginRight: spacing[2],
+            })}>
+            <ArrowLeft color={c.primary} size={18} />
+          </Pressable>
           <AppText
             color={c.primary}
             style={{
               fontFamily: typography.family.sansBold,
               fontSize: 22,
             }}>
-            Profil Saya
+            {t('profile')}
           </AppText>
         </View>
 
@@ -81,7 +103,7 @@ export default function ProfileScreen() {
               width: 80,
             }}>
             <Image
-              source={require('@/assets/images/welcome-hero.png')}
+                source={avatarUri ? { uri: avatarUri } : require('@/assets/images/welcome-hero.png')}
               style={{ height: '100%', width: '100%' }}
               resizeMode="cover"
             />
@@ -178,6 +200,7 @@ export default function ProfileScreen() {
         <View style={{ gap: spacing[3], marginTop: spacing[6], paddingHorizontal: spacing[5] }}>
           <Pressable
             accessibilityRole="button"
+            onPress={() => router.push('/settings/account')}
             style={({ pressed }) => ({
               alignItems: 'center',
               backgroundColor: pressed ? c.surfaceContainerHigh : c.surfaceContainerLow,
@@ -198,6 +221,7 @@ export default function ProfileScreen() {
 
           <Pressable
             accessibilityRole="button"
+            onPress={() => router.push('/settings/privacy')}
             style={({ pressed }) => ({
               alignItems: 'center',
               backgroundColor: pressed ? c.surfaceContainerHigh : c.surfaceContainerLow,

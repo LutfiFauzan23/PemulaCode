@@ -108,7 +108,7 @@ export default function LearnScreen() {
             accessibilityLabel="Notifications"
             accessibilityRole="button"
             hitSlop={8}
-            onPress={() => {}}
+            onPress={() => router.push('/notifications')}
             style={({ pressed }) => ({
               alignItems: 'center',
               backgroundColor: pressed
@@ -224,7 +224,7 @@ export default function LearnScreen() {
                 fontSize: 20,
                 lineHeight: 28,
               }}>
-              HTML Foundation
+              {t('htmlFoundationCourse')}
             </AppText>
             <AppText
               color={c.onSurfaceVariant}
@@ -285,7 +285,7 @@ export default function LearnScreen() {
 
             {/* Continue / Start Button */}
             <Pressable
-              accessibilityLabel="Start Learning HTML Foundation"
+                accessibilityLabel={t('htmlFoundationCourse')}
               accessibilityRole="button"
               onPress={() => router.push('/(tabs)/html-course')}
               style={({ pressed }) => ({
@@ -388,7 +388,7 @@ export default function LearnScreen() {
                 fontSize: 20,
                 lineHeight: 28,
               }}>
-              Advanced CSS
+              {t('advancedCssCourse')}
             </AppText>
             <AppText
               color={c.onSurfaceVariant}
@@ -449,7 +449,7 @@ export default function LearnScreen() {
 
             {/* Continue / Start Button */}
             <Pressable
-              accessibilityLabel="Start Learning Advanced CSS"
+                accessibilityLabel={t('advancedCssCourse')}
               accessibilityRole="button"
               onPress={() => router.push('/(tabs)/css-course')}
               style={({ pressed }) => ({
@@ -550,7 +550,7 @@ export default function LearnScreen() {
                 fontSize: 20,
                 lineHeight: 28,
               }}>
-              JS Logic & APIs
+              {t('jsLogicApisCourse')}
             </AppText>
             <AppText
               color={c.onSurfaceVariant}
@@ -611,7 +611,7 @@ export default function LearnScreen() {
 
             {/* Continue / Start Button */}
             <Pressable
-              accessibilityLabel="Start Learning JS Logic & APIs"
+                accessibilityLabel={t('jsLogicApisCourse')}
               accessibilityRole="button"
               onPress={() => router.push('/(tabs)/course-detail?courseId=javascript')}
               style={({ pressed }) => ({
@@ -727,7 +727,7 @@ export default function LearnScreen() {
                 marginTop: spacing[4],
                 textAlign: 'center',
               }}>
-              Target Harian: 75% Selesai
+              {t('dailyGoalTitle')}: 75% Selesai
             </AppText>
             <AppText
               color={c.onSurfaceVariant}
@@ -737,7 +737,7 @@ export default function LearnScreen() {
                 marginTop: spacing[1],
                 textAlign: 'center',
               }}>
-              Hebat! Selesaikan 1 modul lagi untuk mencapai target XP harianmu.
+              {t('dailyGoalDesc')}
             </AppText>
 
             {/* Weekly Activity Graph (5 vertical bars) */}
@@ -810,7 +810,7 @@ export default function LearnScreen() {
               marginBottom: spacing[3],
               paddingHorizontal: spacing[5],
             }}>
-            Latihan Cepat
+            {t('quickDrills')}
           </AppText>
 
           <ScrollView
@@ -854,7 +854,7 @@ export default function LearnScreen() {
                   lineHeight: 20,
                   textAlign: 'center',
                 }}>
-                Quiz: Divs
+                {t('quizDivs')}
               </AppText>
             </Pressable>
 
@@ -894,7 +894,7 @@ export default function LearnScreen() {
                   lineHeight: 20,
                   textAlign: 'center',
                 }}>
-                Flexbox Mini
+                {t('flexboxMini')}
               </AppText>
             </Pressable>
 
@@ -934,7 +934,7 @@ export default function LearnScreen() {
                   lineHeight: 20,
                   textAlign: 'center',
                 }}>
-                Arrows Logic
+                {t('arrowsLogic')}
               </AppText>
             </Pressable>
 
@@ -974,7 +974,7 @@ export default function LearnScreen() {
                   lineHeight: 20,
                   textAlign: 'center',
                 }}>
-                Bug Hunt
+                {t('bugHunt')}
               </AppText>
             </Pressable>
 

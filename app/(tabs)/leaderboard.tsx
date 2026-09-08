@@ -132,7 +132,7 @@ export default function LeaderboardScreen() {
             accessibilityLabel="Notifications"
             accessibilityRole="button"
             hitSlop={8}
-            onPress={() => {}}
+            onPress={() => router.push('/notifications')}
             style={({ pressed }) => ({
               alignItems: 'center',
               backgroundColor: pressed
@@ -491,7 +491,8 @@ function RankRow({
         <View style={{ alignItems: 'center', flexDirection: 'row', gap: 3, marginTop: 1 }}>
           <Flame color={colors.secondary} size={12} fill={colors.secondary} />
           <AppText color={colors.onSurfaceVariant} style={{ fontSize: 12 }}>
-            {user.streak} {t('dayStreak')}
+            {user.streak} hari 
+            {/* {t('dayStreak')} */}
           </AppText>
         </View>
       </View>

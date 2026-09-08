@@ -212,7 +212,7 @@ export default function CommunityScreen() {
                 accessibilityLabel="Notifications"
                 accessibilityRole="button"
                 hitSlop={8}
-                onPress={() => {}}
+                onPress={() => router.push('/notifications')}
                 style={({ pressed }) => ({
                   alignItems: 'center',
                   backgroundColor: pressed
@@ -497,8 +497,10 @@ export default function CommunityScreen() {
                 const currentLikes = likeCounts[post.id] ?? post.initialLikes;
 
                 return (
-                  <View
+                  <Pressable
                     key={post.id}
+                    accessibilityRole="button"
+                    onPress={() => router.push(`/community/${post.id}` as never)}
                     style={{
                       backgroundColor: c.surfaceContainerLowest,
                       borderColor: c.outlineVariant,
@@ -727,7 +729,7 @@ export default function CommunityScreen() {
                         </View>
                       ) : null}
                     </View>
-                  </View>
+                  </Pressable>
                 );
               })}
             </View>

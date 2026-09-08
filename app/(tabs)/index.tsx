@@ -29,6 +29,7 @@ import { useTranslation } from '@/translations';
 
 import { TAB_BAR_CLEARANCE } from './_layout';
 import { useProgressStore } from '@/stores/progress-store';
+import { useNotificationsStore } from '@/stores/notifications-store';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -38,6 +39,7 @@ export default function HomeScreen() {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const overallProgress = useProgressStore((state) => state.getOverallProgress());
   const htmlProgress = useProgressStore((state) => state.getCourseProgress('html'));
+  const unreadNotifications = useNotificationsStore((state) => state.notifications.filter((item) => !item.read).length);
 
   return (
     <ScreenContainer padded={false} style={{ backgroundColor: c.background }}>
@@ -98,7 +100,7 @@ export default function HomeScreen() {
             accessibilityLabel="Notifications"
             accessibilityRole="button"
             hitSlop={8}
-            onPress={() => {}}
+            onPress={() => router.push('/notifications')}
             style={({ pressed }) => ({
               alignItems: 'center',
               backgroundColor: pressed
@@ -110,6 +112,7 @@ export default function HomeScreen() {
               width: 40,
             })}>
             <Bell color={c.text} size={20} />
+            {unreadNotifications > 0 && <View style={{ alignItems: 'center', backgroundColor: c.danger, borderRadius: radius.full, height: unreadNotifications > 9 ? 20 : 17, justifyContent: 'center', minWidth: unreadNotifications > 9 ? 20 : 17, position: 'absolute', right: -2, top: -2 }}><AppText color="#ffffff" style={{ fontFamily: typography.family.sansBold, fontSize: 10 }}>{unreadNotifications > 9 ? '9+' : unreadNotifications}</AppText></View>}
           </Pressable>
         </View>
 
@@ -291,7 +294,7 @@ export default function HomeScreen() {
                     fontSize: 13,
                     lineHeight: 18,
                   }}>
-                  HTML/CSS
+                  {t('htmlCssLabel')}
                 </AppText>
               </View>
               <View style={{ alignItems: 'center', flexDirection: 'row', gap: spacing[2] }}>
@@ -310,7 +313,7 @@ export default function HomeScreen() {
                     fontSize: 13,
                     lineHeight: 18,
                   }}>
-                  JS Core
+                  {t('jsCoreLabel')}
                 </AppText>
               </View>
             </View>
@@ -365,7 +368,7 @@ export default function HomeScreen() {
               <Pressable
                 accessibilityLabel="Solve Now"
                 accessibilityRole="button"
-                onPress={() => {}}
+                onPress={() => router.push('/daily-challenge')}
                 style={({ pressed }) => ({
                   backgroundColor: pressed ? '#f0f0ff' : '#ffffff',
                   borderRadius: radius.lg,

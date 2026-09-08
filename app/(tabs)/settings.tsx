@@ -433,7 +433,7 @@ export default function SettingsScreen() {
             <Pressable
               accessibilityLabel="Notification Settings"
               accessibilityRole="button"
-              onPress={() => {}}
+              onPress={() => router.push('/(tabs)/notification-settings' as never)}
               style={({ pressed }) => ({
                 alignItems: 'center',
                 backgroundColor: pressed
@@ -567,7 +567,8 @@ export default function SettingsScreen() {
             {/* Divider */}
             <View style={{ backgroundColor: colors.outlineVariant, height: 1, marginHorizontal: spacing[4] }} />
 
-            {/* Item 2: Privacy */}
+            {/* Privacy item removed; the About Application item remains below. */}
+            {false && (
             <Pressable
               accessibilityLabel="Privacy Settings"
               accessibilityRole="button"
@@ -618,6 +619,8 @@ export default function SettingsScreen() {
               <ChevronRight color={colors.outline} size={20} />
             </Pressable>
 
+            )}
+
             {/* Divider */}
             <View style={{ backgroundColor: colors.outlineVariant, height: 1, marginHorizontal: spacing[4] }} />
 
@@ -625,7 +628,7 @@ export default function SettingsScreen() {
             <Pressable
               accessibilityLabel="About Application"
               accessibilityRole="button"
-              onPress={() => {}}
+              onPress={() => router.push('/settings/about')}
               style={({ pressed }) => ({
                 alignItems: 'center',
                 backgroundColor: pressed

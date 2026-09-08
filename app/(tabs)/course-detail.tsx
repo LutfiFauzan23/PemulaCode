@@ -294,7 +294,7 @@ export default function CourseDetailScreen() {
                 <AppText
                   color="#ffffff"
                   style={{ fontFamily: typography.family.mono, fontSize: 13 }}>
-                  Total Progres
+                  {t('totalProgress')}
                 </AppText>
                 <AppText
                   color="#ffffff"
@@ -341,7 +341,7 @@ export default function CourseDetailScreen() {
               lineHeight: 28,
               marginBottom: spacing[4],
             }}>
-            Modul Kurikulum
+            {t('curriculumModules')}
           </AppText>
 
           <View style={{ gap: spacing[4] }}>

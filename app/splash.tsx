@@ -7,10 +7,12 @@ import { AppLogo } from '@/components/branding/AppLogo';
 import { AppText } from '@/components/ui/AppText';
 import { typography } from '@/constants/typography';
 import { useTheme } from '@/context/ThemeContext';
+import { useTranslation } from '@/translations';
 
 export default function SplashScreen() {
   const router = useRouter();
   const { colors, mode } = useTheme();
+  const { t } = useTranslation();
   const animationProgress = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -86,7 +88,7 @@ export default function SplashScreen() {
               lineHeight: 24,
               opacity: 0.82,
             }}>
-            Your journey to mastery starts here.
+            {t('welcomeSubtitle')}
           </AppText>
         </Animated.View>
       </View>

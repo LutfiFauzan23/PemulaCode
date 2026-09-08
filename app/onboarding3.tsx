@@ -28,6 +28,7 @@ import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useTranslation } from '@/translations';
 
 // ─── Local colour aliases ────────────────────────────────────────────────────
 const C = {
@@ -366,6 +367,7 @@ function ProgressDots() {
 export default function Onboarding3Screen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { t } = useTranslation();
 
   // Entrance animations for content sections
   const illustrationStyle = useFadeUp(80);
@@ -414,7 +416,7 @@ export default function Onboarding3Screen() {
 
           {/* Skip — finishes onboarding and enters the app */}
           <Pressable
-            accessibilityLabel="Skip onboarding"
+            accessibilityLabel={t('skipOnboarding')}
             accessibilityRole="button"
             hitSlop={12}
             onPress={goToLogin}
@@ -426,7 +428,7 @@ export default function Onboarding3Screen() {
                 color: C.textMuted,
                 lineHeight: 22,
               }}>
-              Skip
+              {t('skip')}
             </Text>
           </Pressable>
         </View>
@@ -464,12 +466,7 @@ export default function Onboarding3Screen() {
               color: C.text,
               textAlign: 'center',
             }}>
-            {'Learn '}
-            <Text style={{ color: C.primary }}>HTML</Text>
-            {', '}
-            <Text style={{ color: C.orange }}>CSS</Text>
-            {', and\n'}
-            <Text style={{ color: C.tertiary }}>JavaScript</Text>
+            {t('learnHtmlCssJavaScript')}
           </Text>
 
           {/* Subtitle */}
@@ -482,8 +479,7 @@ export default function Onboarding3Screen() {
               textAlign: 'center',
               paddingHorizontal: spacing[2],
             }}>
-            Master modern front-end development from absolute scratch with bite-sized, interactive
-            lessons.
+            {t('masterFrontEnd')}
           </Text>
 
           {/* Technology chips row */}
@@ -517,7 +513,7 @@ export default function Onboarding3Screen() {
 
           {/* Primary CTA: Get Started */}
           <Pressable
-            accessibilityLabel="Login — go to the Login screen"
+            accessibilityLabel={t('login')}
             accessibilityRole="button"
             onPress={goToLogin}
             style={({ pressed }) => ({
@@ -544,13 +540,13 @@ export default function Onboarding3Screen() {
                 lineHeight: 24,
                 letterSpacing: 0.3,
               }}>
-              Login  →
+              {t('login')}
             </Text>
           </Pressable>
 
           {/* Secondary: Back */}
           <Pressable
-            accessibilityLabel="Back to previous onboarding step"
+            accessibilityLabel={t('goBackToPreviousStep')}
             accessibilityRole="button"
             onPress={handleBack}
             style={({ pressed }) => ({
@@ -570,7 +566,7 @@ export default function Onboarding3Screen() {
                 color: C.primary,
                 lineHeight: 22,
               }}>
-              Back
+              {t('back')}
             </Text>
           </Pressable>
         </Animated.View>

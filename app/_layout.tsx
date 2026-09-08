@@ -10,8 +10,18 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import '../global.css';
 import 'react-native-reanimated';
+import * as Notifications from 'expo-notifications';
 
 import { ThemeProvider } from '@/context/ThemeContext';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowBanner: true,
+    shouldShowList: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 export const unstable_settings = {
   anchor: 'splash',
@@ -41,6 +51,11 @@ export default function RootLayout() {
           <Stack.Screen name="(auth)" />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen name="profile" />
+          <Stack.Screen name="notifications" />
+          <Stack.Screen name="settings/account" />
+          <Stack.Screen name="settings/privacy" />
+          <Stack.Screen name="settings/about" />
+          <Stack.Screen name="daily-challenge" />
         </Stack>
         <StatusBar style="auto" />
       </>

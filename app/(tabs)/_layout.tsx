@@ -326,6 +326,14 @@ export default function TabsLayout() {
         />
 
         <Tabs.Screen
+          name="notification-settings"
+          options={{
+            title: 'Notification Settings',
+            href: null,
+          }}
+        />
+
+        <Tabs.Screen
           name="profile"
           options={{
             title: 'Profile',
