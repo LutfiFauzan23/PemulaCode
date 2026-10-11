@@ -22,8 +22,6 @@ import { typography } from '@/constants/typography';
 import { useTheme } from '@/context/ThemeContext';
 import { useTranslation } from '@/translations';
 
-import { SafeAreaView } from 'react-native-safe-area-context';
-
 export const TAB_BAR_CLEARANCE = 100;
 
 // ======================================================
@@ -272,10 +270,12 @@ function TabButton({
 // ======================================================
 
 export default function TabsLayout() {
-  const { colors: themeColors, mode } = useTheme();
+  const { colors: themeColors } = useTheme();
   return (
-    <SafeAreaView
-      edges={['top']}
+    // Inset status bar ditangani `ScreenContainer` di masing-masing layar, jadi
+    // di sini cukup View. Sebelumnya ada SafeAreaView tambahan yang membuat
+    // padding atas terhitung dua kali.
+    <View
       style={{
         flex: 1,
         backgroundColor: themeColors.background,
@@ -373,7 +373,7 @@ export default function TabsLayout() {
           }}
         />
       </Tabs>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -397,6 +397,8 @@ const styles = StyleSheet.create({
   },
 
 
+  // Warna latar & border navbar di-set runtime dari tema (lihat CustomTabBar),
+  // jadi tidak didefinisikan ulang di sini.
   navbar: {
     height: 68,
 
@@ -406,13 +408,9 @@ const styles = StyleSheet.create({
 
     paddingHorizontal: 4,
 
-    backgroundColor: '#FFFFFF',
-
     borderRadius: 22,
 
     borderWidth: 1,
-
-    borderColor: '#E5E7EB',
 
     elevation: 8,
 
@@ -460,9 +458,6 @@ const styles = StyleSheet.create({
 
 
   activeTab: {
-    backgroundColor:
-      colors.light.primaryFixed,
-
     paddingHorizontal: 11,
 
     borderRadius: 17,
@@ -473,9 +468,9 @@ const styles = StyleSheet.create({
     fontFamily:
       typography.family.sansBold,
 
-    fontSize: 9.5,
+    fontSize: 10.5,
 
-    lineHeight: 13,
+    lineHeight: 14,
 
     textAlign: 'center',
   },

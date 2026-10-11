@@ -9,7 +9,7 @@ import {
   Sparkles,
   Trophy,
 } from 'lucide-react-native';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Alert, Pressable, ScrollView, View } from 'react-native';
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
@@ -23,6 +23,8 @@ import { useTranslation } from '@/translations';
 import cssQuizData from '@/data/quizzes/css.json';
 import htmlQuizData from '@/data/quizzes/html.json';
 import jsQuizData from '@/data/quizzes/javascript.json';
+import { useStreak } from '@/hooks/use-streak';
+import { recordActivity as syncActivityToServer } from '@/services/progressService';
 import { useProgressStore } from '@/stores/progress-store';
 
 type QuestionItem = {
@@ -43,6 +45,17 @@ type QuizData = {
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D', 'E'];
 
+/** Layar cadangan saat paket soal tidak ditemukan — dipakai dua guard. */
+function QuizNotFound() {
+  const { colors: c } = useTheme();
+  const { t } = useTranslation();
+  return (
+    <ScreenContainer style={{ backgroundColor: c.background }}>
+      <AppText color={c.text}>{t('quizNotFound')}</AppText>
+    </ScreenContainer>
+  );
+}
+
 export default function QuizScreen() {
   const router = useRouter();
   const { colors: c, mode } = useTheme();
@@ -53,6 +66,8 @@ export default function QuizScreen() {
   }>();
 
   const completeQuiz = useProgressStore((state) => state.completeQuiz);
+  // Streak per akun: +1 untuk hari ini saat kuis diselesaikan.
+  const { recordActivity } = useStreak();
 
   // Normalize courseId and moduleId
   const normalizedCourseId = (courseId || 'html').toLowerCase();
@@ -113,24 +128,24 @@ export default function QuizScreen() {
   const [finalScore, setFinalScore] = useState(0);
   const [earnedXP, setEarnedXP] = useState(0);
 
-  // Initialize answers array when quiz data loads
-  useEffect(() => {
-    if (quizData) {
-      setUserAnswers(new Array(quizData.questions.length).fill(null));
-      setCurrentQuestionIndex(0);
-      setCurrentSelection(null);
-      setIsSubmitted(false);
-      setFinalScore(0);
-      setEarnedXP(0);
-    }
-  }, [quizData]);
+  // Reset jawaban setiap kali paket soal berganti. Dilakukan saat render
+  // (pola resmi React "menyesuaikan state ketika data berubah") sehingga tidak
+  // memicu render berantai seperti `setState` di dalam `useEffect`.
+  const [loadedQuizKey, setLoadedQuizKey] = useState<string | null>(null);
+  const quizKey = quizData ? `${quizData.courseId}:${quizData.moduleId}` : null;
+
+  if (quizKey !== loadedQuizKey) {
+    setLoadedQuizKey(quizKey);
+    setUserAnswers(quizData ? new Array(quizData.questions.length).fill(null) : []);
+    setCurrentQuestionIndex(0);
+    setCurrentSelection(null);
+    setIsSubmitted(false);
+    setFinalScore(0);
+    setEarnedXP(0);
+  }
 
   if (!quizData) {
-    return (
-      <ScreenContainer style={{ backgroundColor: c.background }}>
-        <AppText color={c.text}>Quiz content not found.</AppText>
-      </ScreenContainer>
-    );
+    return <QuizNotFound />;
   }
 
   const currentQuestion = quizData.questions[currentQuestionIndex];
@@ -173,6 +188,10 @@ export default function QuizScreen() {
 
       // Persist progress to store
       completeQuiz(normalizedCourseId, resolvedQuizKey);
+      // Selesaikan soal hari ini → streak hari ini bertambah, lalu XP
+      // disimpan ke server supaya leaderboard memakai data asli.
+      const streakCount = recordActivity();
+      void syncActivityToServer(xpGained, streakCount);
     }
   };
 
@@ -192,25 +211,17 @@ export default function QuizScreen() {
     }
 
     if (currentQuestionIndex > 0) {
-      Alert.alert(
-        'Keluar dari Kuis?',
-        'Progres kuis saat ini akan hilang jika kamu keluar sekarang.',
-        [
-          { text: 'Batal', style: 'cancel' },
-          { text: 'Keluar', style: 'destructive', onPress: () => router.back() },
-        ],
-      );
+      Alert.alert(t('exitQuiz'), t('exitQuizMessage'), [
+        { text: t('cancel'), style: 'cancel' },
+        { text: t('exit'), style: 'destructive', onPress: () => router.back() },
+      ]);
     } else {
       router.back();
     }
   };
 
   if (!quizData || !currentQuestion) {
-    return (
-      <ScreenContainer style={{ backgroundColor: c.background }}>
-        <AppText color={c.text}>Quiz content not found.</AppText>
-      </ScreenContainer>
-    );
+    return <QuizNotFound />;
   }
 
   // ════════════════════════════════════════════════════
@@ -260,7 +271,7 @@ export default function QuizScreen() {
               fontSize: 18,
               marginLeft: spacing[4],
             }}>
-            Hasil Kuis
+            {t('quizResults')}
           </AppText>
         </View>
 
@@ -337,9 +348,7 @@ export default function QuizScreen() {
                 marginTop: spacing[2],
                 textAlign: 'center',
               }}>
-              {isPassed
-                ? 'Selamat! Kamu berhasil menyelesaikan kuis ini dan membuka modul berikutnya.'
-                : 'Jangan berkecil hati. Pelajari kembali materinya dan coba kuis ini sekali lagi.'}
+              {isPassed ? t('greatJob') : t('needMore')}
             </AppText>
 
             {/* XP Gained Badge */}
@@ -362,7 +371,7 @@ export default function QuizScreen() {
                     fontFamily: typography.family.sansBold,
                     fontSize: 15,
                   }}>
-                  +{earnedXP} XP Didapatkan!
+                  {t('xpEarned', { xp: earnedXP })}
                 </AppText>
               </View>
             )}
@@ -389,7 +398,7 @@ export default function QuizScreen() {
                     fontFamily: typography.family.sansBold,
                     fontSize: 16,
                   }}>
-                  Lanjutkan
+                  {t('continue')}
                 </AppText>
                 <ChevronRight color="#ffffff" size={20} />
               </Pressable>
@@ -516,7 +525,10 @@ export default function QuizScreen() {
               fontFamily: typography.family.mono,
               fontSize: 13,
             }}>
-            Soal {currentQuestionIndex + 1} dari {totalQuestions}
+            {t('questionIndicator', {
+              current: currentQuestionIndex + 1,
+              total: totalQuestions,
+            })}
           </AppText>
           <AppText
             color={theme.accent}
@@ -579,7 +591,7 @@ export default function QuizScreen() {
               fontWeight: 'bold',
               marginBottom: spacing[2],
             }}>
-            PERTANYAAN {currentQuestionIndex + 1}
+            {t('question').toUpperCase()} {currentQuestionIndex + 1}
           </AppText>
 
           <AppText

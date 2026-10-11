@@ -4,10 +4,12 @@ import {
   Bell,
   Brain,
   Database,
+  ImagePlus,
   MessageSquare,
   MoreHorizontal,
   Palette,
   Pencil,
+  Reply,
   Search,
   Share2,
   Terminal,
@@ -17,21 +19,39 @@ import {
 
 import React, { useState } from 'react';
 import {
+  Alert,
   Image,
   Modal,
   Pressable,
   ScrollView,
+  Share,
   TextInput,
   View,
 } from 'react-native';
 
+import { CommunityMediaView } from '@/components/community/CommunityMediaView';
+import { MessageComposer, type PendingMedia } from '@/components/community/MessageComposer';
+import { PendingMediaPreview } from '@/components/community/PendingMediaPreview';
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
 import { useTheme } from '@/context/ThemeContext';
+import { useCommunityPosts } from '@/hooks/use-community-posts';
+import { useMediaPicker } from '@/hooks/use-media-picker';
+import {
+  createComment,
+  createPost,
+  setPostLike,
+  uploadCommunityMedia,
+} from '@/services/communityService';
+import { useAuthStore } from '@/stores/auth-store';
 import { useTranslation } from '@/translations';
+import type { CommunityMedia } from '@/types/community';
+import { relativeTime } from '@/utils/relative-time';
+
+import { TAB_BAR_CLEARANCE } from './_layout';
 
 interface PostData {
   accentColor: string;
@@ -45,10 +65,22 @@ interface PostData {
   initialLikes: number;
 
   liked?: boolean;
+  media?: CommunityMedia | null;
   time: string;
   title: string;
   username: string;
 }
+
+const FALLBACK_AVATAR =
+  'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
+
+/** Topik populer di strip chip; satu-satunya sumber kebenaran untuk chip topik. */
+const TRENDING_TOPICS = [
+  { icon: Terminal, label: '#ReactJS', value: 'ReactJS' },
+  { icon: Palette, label: '#TailwindCSS', value: 'TailwindCSS' },
+  { icon: Database, label: '#SQL_Hacks', value: 'SQL_Hacks' },
+  { icon: Brain, label: '#LogicHelp', value: 'LogicHelp' },
+] as const;
 
 const INITIAL_POSTS: PostData[] = [
   {
@@ -109,35 +141,182 @@ export default function CommunityScreen() {
   const [activeTopic, setActiveTopic] = useState('ReactJS');
 
   // Interactive state for likes
-  const [likedPosts, setLikedPosts] = useState<Record<string, boolean>>({});
-  const [likeCounts, setLikeCounts] = useState<Record<string, number>>({
-    'post-1': 124,
-    'post-2': 890,
-    'post-3': 2100,
-  });
+  const authUser = useAuthStore((state) => state.user);
+  const {
+    isConfigured,
+    isLoading: isFeedLoading,
+    isLive,
+    posts: serverPosts,
+    reload: reloadPosts,
+  } = useCommunityPosts();
+
+  // Perubahan like optimistis di atas nilai dari server.
+  const [likeOverrides, setLikeOverrides] = useState<
+    Record<string, { delta: number; liked: boolean }>
+  >({});
 
   // Modals state
-  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+  const [, setSelectedPostId] = useState<string | null>(null);
   const [isOptionsModalOpen, setIsOptionsModalOpen] = useState(false);
   const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
   const [newPostTitle, setNewPostTitle] = useState('');
   const [newPostContent, setNewPostContent] = useState('');
+  // Lampiran foto/video untuk form post panjang.
+  const createMedia = useMediaPicker();
 
-  const toggleLike = (postId: string) => {
-    setLikedPosts((prev) => {
-      const isCurrentlyLiked = !!prev[postId];
-      const newLikedState = !isCurrentlyLiked;
+  // Pesan yang sedang dibalas (null = tidak ada).
+  const [replyingTo, setReplyingTo] = useState<PostData | null>(null);
+  const [isSendingReply, setIsSendingReply] = useState(false);
 
-      setLikeCounts((countPrev) => ({
-        ...countPrev,
-        [postId]: (countPrev[postId] || 0) + (newLikedState ? 1 : -1),
-      }));
+  // Saat Supabase belum dikonfigurasi, tampilkan data demo.
+  const allPosts: PostData[] = React.useMemo(() => {
+    if (!isConfigured) return INITIAL_POSTS;
 
-      return {
-        ...prev,
-        [postId]: newLikedState,
-      };
+    return serverPosts.map((post) => ({
+      accentColor: post.accentColor,
+      avatar: post.author.avatarUrl ?? FALLBACK_AVATAR,
+      category: post.category,
+      code: post.code ?? undefined,
+      content: post.content ?? undefined,
+      id: post.id,
+      initialComments: post.commentsCount,
+      initialLikes: post.likesCount,
+      liked: post.likedByMe,
+      media: post.media,
+      time: relativeTime(post.createdAt),
+      title: post.title,
+      username: post.author.username,
+    }));
+  }, [isConfigured, serverPosts]);
+
+  // Kolom pencarian benar-benar menyaring feed: judul, isi, penulis, topik.
+  const feedPosts = React.useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return allPosts;
+    return allPosts.filter((post) =>
+      [post.title, post.content ?? '', post.username, post.category].some((field) =>
+        field.toLowerCase().includes(query),
+      ),
+    );
+  }, [allPosts, searchQuery]);
+
+  const toggleLike = (post: PostData) => {
+    const override = likeOverrides[post.id];
+    const currentlyLiked = override ? override.liked : !!post.liked;
+    const nextLiked = !currentlyLiked;
+
+    setLikeOverrides((prev) => ({
+      ...prev,
+      [post.id]: { delta: nextLiked ? 1 : -1, liked: nextLiked },
+    }));
+
+    if (isConfigured && authUser) {
+      void setPostLike(post.id, authUser.id, nextLiked);
+    }
+  };
+
+  /**
+   * Pastikan user siap menulis. Mengembalikan `false` sekaligus menampilkan
+   * alasan bila belum login atau Supabase belum dikonfigurasi.
+   */
+  const ensureCanWrite = (action: string): boolean => {
+    if (!isConfigured) {
+      Alert.alert(
+        'Supabase belum dikonfigurasi',
+        'Isi .env.local dengan URL dan key Supabase lalu restart Expo. Lihat supabase/README.md.'
+      );
+      return false;
+    }
+    if (!authUser) {
+      Alert.alert('Login dulu', `Kamu harus login untuk ${action}.`, [
+        { text: 'Batal', style: 'cancel' },
+        { text: 'Login', onPress: () => router.push('/(auth)/login') },
+      ]);
+      return false;
+    }
+    return true;
+  };
+
+  /** Unggah lampiran (bila ada) dan kembalikan media yang siap disimpan. */
+  const uploadMediaIfAny = async (
+    media: PendingMedia | null
+  ): Promise<{ error: string | null; media: CommunityMedia | null }> => {
+    if (!media) return { error: null, media: null };
+    if (!authUser) return { error: 'Login dulu untuk mengirim media.', media: null };
+
+    const { data, error } = await uploadCommunityMedia({
+      fileName: media.fileName,
+      sizeBytes: media.sizeBytes,
+      type: media.type,
+      uri: media.uri,
+      userId: authUser.id,
     });
+
+    if (error) return { error, media: null };
+    return { error: null, media: { type: media.type, url: data } };
+  };
+
+  const handlePublish = async () => {
+    const title = newPostTitle.trim();
+    if (!title) {
+      Alert.alert('Perhatian', 'Judul post tidak boleh kosong.');
+      return;
+    }
+    if (!ensureCanWrite('membuat post') || !authUser) return;
+
+    const uploaded = await uploadMediaIfAny(createMedia.media);
+    if (uploaded.error) {
+      Alert.alert('Gagal mengunggah media', uploaded.error);
+      return;
+    }
+
+    const { error } = await createPost(
+      { category: activeTopic, content: newPostContent, media: uploaded.media, title },
+      authUser.id
+    );
+
+    if (error) {
+      Alert.alert('Gagal mempublikasikan', error);
+      return;
+    }
+
+    setIsCreatePostModalOpen(false);
+    setNewPostTitle('');
+    setNewPostContent('');
+    createMedia.clear();
+    void reloadPosts();
+  };
+
+  /** Balas sebuah pesan (tersimpan sebagai komentar yang terlihat semua orang). */
+  const handleSendReply = async (
+    text: string,
+    pending: PendingMedia | null
+  ): Promise<boolean> => {
+    if (!replyingTo) return false;
+    if (!ensureCanWrite('membalas pesan') || !authUser) return false;
+
+    setIsSendingReply(true);
+    const uploaded = await uploadMediaIfAny(pending);
+    if (uploaded.error) {
+      setIsSendingReply(false);
+      Alert.alert('Gagal mengunggah media', uploaded.error);
+      return false;
+    }
+
+    const { error } = await createComment(replyingTo.id, authUser.id, {
+      content: text || 'Mengirim lampiran',
+      media: uploaded.media,
+    });
+    setIsSendingReply(false);
+
+    if (error) {
+      Alert.alert('Gagal mengirim balasan', error);
+      return false;
+    }
+
+    setReplyingTo(null);
+    void reloadPosts();
+    return true;
   };
 
   const handleOpenOptions = (postId: string) => {
@@ -152,6 +331,15 @@ export default function CommunityScreen() {
     return count.toString();
   };
 
+  /** Bagikan judul post lewat share sheet bawaan sistem. */
+  const handleSharePost = async (title: string) => {
+    try {
+      await Share.share({ message: title });
+    } catch {
+      // Pengguna menutup share sheet / platform tanpa share — tidak perlu aksi.
+    }
+  };
+
   return (
     <ScreenContainer padded={false} style={{ backgroundColor: c.background }}>
       <StatusBar style={mode === 'dark' ? 'light' : 'dark'} />
@@ -160,7 +348,7 @@ export default function CommunityScreen() {
         <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={{
-            paddingBottom: 140,
+            paddingBottom: TAB_BAR_CLEARANCE,
           }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={true}>
@@ -223,7 +411,7 @@ export default function CommunityScreen() {
                   justifyContent: 'center',
                   width: 40,
                 })}>
-                <Bell color={c.primary} size={20} />
+                <Bell color={c.text} size={20} />
               </Pressable>
             </View>
 
@@ -271,9 +459,6 @@ export default function CommunityScreen() {
             <View style={{ marginTop: spacing[5] }}>
               <View
                 style={{
-                  alignItems: 'center',
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
                   marginBottom: spacing[3],
                   paddingHorizontal: spacing[5],
                 }}>
@@ -286,16 +471,6 @@ export default function CommunityScreen() {
                   }}>
                   {t('trendingTopics')}
                 </AppText>
-                <Pressable hitSlop={8} onPress={() => {}}>
-                  <AppText
-                    color={c.primary}
-                    style={{
-                      fontFamily: typography.family.sansBold,
-                      fontSize: 14,
-                    }}>
-                    {t('seeAll')}
-                  </AppText>
-                </Pressable>
               </View>
 
               {/* Topic Chips Horizontal Scroll */}
@@ -303,185 +478,44 @@ export default function CommunityScreen() {
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={{ gap: spacing[3], paddingHorizontal: spacing[5] }}>
-                {/* 1. #ReactJS */}
-                <Pressable
-                  accessibilityLabel="#ReactJS Topic"
-                  accessibilityRole="button"
-                  onPress={() => setActiveTopic('ReactJS')}
-                  style={({ pressed }) => ({
-                    alignItems: 'center',
-                    backgroundColor:
-                      activeTopic === 'ReactJS'
-                        ? c.primary
-                        : c.surfaceContainerLow,
-                    borderColor:
-                      activeTopic === 'ReactJS'
-                        ? c.primary
-                        : c.outlineVariant,
-                    borderRadius: radius.full,
-                    borderWidth: 1,
-                    flexDirection: 'row',
-                    gap: spacing[2],
-                    paddingHorizontal: spacing[4],
-                    paddingVertical: spacing[2],
-                    opacity: pressed ? 0.85 : 1,
-                  })}>
-                  <Terminal
-                    color={
-                      activeTopic === 'ReactJS' ? '#ffffff' : c.onSurfaceVariant
-                    }
-                    size={16}
-                  />
-                  <AppText
-                    color={
-                      activeTopic === 'ReactJS' ? '#ffffff' : c.onSurfaceVariant
-                    }
-                    style={{
-                      fontFamily: typography.family.mono,
-                      fontSize: 13,
-                      fontWeight: activeTopic === 'ReactJS' ? 'bold' : '500',
-                    }}>
-                    #ReactJS
-                  </AppText>
-                </Pressable>
-
-                {/* 2. #TailwindCSS */}
-                <Pressable
-                  accessibilityLabel="#TailwindCSS Topic"
-                  accessibilityRole="button"
-                  onPress={() => setActiveTopic('TailwindCSS')}
-                  style={({ pressed }) => ({
-                    alignItems: 'center',
-                    backgroundColor:
-                      activeTopic === 'TailwindCSS'
-                        ? c.primary
-                        : c.surfaceContainerLow,
-                    borderColor:
-                      activeTopic === 'TailwindCSS'
-                        ? c.primary
-                        : c.outlineVariant,
-                    borderRadius: radius.full,
-                    borderWidth: 1,
-                    flexDirection: 'row',
-                    gap: spacing[2],
-                    paddingHorizontal: spacing[4],
-                    paddingVertical: spacing[2],
-                    opacity: pressed ? 0.85 : 1,
-                  })}>
-                  <Palette
-                    color={
-                      activeTopic === 'TailwindCSS'
-                        ? '#ffffff'
-                        : c.onSurfaceVariant
-                    }
-                    size={16}
-                  />
-                  <AppText
-                    color={
-                      activeTopic === 'TailwindCSS'
-                        ? '#ffffff'
-                        : c.onSurfaceVariant
-                    }
-                    style={{
-                      fontFamily: typography.family.mono,
-                      fontSize: 13,
-                      fontWeight: activeTopic === 'TailwindCSS' ? 'bold' : '500',
-                    }}>
-                    #TailwindCSS
-                  </AppText>
-                </Pressable>
-
-                {/* 3. #SQL_Hacks */}
-                <Pressable
-                  accessibilityLabel="#SQL_Hacks Topic"
-                  accessibilityRole="button"
-                  onPress={() => setActiveTopic('SQL_Hacks')}
-                  style={({ pressed }) => ({
-                    alignItems: 'center',
-                    backgroundColor:
-                      activeTopic === 'SQL_Hacks'
-                        ? c.primary
-                        : c.surfaceContainerLow,
-                    borderColor:
-                      activeTopic === 'SQL_Hacks'
-                        ? c.primary
-                        : c.outlineVariant,
-                    borderRadius: radius.full,
-                    borderWidth: 1,
-                    flexDirection: 'row',
-                    gap: spacing[2],
-                    paddingHorizontal: spacing[4],
-                    paddingVertical: spacing[2],
-                    opacity: pressed ? 0.85 : 1,
-                  })}>
-                  <Database
-                    color={
-                      activeTopic === 'SQL_Hacks'
-                        ? '#ffffff'
-                        : c.onSurfaceVariant
-                    }
-                    size={16}
-                  />
-                  <AppText
-                    color={
-                      activeTopic === 'SQL_Hacks'
-                        ? '#ffffff'
-                        : c.onSurfaceVariant
-                    }
-                    style={{
-                      fontFamily: typography.family.mono,
-                      fontSize: 13,
-                      fontWeight: activeTopic === 'SQL_Hacks' ? 'bold' : '500',
-                    }}>
-                    #SQL_Hacks
-                  </AppText>
-                </Pressable>
-
-                {/* 4. #LogicHelp */}
-                <Pressable
-                  accessibilityLabel="#LogicHelp Topic"
-                  accessibilityRole="button"
-                  onPress={() => setActiveTopic('LogicHelp')}
-                  style={({ pressed }) => ({
-                    alignItems: 'center',
-                    backgroundColor:
-                      activeTopic === 'LogicHelp'
-                        ? c.primary
-                        : c.surfaceContainerLow,
-                    borderColor:
-                      activeTopic === 'LogicHelp'
-                        ? c.primary
-                        : c.outlineVariant,
-                    borderRadius: radius.full,
-                    borderWidth: 1,
-                    flexDirection: 'row',
-                    gap: spacing[2],
-                    paddingHorizontal: spacing[4],
-                    paddingVertical: spacing[2],
-                    opacity: pressed ? 0.85 : 1,
-                  })}>
-                  <Brain
-                    color={
-                      activeTopic === 'LogicHelp'
-                        ? '#ffffff'
-                        : c.onSurfaceVariant
-                    }
-                    size={16}
-                  />
-                  <AppText
-                    color={
-                      activeTopic === 'LogicHelp'
-                        ? '#ffffff'
-                        : c.onSurfaceVariant
-                    }
-                    style={{
-                      fontFamily: typography.family.mono,
-                      fontSize: 13,
-                      fontWeight: activeTopic === 'LogicHelp' ? 'bold' : '500',
-                    }}>
-                    #LogicHelp
-                  </AppText>
-                </Pressable>
+                {TRENDING_TOPICS.map((topic) => {
+                  const isActive = activeTopic === topic.value;
+                  return (
+                    <Pressable
+                      key={topic.value}
+                      accessibilityLabel={`${topic.label} Topic`}
+                      accessibilityRole="button"
+                      onPress={() => setActiveTopic(topic.value)}
+                      style={({ pressed }) => ({
+                        alignItems: 'center',
+                        backgroundColor: isActive
+                          ? c.primary
+                          : c.surfaceContainerLow,
+                        borderColor: isActive ? c.primary : c.outlineVariant,
+                        borderRadius: radius.full,
+                        borderWidth: 1,
+                        flexDirection: 'row',
+                        gap: spacing[2],
+                        opacity: pressed ? 0.85 : 1,
+                        paddingHorizontal: spacing[4],
+                        paddingVertical: spacing[2],
+                      })}>
+                      <topic.icon
+                        color={isActive ? '#ffffff' : c.onSurfaceVariant}
+                        size={16}
+                      />
+                      <AppText
+                        color={isActive ? '#ffffff' : c.onSurfaceVariant}
+                        style={{
+                          fontFamily: typography.family.mono,
+                          fontSize: 13,
+                          fontWeight: isActive ? 'bold' : '500',
+                        }}>
+                        {topic.label}
+                      </AppText>
+                    </Pressable>
+                  );
+                })}
               </ScrollView>
             </View>
 
@@ -492,9 +526,67 @@ export default function CommunityScreen() {
                 marginTop: spacing[5],
                 paddingHorizontal: spacing[5],
               }}>
-              {INITIAL_POSTS.map((post) => {
-                const isLiked = !!likedPosts[post.id];
-                const currentLikes = likeCounts[post.id] ?? post.initialLikes;
+              {/* Status koneksi realtime */}
+              <View
+                style={{
+                  alignItems: 'center',
+                  flexDirection: 'row',
+                  gap: spacing[2],
+                }}>
+                <View
+                  style={{
+                    backgroundColor: !isConfigured
+                      ? c.outline
+                      : isLive
+                        ? '#16a34a'
+                        : '#f59e0b',
+                    borderRadius: radius.full,
+                    height: 8,
+                    width: 8,
+                  }}
+                />
+                <AppText
+                  color={c.onSurfaceVariant}
+                  style={{ fontFamily: typography.family.mono, fontSize: 12 }}>
+                  {!isConfigured
+                    ? 'Mode demo - Supabase belum dikonfigurasi'
+                    : isFeedLoading
+                      ? 'Memuat feed...'
+                      : isLive
+                        ? 'Realtime aktif'
+                        : 'Menghubungkan...'}
+                </AppText>
+              </View>
+
+              {/* Tidak ada hasil untuk kata kunci pencarian */}
+              {feedPosts.length === 0 ? (
+                <View
+                  style={{
+                    alignItems: 'center',
+                    backgroundColor: c.surfaceContainerLowest,
+                    borderColor: c.outlineVariant,
+                    borderRadius: radius.xl,
+                    borderWidth: 1,
+                    padding: spacing[6],
+                  }}>
+                  <Search color={c.outline} size={28} />
+                  <AppText
+                    color={c.onSurfaceVariant}
+                    style={{
+                      fontSize: 14,
+                      lineHeight: 20,
+                      marginTop: spacing[3],
+                      textAlign: 'center',
+                    }}>
+                    {t('noMatchingDiscussions')}
+                  </AppText>
+                </View>
+              ) : null}
+
+              {feedPosts.map((post) => {
+                const override = likeOverrides[post.id];
+                const isLiked = override ? override.liked : !!post.liked;
+                const currentLikes = post.initialLikes + (override?.delta ?? 0);
 
                 return (
                   <Pressable
@@ -590,6 +682,9 @@ export default function CommunityScreen() {
                       </AppText>
                     ) : null}
 
+                    {/* Foto / video lampiran */}
+                    {post.media ? <CommunityMediaView media={post.media} /> : null}
+
                     {/* Post Code Block */}
                     {post.code ? (
                       <View
@@ -634,7 +729,7 @@ export default function CommunityScreen() {
                           accessibilityLabel="Like post"
                           accessibilityRole="button"
                           hitSlop={8}
-                          onPress={() => toggleLike(post.id)}
+                          onPress={() => toggleLike(post)}
                           style={{
                             alignItems: 'center',
                             flexDirection: 'row',
@@ -664,12 +759,34 @@ export default function CommunityScreen() {
                           </AppText>
                         </Pressable>
 
+                        {/* Reply Button → membalas pesan ini tanpa keluar dari feed */}
+                        <Pressable
+                          accessibilityLabel={t('reply')}
+                          accessibilityRole="button"
+                          hitSlop={8}
+                          onPress={() => setReplyingTo(post)}
+                          style={{
+                            alignItems: 'center',
+                            flexDirection: 'row',
+                            gap: spacing[1],
+                          }}>
+                          <Reply color={c.outline} size={18} />
+                          <AppText
+                            color={c.onSurfaceVariant}
+                            style={{
+                              fontFamily: typography.family.mono,
+                              fontSize: 13,
+                            }}>
+                            {t('reply')}
+                          </AppText>
+                        </Pressable>
+
                         {/* Comment Button */}
                         <Pressable
                           accessibilityLabel="Comment on post"
                           accessibilityRole="button"
                           hitSlop={8}
-                          onPress={() => {}}
+                          onPress={() => router.push(`/community/${post.id}` as never)}
                           style={{
                             alignItems: 'center',
                             flexDirection: 'row',
@@ -686,48 +803,15 @@ export default function CommunityScreen() {
                           </AppText>
                         </Pressable>
 
-                        {/* Share Button (Post 1) */}
-                        {post.id === 'post-1' ? (
-                          <Pressable
-                            accessibilityLabel="Share post"
-                            accessibilityRole="button"
-                            hitSlop={8}
-                            onPress={() => {}}>
-                            <Share2 color={c.outline} size={18} />
-                          </Pressable>
-                        ) : null}
+                        {/* Share Button */}
+                        <Pressable
+                          accessibilityLabel="Share post"
+                          accessibilityRole="button"
+                          hitSlop={8}
+                          onPress={() => void handleSharePost(post.title)}>
+                          <Share2 color={c.outline} size={18} />
+                        </Pressable>
                       </View>
-
-                      {/* Overlapping Avatar Group for Post 2 */}
-                      {post.id === 'post-2' ? (
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <Image
-                            source={{
-                              uri: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100',
-                            }}
-                            style={{
-                              borderColor: c.surfaceContainerLowest,
-                              borderRadius: radius.full,
-                              borderWidth: 2,
-                              height: 24,
-                              width: 24,
-                            }}
-                          />
-                          <Image
-                            source={{
-                              uri: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100',
-                            }}
-                            style={{
-                              borderColor: c.surfaceContainerLowest,
-                              borderRadius: radius.full,
-                              borderWidth: 2,
-                              height: 24,
-                              marginLeft: -8,
-                              width: 24,
-                            }}
-                          />
-                        </View>
-                      ) : null}
                     </View>
                   </Pressable>
                 );
@@ -746,7 +830,9 @@ export default function CommunityScreen() {
                 ? c.primaryPressed
                 : c.primary,
               borderRadius: radius.xl,
-              bottom: 24,
+              // 12 (offset navbar) + 68 (tinggi navbar) + 12 (jarak) —
+              // melayang tepat di atas tab bar.
+              bottom: 92,
               elevation: 8,
               height: 56,
               justifyContent: 'center',
@@ -900,12 +986,32 @@ export default function CommunityScreen() {
               value={newPostContent}
             />
 
+            {createMedia.media ? (
+              <PendingMediaPreview media={createMedia.media} onRemove={createMedia.clear} />
+            ) : null}
+
             <Pressable
-              onPress={() => {
-                setIsCreatePostModalOpen(false);
-                setNewPostTitle('');
-                setNewPostContent('');
-              }}
+              accessibilityLabel="Lampirkan foto atau video"
+              accessibilityRole="button"
+              onPress={createMedia.choose}
+              style={{
+                alignItems: 'center',
+                borderColor: c.outlineVariant,
+                borderRadius: radius.lg,
+                borderWidth: 1,
+                flexDirection: 'row',
+                gap: spacing[2],
+                justifyContent: 'center',
+                paddingVertical: spacing[3],
+              }}>
+              <ImagePlus color={c.primary} size={18} />
+              <AppText color={c.primary} style={{ fontSize: 15, fontWeight: '600' }}>
+                {t('addMedia')}
+              </AppText>
+            </Pressable>
+
+            <Pressable
+              onPress={handlePublish}
               style={{
                 backgroundColor: c.primary,
                 borderRadius: radius.xl,
@@ -916,6 +1022,65 @@ export default function CommunityScreen() {
                 {t('publish')}
               </AppText>
             </Pressable>
+          </View>
+        </View>
+      </Modal>
+
+      {/* REPLY MODAL: balas pesan dari feed, bisa sekalian lampirkan media */}
+      <Modal
+        animationType="slide"
+        transparent
+        visible={replyingTo !== null}
+        onRequestClose={() => setReplyingTo(null)}>
+        <View
+          style={{
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            flex: 1,
+            justifyContent: 'flex-end',
+          }}>
+          <View
+            style={{
+              backgroundColor: c.surfaceContainerLowest,
+              borderTopLeftRadius: radius['2xl'],
+              borderTopRightRadius: radius['2xl'],
+              gap: spacing[4],
+              padding: spacing[6],
+            }}>
+            <View
+              style={{
+                alignItems: 'center',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+              }}>
+              <AppText
+                color={c.text}
+                style={{ fontFamily: typography.family.sansBold, fontSize: 20 }}>
+                {t('replyMessage')}
+              </AppText>
+              <Pressable accessibilityLabel="Tutup" hitSlop={8} onPress={() => setReplyingTo(null)}>
+                <X color={c.outline} size={22} />
+              </Pressable>
+            </View>
+
+            {replyingTo ? (
+              <View
+                style={{
+                  backgroundColor: c.surfaceContainerLow,
+                  borderRadius: radius.lg,
+                  padding: spacing[4],
+                }}>
+                <AppText color={c.onSurfaceVariant} numberOfLines={2} style={{ fontSize: 13 }}>
+                  {replyingTo.content?.trim() || replyingTo.title}
+                </AppText>
+              </View>
+            ) : null}
+
+            <MessageComposer
+              isSending={isSendingReply}
+              onSend={handleSendReply}
+              placeholder={t('writeMessage')}
+              replyToLabel={replyingTo ? `Membalas @${replyingTo.username}` : null}
+            />
           </View>
         </View>
       </Modal>

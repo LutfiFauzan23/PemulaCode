@@ -1,10 +1,11 @@
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Contact, Lock, Mail, RotateCcw, Smile } from 'lucide-react-native';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { Animated, KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native';
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
+import { AppAlert, type AppAlertVariant } from '@/components/ui/AppAlert';
 import { AppInput } from '@/components/ui/AppInput';
 import { AppText } from '@/components/ui/AppText';
 import { PasswordInput } from '@/components/ui/PasswordInput';
@@ -12,6 +13,7 @@ import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useAuthStore } from '@/stores/auth-store';
 
 // ======================================================
 // DUO-STYLE 3D PRESS BUTTON
@@ -32,7 +34,7 @@ function DuoButton({
   textColor?: string;
   title: string;
 }) {
-  const translateY = useRef(new Animated.Value(0)).current;
+  const [translateY] = useState(() => new Animated.Value(0));
 
   const pressIn = () => {
     Animated.timing(translateY, { duration: 80, toValue: 4, useNativeDriver: true }).start();
@@ -162,12 +164,95 @@ export default function RegisterScreen() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(false);
 
-  const handleCreateAccount = () => {
-    // UI only - no backend registration per requirement
+  const signUp = useAuthStore((state) => state.signUp);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [alertState, setAlertState] = useState<{
+    message: string;
+    primaryLabel?: string;
+    primaryOnPress?: () => void;
+    title: string;
+    variant: AppAlertVariant;
+  } | null>(null);
+
+  const closeAlert = () => setAlertState(null);
+
+  const warn = (title: string, message: string) =>
+    setAlertState({ message, title, variant: 'warning' });
+
+  const goToLogin = () => {
+    closeAlert();
+    router.replace('/(auth)/login');
+  };
+
+  const handleCreateAccount = async () => {
+    if (!fullName.trim() || !nickname.trim()) {
+      warn('Data belum lengkap', 'Nama lengkap dan nama panggilan wajib diisi.');
+      return;
+    }
+    if (!email.trim()) {
+      warn('Email belum diisi', 'Masukkan email aktif supaya kamu bisa login nanti.');
+      return;
+    }
+    if (password.length < 8) {
+      warn('Password terlalu pendek', 'Password minimal 8 karakter.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      warn('Konfirmasi tidak cocok', 'Konfirmasi password harus sama dengan password.');
+      return;
+    }
+    if (!agreeTerms) {
+      warn('Syarat & Ketentuan', 'Kamu harus menyetujui Syarat & Ketentuan untuk melanjutkan.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    const { alreadyRegistered, error, needsEmailConfirmation } = await signUp({
+      email,
+      fullName: fullName.trim(),
+      password,
+      username: nickname.trim(),
+    });
+    setIsSubmitting(false);
+
+    // Dicek lebih dulu karena Supabase juga mengembalikan error untuk kasus ini.
+    if (alreadyRegistered) {
+      setAlertState({
+        message:
+          'Email ini sudah dipakai akun lain. Coba masuk dengan akun tersebut, atau daftar memakai email berbeda.',
+        primaryLabel: 'Masuk',
+        primaryOnPress: goToLogin,
+        title: 'Email sudah terdaftar',
+        variant: 'warning',
+      });
+      return;
+    }
+
+    if (error) {
+      setAlertState({ message: error, title: 'Pendaftaran gagal', variant: 'error' });
+      return;
+    }
+
+    if (needsEmailConfirmation) {
+      setAlertState({
+        message: `Kami sudah mengirim tautan konfirmasi ke ${email.trim()}. Buka email itu, konfirmasi, lalu masuk.`,
+        primaryLabel: 'Ke halaman masuk',
+        primaryOnPress: goToLogin,
+        title: 'Cek email kamu',
+        variant: 'success',
+      });
+      return;
+    }
+
+    router.replace('/(tabs)');
   };
 
   return (
-    <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
+    <ScreenContainer
+      padded={false}
+      style={{ backgroundColor: colors.light.background }}
+      topColor={colors.light.primary}>
       <StatusBar style="light" />
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
@@ -308,9 +393,10 @@ export default function RegisterScreen() {
 
                 <DuoButton
                   backgroundColor={colors.light.primary}
+                  disabled={isSubmitting}
                   onPress={handleCreateAccount}
                   shadowColor={colors.light.primaryPressed}
-                  title="Buat Akun"
+                  title={isSubmitting ? 'Memproses...' : 'Buat Akun'}
                 />
               </View>
 
@@ -342,6 +428,19 @@ export default function RegisterScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <AppAlert
+        message={alertState?.message ?? ''}
+        onClose={closeAlert}
+        primaryAction={
+          alertState?.primaryOnPress
+            ? { label: alertState.primaryLabel ?? 'Lanjut', onPress: alertState.primaryOnPress }
+            : { label: 'Mengerti', onPress: closeAlert }
+        }
+        title={alertState?.title ?? ''}
+        variant={alertState?.variant ?? 'info'}
+        visible={alertState !== null}
+      />
     </ScreenContainer>
   );
 }

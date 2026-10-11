@@ -1,9 +1,8 @@
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Lock, Mail } from 'lucide-react-native';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import {
-  Alert,
   Animated,
   KeyboardAvoidingView,
   Platform,
@@ -13,6 +12,7 @@ import {
 } from 'react-native';
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
+import { AppAlert, type AppAlertVariant } from '@/components/ui/AppAlert';
 import { AppInput } from '@/components/ui/AppInput';
 import { AppText } from '@/components/ui/AppText';
 import { GoogleIcon } from '@/components/ui/GoogleIcon';
@@ -21,6 +21,7 @@ import { colors } from '@/constants/colors';
 import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
+import { useAuthStore } from '@/stores/auth-store';
 
 // ======================================================
 // DUO-STYLE 3D PRESS BUTTON
@@ -43,7 +44,7 @@ function DuoButton({
   textColor?: string;
   title: string;
 }) {
-  const translateY = useRef(new Animated.Value(0)).current;
+  const [translateY] = useState(() => new Animated.Value(0));
 
   const pressIn = () => {
     Animated.timing(translateY, { duration: 80, toValue: 4, useNativeDriver: true }).start();
@@ -168,40 +169,56 @@ function BotMascot() {
 
 export default function LoginScreen() {
   const router = useRouter();
+  const signIn = useAuthStore((state) => state.signIn);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = () => {
-    if (!email || !password) {
-      Alert.alert('Perhatian', 'Email dan password tidak boleh kosong.');
+  const [alertState, setAlertState] = useState<{
+    message: string;
+    primaryLabel?: string;
+    primaryOnPress?: () => void;
+    title: string;
+    variant: AppAlertVariant;
+  } | null>(null);
+
+  const closeAlert = () => setAlertState(null);
+
+  const handleLogin = async () => {
+    if (!email.trim() || !password) {
+      setAlertState({
+        message: 'Email dan password tidak boleh kosong.',
+        title: 'Data belum lengkap',
+        variant: 'warning',
+      });
       return;
     }
 
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      if (email === 'test@example.com' && password === '123456') {
-        router.replace('/(tabs)');
-      } else {
-        Alert.alert(
-          'Login Gagal',
-          'Gunakan akun dummy berikut untuk masuk:\n\nEmail: test@example.com\nPassword: 123456'
-        );
-      }
-    }, 1200);
+    const { error } = await signIn(email.trim(), password);
+    setIsLoading(false);
+
+    if (error) {
+      setAlertState({ message: error, title: 'Login gagal', variant: 'error' });
+      return;
+    }
+
+    router.replace('/(tabs)');
   };
 
   const handleGoogleLogin = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      router.replace('/(tabs)');
-    }, 1200);
+    setAlertState({
+      message: 'Login Google belum dikonfigurasi. Silakan gunakan email dan password.',
+      title: 'Login Google',
+      variant: 'info',
+    });
   };
 
   return (
-    <ScreenContainer padded={false} style={{ backgroundColor: colors.light.background }}>
+    <ScreenContainer
+      padded={false}
+      style={{ backgroundColor: colors.light.background }}
+      topColor={colors.light.primary}>
       <StatusBar style="light" />
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
@@ -347,6 +364,14 @@ export default function LoginScreen() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <AppAlert
+        message={alertState?.message ?? ''}
+        onClose={closeAlert}
+        title={alertState?.title ?? ''}
+        variant={alertState?.variant ?? 'info'}
+        visible={alertState !== null}
+      />
     </ScreenContainer>
   );
 }

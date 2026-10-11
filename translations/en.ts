@@ -42,7 +42,10 @@ export const en: Record<TranslationKeys, string> = {
   learnMore: 'Learn More',
   completed: 'Completed',
   inProgress: 'In Progress',
-  helloLearner: 'Hello, Learner!',
+  // Main greeting: "Hello, <nickname>!"
+  helloName: 'Hello, {name}!',
+  // Fallback greeting shown only when the user has no nickname yet.
+  helloLearner: 'Hello!',
   readyToLearn: 'Ready to Learn?',
   searchMaterials: 'Search lessons...',
   overallMastery: 'Overall Mastery',
@@ -103,6 +106,7 @@ export const en: Record<TranslationKeys, string> = {
   // ── Quiz ─────────────────────────────────────
   question: 'Question',
   of: 'of',
+  questionIndicator: 'Question {current} of {total}',
   submitQuiz: 'Submit Quiz',
   nextQuestion: 'Next Question',
   quizComplete: 'Quiz Complete!',
@@ -111,6 +115,8 @@ export const en: Record<TranslationKeys, string> = {
   greatJob: 'Great job! You have successfully completed this quiz and unlocked the next step.',
   needMore: 'Review the lesson and try again. You need at least 4 out of 5 to pass.',
   quizResults: 'Quiz Results',
+  quizNotFound: 'Quiz content not found.',
+  xpEarned: '+{xp} XP Earned!',
   exitQuiz: 'Exit Quiz?',
   exitQuizMessage: 'Your answers will not be saved. Are you sure you want to leave?',
   exit: 'Exit',
@@ -119,9 +125,15 @@ export const en: Record<TranslationKeys, string> = {
   weekly: 'Weekly',
   monthly: 'Monthly',
   allTime: 'All-Time',
+  fullRanking: 'Full Ranking',
   yourRank: 'Your Rank',
   keepClimbing: 'Keep climbing!',
   dayStreak: 'day streak',
+  you: 'You',
+  leaderboardSubtitle: 'Ranking is based on the real XP of PemulaCode users.',
+  leaderboardEmptyTitle: 'No XP yet',
+  leaderboardEmptyBody:
+    'Every account starts at 0 XP. Finish quizzes and the daily challenge to climb the board.',
 
   // ── Community ────────────────────────────────
   reply: 'Reply',
@@ -139,7 +151,21 @@ export const en: Record<TranslationKeys, string> = {
   postTitle: 'Post Title',
   whatToDiscuss: 'What would you like to discuss?',
   publish: 'Publish',
+  writeMessage: 'Write a message to the community…',
+  replyMessage: 'Reply to Message',
+  addMedia: 'Add photo/video',
   inCategory: 'in',
+  noMatchingDiscussions: 'No discussions match your search.',
+
+  // ── Daily Challenge ─────────────────────────
+  todayChallenge: "Today's Challenge",
+  resetsTomorrow: 'Resets tomorrow',
+  oneDailyQuestion: '1 DAILY QUESTION',
+  answerCorrect: 'Correct Answer!',
+  answerWrong: 'Wrong Answer',
+  dailyDone: "Today's Challenge Is Done!",
+  comeBackTomorrow: 'Come back tomorrow for the next question.',
+  xpForTrying: '+10 XP for trying',
 
   // ── Playground ──────────────────────────────
   copied: 'Copied',

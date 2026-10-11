@@ -26,8 +26,11 @@ import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
 import { useTheme } from '@/context/ThemeContext';
 import { useTranslation } from '@/translations';
+import { getDisplayName } from '@/utils/display-name';
 
 import { TAB_BAR_CLEARANCE } from './_layout';
+import { useStreak } from '@/hooks/use-streak';
+import { useAuthStore } from '@/stores/auth-store';
 import { useProgressStore } from '@/stores/progress-store';
 import { useNotificationsStore } from '@/stores/notifications-store';
 
@@ -40,6 +43,14 @@ export default function HomeScreen() {
   const overallProgress = useProgressStore((state) => state.getOverallProgress());
   const htmlProgress = useProgressStore((state) => state.getCourseProgress('html'));
   const unreadNotifications = useNotificationsStore((state) => state.notifications.filter((item) => !item.read).length);
+  // Sapaan memakai nama panggilan user: "Halo, <nama>!" ("Hello, <nama>!" saat
+  // bahasa Inggris). Kalau nama belum ada, pakai sapaan netral.
+  const nickname = useAuthStore((state) =>
+    getDisplayName(state.profile?.username, state.user?.user_metadata?.username),
+  );
+  // Streak dihitung per akun: mulai dari 0, +1 tiap hari ada soal yang
+  // diselesaikan, dan reset ke 0 kalau sehari terlewat.
+  const { streak } = useStreak();
 
   return (
     <ScreenContainer padded={false} style={{ backgroundColor: c.background }}>
@@ -112,7 +123,29 @@ export default function HomeScreen() {
               width: 40,
             })}>
             <Bell color={c.text} size={20} />
-            {unreadNotifications > 0 && <View style={{ alignItems: 'center', backgroundColor: c.danger, borderRadius: radius.full, height: unreadNotifications > 9 ? 20 : 17, justifyContent: 'center', minWidth: unreadNotifications > 9 ? 20 : 17, position: 'absolute', right: -2, top: -2 }}><AppText color="#ffffff" style={{ fontFamily: typography.family.sansBold, fontSize: 10 }}>{unreadNotifications > 9 ? '9+' : unreadNotifications}</AppText></View>}
+            {unreadNotifications > 0 && (
+              <View
+                style={{
+                  alignItems: 'center',
+                  backgroundColor: c.danger,
+                  borderRadius: radius.full,
+                  height: unreadNotifications > 9 ? 20 : 17,
+                  justifyContent: 'center',
+                  minWidth: unreadNotifications > 9 ? 20 : 17,
+                  position: 'absolute',
+                  right: -2,
+                  top: -2,
+                }}>
+                <AppText
+                  color="#ffffff"
+                  style={{
+                    fontFamily: typography.family.sansBold,
+                    fontSize: 10,
+                  }}>
+                  {unreadNotifications > 9 ? '9+' : unreadNotifications}
+                </AppText>
+              </View>
+            )}
           </Pressable>
         </View>
 
@@ -134,7 +167,7 @@ export default function HomeScreen() {
                 fontSize: 14,
                 lineHeight: 20,
               }}>
-              {t('helloLearner')}
+              {nickname ? t('helloName', { name: nickname }) : t('helloLearner')}
             </AppText>
             <AppText
               color={c.text}
@@ -163,13 +196,14 @@ export default function HomeScreen() {
             }}>
             <Flame color={c.secondary} size={22} fill={c.secondary} />
             <AppText
+              accessibilityLabel={`${streak} ${t('dayStreak')}`}
               color={c.secondary}
               style={{
                 fontFamily: typography.family.sansBold,
                 fontSize: 18,
                 lineHeight: 24,
               }}>
-              12
+              {streak}
             </AppText>
           </View>
         </View>

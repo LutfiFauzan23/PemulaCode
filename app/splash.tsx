@@ -1,7 +1,8 @@
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef } from 'react';
-import { Animated, Easing, SafeAreaView, View } from 'react-native';
+import { Animated, Easing, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { AppLogo } from '@/components/branding/AppLogo';
 import { AppText } from '@/components/ui/AppText';

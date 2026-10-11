@@ -8,20 +8,12 @@ import {
 } from '@expo-google-fonts/inter';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
 import '../global.css';
 import 'react-native-reanimated';
-import * as Notifications from 'expo-notifications';
 
 import { ThemeProvider } from '@/context/ThemeContext';
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowBanner: true,
-    shouldShowList: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-  }),
-});
+import { useAuthStore } from '@/stores/auth-store';
 
 export const unstable_settings = {
   anchor: 'splash',
@@ -35,6 +27,11 @@ export default function RootLayout() {
     Inter_700Bold,
     Inter_800ExtraBold,
   });
+
+  // Pulihkan sesi Supabase sekali saat app dibuka.
+  useEffect(() => {
+    void useAuthStore.getState().initialize();
+  }, []);
 
   if (!fontsLoaded) {
     return null;
@@ -57,6 +54,7 @@ export default function RootLayout() {
           <Stack.Screen name="settings/about" />
           <Stack.Screen name="daily-challenge" />
         </Stack>
+
         <StatusBar style="auto" />
       </>
     </ThemeProvider>

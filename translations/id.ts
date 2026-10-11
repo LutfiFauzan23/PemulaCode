@@ -40,7 +40,10 @@ export const id = {
   learnMore: 'Selengkapnya',
   completed: 'Selesai',
   inProgress: 'Sedang Berlangsung',
-  helloLearner: 'Halo, Pelajar!',
+  // Sapaan utama: "Halo, <nama panggilan>!".
+  helloName: 'Halo, {name}!',
+  // Cadangan saat user belum punya nama panggilan.
+  helloLearner: 'Halo!',
   readyToLearn: 'Siap Belajar?',
   searchMaterials: 'Cari materi...',
   overallMastery: 'Masteri Keseluruhan',
@@ -101,6 +104,7 @@ export const id = {
   // ── Quiz ─────────────────────────────────────
   question: 'Pertanyaan',
   of: 'dari',
+  questionIndicator: 'Soal {current} dari {total}',
   submitQuiz: 'Kirim Jawaban',
   nextQuestion: 'Soal Berikutnya',
   quizComplete: 'Kuis Selesai!',
@@ -109,6 +113,8 @@ export const id = {
   greatJob: 'Kerja bagus! Kamu telah menyelesaikan kuis ini dan membuka langkah berikutnya.',
   needMore: 'Pelajari kembali materinya dan coba lagi. Kamu perlu minimal 4 dari 5 untuk lulus.',
   quizResults: 'Hasil Kuis',
+  quizNotFound: 'Konten kuis tidak ditemukan.',
+  xpEarned: '+{xp} XP Didapatkan!',
   exitQuiz: 'Keluar Kuis?',
   exitQuizMessage: 'Jawaban kamu tidak akan disimpan. Yakin ingin keluar?',
   exit: 'Keluar',
@@ -117,9 +123,15 @@ export const id = {
   weekly: 'Mingguan',
   monthly: 'Bulanan',
   allTime: 'Semua Waktu',
+  fullRanking: 'Peringkat Lengkap',
   yourRank: 'Peringkat Kamu',
   keepClimbing: 'Terus berkembang!',
   dayStreak: 'hari beruntun',
+  you: 'Kamu',
+  leaderboardSubtitle: 'Peringkat dihitung dari total XP asli pengguna PemulaCode.',
+  leaderboardEmptyTitle: 'Belum ada XP',
+  leaderboardEmptyBody:
+    'Setiap akun mulai dari 0 XP. Selesaikan kuis dan tantangan harian untuk naik ke papan peringkat.',
 
   // ── Community ────────────────────────────────
   reply: 'Balas',
@@ -137,7 +149,21 @@ export const id = {
   postTitle: 'Judul Postingan',
   whatToDiscuss: 'Apa yang ingin kamu diskusikan?',
   publish: 'Publikasikan',
+  writeMessage: 'Tulis pesan untuk komunitas…',
+  replyMessage: 'Balas Pesan',
+  addMedia: 'Tambah foto/video',
   inCategory: 'di',
+  noMatchingDiscussions: 'Tidak ada diskusi yang cocok dengan pencarianmu.',
+
+  // ── Tantangan Harian ────────────────────────
+  todayChallenge: 'Tantangan Hari Ini',
+  resetsTomorrow: 'Reset besok',
+  oneDailyQuestion: '1 SOAL HARIAN',
+  answerCorrect: 'Jawaban Benar!',
+  answerWrong: 'Jawaban Salah',
+  dailyDone: 'Kuis Hari Ini Sudah Selesai!',
+  comeBackTomorrow: 'Kembali lagi besok untuk soal berikutnya.',
+  xpForTrying: '+10 XP untuk mencoba',
 
   // ── Playground ──────────────────────────────
   copied: 'Tersalin',

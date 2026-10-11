@@ -1,15 +1,8 @@
 import { useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import {
-  Bell,
-  ChevronUp,
-  Crown,
-  Flame,
-  Medal,
-  Trophy,
-} from 'lucide-react-native';
-import { useState } from 'react';
-import { Image, Pressable, ScrollView, View } from 'react-native';
+import { Bell, Crown, Flame, Medal, Trophy } from 'lucide-react-native';
+import { useMemo } from 'react';
+import { ActivityIndicator, Image, Pressable, ScrollView, View } from 'react-native';
 
 import { ScreenContainer } from '@/components/layout/ScreenContainer';
 import { AppText } from '@/components/ui/AppText';
@@ -17,53 +10,36 @@ import { radius } from '@/constants/radius';
 import { spacing } from '@/constants/spacing';
 import { typography } from '@/constants/typography';
 import { useTheme } from '@/context/ThemeContext';
+import { useLeaderboard } from '@/hooks/use-leaderboard';
+import { useAuthStore } from '@/stores/auth-store';
 import { useTranslation } from '@/translations';
+
 import { TAB_BAR_CLEARANCE } from './_layout';
 
 // ======================================================
-// TYPES & MOCK DATA
+// TYPES
 // ======================================================
 
-type Period = 'Weekly' | 'Monthly' | 'AllTime';
-
 interface LeaderUser {
-  id: string;
-  name: string;
   avatar: string;
-  xp: number;
+  id: string;
+  isCurrentUser: boolean;
+  name: string;
   streak: number;
-  isCurrentUser?: boolean;
+  xp: number;
 }
 
-const LEADERS: Record<Period, LeaderUser[]> = {
-  Weekly: [
-    { id: 'u1', name: 'Dev_Mia', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150', xp: 2450, streak: 14 },
-    { id: 'u2', name: 'Master_Coda', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150', xp: 2180, streak: 9 },
-    { id: 'u3', name: 'Alex Rivera', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150', xp: 1990, streak: 21 },
-    { id: 'u4', name: 'Nadia K.', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150', xp: 1720, streak: 6 },
-    { id: 'u5', name: 'You', avatar: 'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=150', xp: 1580, streak: 12, isCurrentUser: true },
-    { id: 'u6', name: 'Rian P.', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150', xp: 1340, streak: 3 },
-    { id: 'u7', name: 'Sasha L.', avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150', xp: 1120, streak: 8 },
-  ],
-  Monthly: [
-    { id: 'u2', name: 'Master_Coda', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150', xp: 9840, streak: 30 },
-    { id: 'u1', name: 'Dev_Mia', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150', xp: 9210, streak: 22 },
-    { id: 'u5', name: 'You', avatar: 'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=150', xp: 8430, streak: 12, isCurrentUser: true },
-    { id: 'u3', name: 'Alex Rivera', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150', xp: 7650, streak: 21 },
-    { id: 'u4', name: 'Nadia K.', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150', xp: 6120, streak: 6 },
-    { id: 'u6', name: 'Rian P.', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150', xp: 5230, streak: 3 },
-  ],
-  AllTime: [
-    { id: 'u2', name: 'Master_Coda', avatar: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150', xp: 84200, streak: 30 },
-    { id: 'u3', name: 'Alex Rivera', avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150', xp: 76800, streak: 21 },
-    { id: 'u1', name: 'Dev_Mia', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150', xp: 71230, streak: 22 },
-    { id: 'u4', name: 'Nadia K.', avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150', xp: 58900, streak: 6 },
-    { id: 'u5', name: 'You', avatar: 'https://images.unsplash.com/photo-1502685104226-ee32379fefbe?w=150', xp: 42310, streak: 12, isCurrentUser: true },
-    { id: 'u6', name: 'Rian P.', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150', xp: 33100, streak: 3 },
-  ],
-};
+const FALLBACK_AVATAR =
+  'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150';
 
 const PODIUM_COLORS = ['#FFD166', '#C0C0C0', '#CD7F32']; // gold, silver, bronze
+
+/**
+ * Posisi bar peringkat pengguna yang menempel: 12 (offset navbar) + 68
+ * (tinggi navbar) + 12 (jarak) — tepat di atas tab bar, konsisten dengan
+ * bottomContainer di `./_layout`.
+ */
+const STICKY_BAR_BOTTOM = 92;
 
 // ======================================================
 // LEADERBOARD SCREEN
@@ -73,12 +49,27 @@ export default function LeaderboardScreen() {
   const router = useRouter();
   const { colors, mode } = useTheme();
   const { t } = useTranslation();
-  const [period, setPeriod] = useState<Period>('Weekly');
 
-  const leaders = LEADERS[period];
+  const authUser = useAuthStore((state) => state.user);
+  const { entries, error, isLoading } = useLeaderboard();
+
+  // Peringkat dari data pengguna asli (profiles.xp), bukan contoh.
+  const leaders: LeaderUser[] = useMemo(
+    () =>
+      entries.map((entry) => ({
+        avatar: entry.avatarUrl ?? FALLBACK_AVATAR,
+        id: entry.id,
+        isCurrentUser: entry.id === authUser?.id,
+        name: entry.fullName?.trim() || entry.username,
+        streak: entry.streakCount,
+        xp: entry.xp,
+      })),
+    [authUser?.id, entries],
+  );
+
   const podium = leaders.slice(0, 3);
   const rest = leaders.slice(3);
-  const currentUser = leaders.find((u) => u.isCurrentUser);
+  const currentUser = leaders.find((user) => user.isCurrentUser);
   const currentUserRank = currentUser ? leaders.indexOf(currentUser) + 1 : null;
 
   const formatXp = (xp: number) => (xp >= 1000 ? `${(xp / 1000).toFixed(1)}k` : `${xp}`);
@@ -147,114 +138,129 @@ export default function LeaderboardScreen() {
           </Pressable>
         </View>
 
-        {/* Period Tabs */}
-        <View
-          style={{
-            flexDirection: 'row',
-            gap: spacing[2],
-            marginTop: spacing[4],
-            paddingHorizontal: spacing[5],
-          }}>
-          {(['Weekly', 'Monthly', 'AllTime'] as Period[]).map((p) => {
-            const isActive = period === p;
-            const label = p === 'Weekly' ? t('weekly') : p === 'Monthly' ? t('monthly') : t('allTime');
-            return (
-              <Pressable
-                key={p}
-                accessibilityLabel={`${label} Ranking`}
-                accessibilityRole="button"
-                onPress={() => setPeriod(p)}
-                style={({ pressed }) => ({
-                  alignItems: 'center',
-                  backgroundColor: isActive
-                    ? colors.primary
-                    : colors.surfaceContainerLow,
-                  borderColor: isActive ? colors.primary : colors.outlineVariant,
-                  borderRadius: radius.full,
-                  borderWidth: 1,
-                  flex: 1,
-                  opacity: pressed ? 0.85 : 1,
-                  paddingVertical: spacing[3],
-                })}>
-                <AppText
-                  color={isActive ? '#ffffff' : colors.onSurfaceVariant}
-                  style={{
-                    fontFamily: typography.family.sansBold,
-                    fontSize: 13,
-                  }}>
-                  {label}
-                </AppText>
-              </Pressable>
-            );
-          })}
-        </View>
-
-        {/* Podium - Top 3 */}
-        <View
-          style={{
-            alignItems: 'flex-end',
-            flexDirection: 'row',
-            gap: spacing[3],
-            justifyContent: 'center',
-            marginTop: spacing[6],
-            paddingHorizontal: spacing[5],
-          }}>
-          {/* 2nd place */}
-          {podium[1] && (
-            <PodiumSlot user={podium[1]} rank={2} height={104} formatXp={formatXp} />
-          )}
-          {/* 1st place */}
-          {podium[0] && (
-            <PodiumSlot user={podium[0]} rank={1} height={132} formatXp={formatXp} />
-          )}
-          {/* 3rd place */}
-          {podium[2] && (
-            <PodiumSlot user={podium[2]} rank={3} height={84} formatXp={formatXp} />
-          )}
-        </View>
-
-        {/* Ranked List */}
-        <View style={{ marginTop: spacing[6], paddingHorizontal: spacing[5] }}>
-          <AppText
-            color={colors.text}
-            style={{
-              fontFamily: typography.family.sansBold,
-              fontSize: 18,
-              lineHeight: 26,
-              marginBottom: spacing[3],
-            }}>
-            {t('leaderboard')}
+        {/* Keterangan sumber data */}
+        <View style={{ marginTop: spacing[4], paddingHorizontal: spacing[5] }}>
+          <AppText color={colors.onSurfaceVariant} style={{ fontSize: 13 }}>
+            {t('leaderboardSubtitle')}
           </AppText>
+        </View>
 
+        {isLoading ? (
+          <ActivityIndicator color={colors.primary} style={{ marginTop: spacing[6] }} />
+        ) : null}
+
+        {!isLoading && error ? (
+          <AppText
+            color={colors.onSurfaceVariant}
+            style={{ marginTop: spacing[5], paddingHorizontal: spacing[5] }}>
+            {error}
+          </AppText>
+        ) : null}
+
+        {!isLoading && !error && leaders.length === 0 ? (
           <View
             style={{
+              alignItems: 'center',
               backgroundColor: colors.surfaceContainerLowest,
               borderColor: colors.outlineVariant,
               borderRadius: radius.xl,
               borderWidth: 1,
-              overflow: 'hidden',
+              marginHorizontal: spacing[5],
+              marginTop: spacing[5],
+              padding: spacing[6],
             }}>
-            {rest.map((user, index) => {
-              const rank = index + 4;
-              return (
+            <View
+              style={{
+                alignItems: 'center',
+                backgroundColor: colors.primaryFixed,
+                borderRadius: radius.full,
+                height: 56,
+                justifyContent: 'center',
+                marginBottom: spacing[4],
+                width: 56,
+              }}>
+              <Trophy color={colors.primary} size={26} />
+            </View>
+            <AppText
+              color={colors.text}
+              style={{
+                fontFamily: typography.family.sansBold,
+                fontSize: 16,
+                textAlign: 'center',
+              }}>
+              {t('leaderboardEmptyTitle')}
+            </AppText>
+            <AppText
+              color={colors.onSurfaceVariant}
+              style={{
+                fontSize: 13,
+                lineHeight: 20,
+                marginTop: spacing[2],
+                textAlign: 'center',
+              }}>
+              {t('leaderboardEmptyBody')}
+            </AppText>
+          </View>
+        ) : null}
+
+        {/* Podium - Top 3 */}
+        {podium.length > 0 ? (
+          <View
+            style={{
+              alignItems: 'flex-end',
+              flexDirection: 'row',
+              gap: spacing[3],
+              justifyContent: 'center',
+              marginTop: spacing[6],
+              paddingHorizontal: spacing[5],
+            }}>
+            {podium[1] ? <PodiumSlot user={podium[1]} rank={2} height={104} formatXp={formatXp} /> : null}
+            {podium[0] ? <PodiumSlot user={podium[0]} rank={1} height={132} formatXp={formatXp} /> : null}
+            {podium[2] ? <PodiumSlot user={podium[2]} rank={3} height={84} formatXp={formatXp} /> : null}
+          </View>
+        ) : null}
+
+        {/* Ranked List */}
+        {rest.length > 0 ? (
+          <View style={{ marginTop: spacing[6], paddingHorizontal: spacing[5] }}>
+            <AppText
+              color={colors.text}
+              style={{
+                fontFamily: typography.family.sansBold,
+                fontSize: 18,
+                lineHeight: 26,
+                marginBottom: spacing[3],
+              }}>
+              {t('fullRanking')}
+            </AppText>
+
+            <View
+              style={{
+                backgroundColor: colors.surfaceContainerLowest,
+                borderColor: colors.outlineVariant,
+                borderRadius: radius.xl,
+                borderWidth: 1,
+                overflow: 'hidden',
+              }}>
+              {rest.map((user, index) => (
                 <RankRow
                   key={user.id}
                   user={user}
-                  rank={rank}
+                  rank={index + 4}
                   formatXp={formatXp}
                   isLast={index === rest.length - 1}
                 />
-              );
-            })}
+              ))}
+            </View>
           </View>
-        </View>
+        ) : null}
       </ScrollView>
 
       {/* Sticky Current-User Rank Bar */}
-      {currentUser && currentUserRank && currentUserRank > 3 && (
+      {currentUser && currentUserRank && currentUserRank > 3 ? (
         <View
           style={{
-            bottom: Platform_bottom(),
+            bottom: STICKY_BAR_BOTTOM,
             left: 12,
             position: 'absolute',
             right: 12,
@@ -312,35 +318,24 @@ export default function LeaderboardScreen() {
                 style={{ fontFamily: typography.family.sansBold, fontSize: 14 }}>
                 {t('yourRank')}
               </AppText>
-              <AppText
-                color="rgba(255,255,255,0.85)"
-                style={{ fontFamily: typography.family.mono, fontSize: 12, marginTop: 1 }}>
-                {t('keepClimbing')}
-              </AppText>
-            </View>
-
-            <View style={{ alignItems: 'flex-end' }}>
-              <AppText
-                color="#ffffff"
-                style={{ fontFamily: typography.family.sansBold, fontSize: 16 }}>
-                {formatXp(currentUser.xp)} XP
-              </AppText>
-              <View style={{ alignItems: 'center', flexDirection: 'row', gap: 2, marginTop: 1 }}>
-                <ChevronUp color="#ffffff" size={12} />
-                <AppText color="rgba(255,255,255,0.85)" style={{ fontSize: 11 }}>
-                  2 spots
+              <View style={{ alignItems: 'center', flexDirection: 'row', gap: 3, marginTop: 1 }}>
+                <Flame color="#ffffff" size={12} fill="#ffffff" />
+                <AppText
+                  color="rgba(255,255,255,0.85)"
+                  style={{ fontFamily: typography.family.mono, fontSize: 12 }}>
+                  {currentUser.streak} {t('dayStreak')}
                 </AppText>
               </View>
             </View>
+
+            <AppText color="#ffffff" style={{ fontFamily: typography.family.sansBold, fontSize: 16 }}>
+              {formatXp(currentUser.xp)} XP
+            </AppText>
           </View>
         </View>
-      )}
+      ) : null}
     </ScreenContainer>
   );
-}
-
-function Platform_bottom() {
-  return 92;
 }
 
 // ======================================================
@@ -373,7 +368,7 @@ function PodiumSlot({
 
       <View
         style={{
-          borderColor: accent,
+          borderColor: user.isCurrentUser ? colors.primary : accent,
           borderRadius: radius.full,
           borderWidth: 3,
           height: rank === 1 ? 64 : 52,
@@ -416,9 +411,7 @@ function PodiumSlot({
           paddingTop: spacing[2],
           width: '100%',
         }}>
-        <AppText
-          color="#ffffff"
-          style={{ fontFamily: typography.family.sansBold, fontSize: 20 }}>
+        <AppText color="#ffffff" style={{ fontFamily: typography.family.sansBold, fontSize: 20 }}>
           {rank}
         </AppText>
       </View>
@@ -442,6 +435,7 @@ function RankRow({
   user: LeaderUser;
 }) {
   const { colors } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <View
@@ -486,13 +480,12 @@ function RankRow({
           color={colors.text}
           numberOfLines={1}
           style={{ fontFamily: typography.family.sansBold, fontSize: 15 }}>
-          {user.isCurrentUser ? 'You' : user.name}
+          {user.isCurrentUser ? t('you') : user.name}
         </AppText>
         <View style={{ alignItems: 'center', flexDirection: 'row', gap: 3, marginTop: 1 }}>
           <Flame color={colors.secondary} size={12} fill={colors.secondary} />
           <AppText color={colors.onSurfaceVariant} style={{ fontSize: 12 }}>
-            {user.streak} hari 
-            {/* {t('dayStreak')} */}
+            {user.streak} {t('dayStreak')}
           </AppText>
         </View>
       </View>
@@ -508,9 +501,7 @@ function RankRow({
           paddingVertical: spacing[1],
         }}>
         <Trophy color={colors.onSurfaceVariant} size={12} />
-        <AppText
-          color={colors.text}
-          style={{ fontFamily: typography.family.sansBold, fontSize: 13 }}>
+        <AppText color={colors.text} style={{ fontFamily: typography.family.sansBold, fontSize: 13 }}>
           {formatXp(user.xp)}
         </AppText>
       </View>

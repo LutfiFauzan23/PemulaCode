@@ -13,7 +13,7 @@ export type AppNotification = {
 };
 
 const initialNotifications: AppNotification[] = [
-  { id: 'streak-1', title: 'Jaga streak belajarmu', message: 'Belum belajar hari ini. Selesaikan satu lesson agar streak 12 harimu tetap aman.', timestamp: '10 menit lalu', read: false, type: 'streak' },
+  { id: 'streak-1', title: 'Jaga streak belajarmu', message: 'Selesaikan minimal satu soal hari ini supaya streak-mu bertambah dan tidak kembali ke nol.', timestamp: '10 menit lalu', read: false, type: 'streak' },
   { id: 'achievement-1', title: 'Lencana baru terbuka!', message: 'Kamu mendapatkan lencana First Steps setelah menyelesaikan modul pertamamu.', timestamp: '1 jam lalu', read: false, type: 'achievement' },
   { id: 'content-1', title: 'Materi baru tersedia', message: 'Modul Flexbox Layout sudah tersedia untuk dipelajari.', timestamp: 'Kemarin', read: false, type: 'content' },
   { id: 'tip-1', title: 'Tips coding hari ini', message: 'Gunakan nama class yang deskriptif agar kode CSS lebih mudah dipahami.', timestamp: 'Kemarin', read: true, type: 'tip' },
